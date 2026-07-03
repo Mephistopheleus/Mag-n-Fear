@@ -1,0 +1,21 @@
+```
+# Temporary directories
+temp_matrix/
+temp_neiros/
+temp_nova/
+temp_tenbid/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+```
