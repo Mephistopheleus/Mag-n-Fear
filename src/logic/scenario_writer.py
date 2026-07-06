@@ -59,19 +59,24 @@ class ScenarioWriter:
     Анализирует ВСЕ доступные данные из ProbabilityField и формирует план действий.
     """
     
-    def __init__(self, config: Dict[str, Any], probability_field: ProbabilityField, risk_manager: RiskManager):
-        self.config = config
+    def __init__(self, config: Any, probability_field: ProbabilityField, risk_manager: RiskManager):
+        # Конвертируем Pydantic модель в dict для совместимости
+        if hasattr(config, 'model_dump'):
+            self.config = config.model_dump()
+        else:
+            self.config = config
+            
         self.field = probability_field
         self.risk_manager = risk_manager
         
         # Настройки из конфига
-        scenario_cfg = config.get('scenario', {})
+        scenario_cfg = self.config.get('scenario', {})
         self.min_confidence = scenario_cfg.get('min_confidence', 0.65)
         self.max_scenarios_per_hour = scenario_cfg.get('max_scenarios_per_hour', 5)
         
-        exec_cfg = config.get('executor', {})
+        exec_cfg = self.config.get('executor', {})
         self.default_leverage = exec_cfg.get('default_leverage', 3)
-        self.max_leverage = config.get('risk', {}).get('max_leverage', 10)
+        self.max_leverage = self.config.get('risk', {}).get('max_leverage', 10)
         
         # Состояние
         self._scenario_count = 0

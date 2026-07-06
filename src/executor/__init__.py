@@ -27,9 +27,25 @@ class Executor:
         self.field = probability_field
         self.risk_manager = risk_manager
         
-        # Настройки
-        exec_cfg = config.get('executor', {})
-        self.testnet = exec_cfg.get('testnet', True)
+        # Настройки - извлекаем из Pydantic-модели или dict
+        exec_obj = config.get('executor', {})
+        
+        # Если это Pydantic-модель, конвертируем в dict
+        if hasattr(exec_obj, 'dict'):
+            exec_cfg = exec_obj.dict()
+        elif isinstance(exec_obj, dict):
+            exec_cfg = exec_obj
+        else:
+            exec_cfg = {}
+            
+        # Testnet берем из общего конфига binance или по умолчанию True
+        binance_cfg = config.get('binance', {})
+        if hasattr(binance_cfg, 'dict'):
+            binance_dict = binance_cfg.dict()
+        else:
+            binance_dict = binance_cfg
+            
+        self.testnet = binance_dict.get('testnet', True)
         self.max_queue_size = exec_cfg.get('max_queue_size', 10)
         self.rate_limit_ms = exec_cfg.get('rate_limit_ms', 100)  # Мин. интервал между ордерами
         

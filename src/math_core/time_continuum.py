@@ -35,13 +35,23 @@ class ContinuumSnapshot:
             self.tags = []
 
 class TimeContinuum:
-    def __init__(self, window_sec: int = 300, decay_factor: float = 0.95):
+    def __init__(self, config=None, window_sec: int = 300, decay_factor: float = 0.95):
         """
+        :param config: Конфигурация (опционально)
         :param window_sec: Размер скользящего окна в секундах (по умолчанию 5 мин)
         :param decay_factor: Коэффициент затухания (чем ближе к 1, тем дольше память)
         """
-        self.window_sec = window_sec
-        self.decay_factor = decay_factor
+        self.config = config
+        # Если есть конфиг, берем параметры оттуда
+        if config:
+            matrix_cfg = getattr(config, 'matrix', None)
+            if matrix_cfg:
+                self.window_sec = getattr(matrix_cfg, 'time_horizon_sec', window_sec)
+                self.decay_factor = getattr(matrix_cfg, 'decay_factor', decay_factor)
+        else:
+            self.window_sec = window_sec
+            self.decay_factor = decay_factor
+            
         self.buffer: List[Dict[str, Any]] = []
         
     def add_tick(self, timestamp: datetime, price: float, volume: float):

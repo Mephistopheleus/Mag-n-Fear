@@ -74,6 +74,11 @@ class StorageConfig(BaseModel):
     matrix_cache_path: str = "data_storage/matrix_cache.parquet"
 
 
+class ApiKeysConfig(BaseModel):
+    binance_testnet_api_key: str = ""
+    binance_testnet_api_secret: str = ""
+
+
 class Config(BaseModel):
     bot: BotConfig
     data: DataConfig
@@ -84,6 +89,11 @@ class Config(BaseModel):
     executor: ExecutorConfig
     logging: LoggingConfig
     storage: StorageConfig
+    api_keys: ApiKeysConfig = Field(default_factory=ApiKeysConfig)
+    
+    def get(self, key: str, default=None):
+        """Метод для совместимости со старым кодом, ожидающим dict."""
+        return getattr(self, key, default)
 
 
 def load_config(config_path: str = "configs/config.yaml") -> Config:

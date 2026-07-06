@@ -18,10 +18,20 @@ class SRLevel:
     distance_pct: float # Расстояние от текущей цены в %
 
 class OrderBookAnalyzer:
-    def __init__(self, config: dict):
+    def __init__(self, config=None):
         self.config = config
-        self.min_wall_volume = config.get("order_book", {}).get("min_wall_volume", 10000) # Мин объем для "стены"
-        self.cluster_tolerance = config.get("order_book", {}).get("cluster_tolerance_pct", 0.5) # % кластеризации цен
+        # Пороги из конфига или дефолтные
+        if config:
+            ob_cfg = getattr(config, 'data', {}) or getattr(config, 'order_book', {})
+            if isinstance(ob_cfg, dict):
+                self.min_wall_volume = ob_cfg.get("min_wall_volume", 10000)
+                self.cluster_tolerance = ob_cfg.get("cluster_tolerance_pct", 0.5)
+            else:
+                self.min_wall_volume = getattr(ob_cfg, 'min_wall_volume', 10000)
+                self.cluster_tolerance = getattr(ob_cfg, 'cluster_tolerance_pct', 0.5)
+        else:
+            self.min_wall_volume = 10000
+            self.cluster_tolerance = 0.5
 
     def analyze_snapshot(self, bids: List[Tuple[float, float]], asks: List[Tuple[float, float]], current_price: float) -> Dict[str, List[SRLevel]]:
         """

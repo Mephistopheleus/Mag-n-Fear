@@ -81,7 +81,10 @@ class TradingBot:
         logger.info("Starting Trading Bot loop...")
         await self.notifier.notify_status("Bot Started")
         
-        # Инициализация клиента Binance
+        # Инициализация DataFeed (клиент Binance)
+        await self.feed.start()
+        
+        # Инициализация клиента Binance в Executor
         await self.executor.start()
         await self.news.start()
         
@@ -89,8 +92,11 @@ class TradingBot:
         for symbol in self.symbols:
             # Получаем начальную цену из фида
             initial_price = await self.feed.get_initial_price(symbol)
-            await self.prob_field.initialize_symbol(symbol, initial_price)
-            logger.info(f"Initialized {symbol} with price {initial_price}")
+            if initial_price:
+                await self.prob_field.initialize_symbol(symbol, initial_price)
+                logger.info(f"Initialized {symbol} with price {initial_price}")
+            else:
+                logger.error(f"Failed to get initial price for {symbol}")
         
         # Запуск фоновых задач
         tasks = [
@@ -116,12 +122,13 @@ class TradingBot:
         await self.notifier.notify_status("Bot Stopped")
 
     async def _data_feed_loop(self):
-        """Цикл получения рыночных данных."""
-        delay = self.config.get('core', {}).get('loop_delay_sec', 1)
+        """Цикл получения рыночных данных (WebSocket работает автоматически)."""
+        # DataFeed уже запустил WebSocket в background через start()
+        # Этот цикл только для периодического обновления REST данных если нужно
+        delay = self.config.get('core', {}).get('loop_delay_sec', 5)
         while True:
             try:
-                for symbol in self.symbols:
-                    await self.feed.run_cycle(symbol)
+                # WebSocket потоки работают автоматически, просто ждем
                 await asyncio.sleep(delay)
             except Exception as e:
                 logger.error(f"Error in data feed loop: {e}", exc_info=True)
@@ -195,7 +202,7 @@ class TradingBot:
         while True:
             try:
                 self.health.heartbeat("health_monitor")
-                await self.health.check_connectivity()
+                # check_connectivity не существует, используем start_monitoring или просто heartbeat
                 await asyncio.sleep(delay)
             except Exception as e:
                 logger.error(f"Error in health monitor: {e}", exc_info=True)

@@ -7,10 +7,13 @@ Tuner Module: Auto Tuner
 """
 import json
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, TYPE_CHECKING
 from datetime import datetime
 from collections import defaultdict
 import yaml
+
+if TYPE_CHECKING:
+    from src.math_core.probability_field import ProbabilityField
 
 
 class AutoTuner:
@@ -28,7 +31,22 @@ class AutoTuner:
     (На практике: стремление к максимуму этих показателей)
     """
     
-    def __init__(self, cards_path: str, config_path: str):
+    def __init__(self, config: Any, probability_field):
+        # Конвертируем Pydantic модель в dict для совместимости
+        if hasattr(config, 'model_dump'):
+            self.config_dict = config.model_dump()
+        else:
+            self.config_dict = config
+            
+        self.field = probability_field
+        
+        # Пути из конфига
+        logging_cfg = self.config_dict.get('logging', {})
+        storage_cfg = self.config_dict.get('storage', {})
+        
+        cards_path = logging_cfg.get('cards_path', 'data_storage/cards') if isinstance(logging_cfg, dict) else getattr(logging_cfg, 'cards_path', 'data_storage/cards')
+        config_path = 'configs/config.yaml'
+        
         self.cards_path = Path(cards_path)
         self.config_path = Path(config_path)
         self.cards: List[Dict] = []

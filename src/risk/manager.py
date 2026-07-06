@@ -22,12 +22,17 @@ class RiskManager:
     5. Экстренное закрытие при критических рисках.
     """
     
-    def __init__(self, config: Dict[str, Any], probability_field: ProbabilityField):
-        self.config = config
+    def __init__(self, config: Any, probability_field: ProbabilityField):
+        # Конвертируем Pydantic модель в dict для совместимости
+        if hasattr(config, 'model_dump'):
+            self.config = config.model_dump()
+        else:
+            self.config = config
+            
         self.field = probability_field
         
         # Настройки из конфига (с дефолтами для старта)
-        risk_cfg = config.get('risk', {})
+        risk_cfg = self.config.get('risk', {})
         self.min_leverage = risk_cfg.get('min_leverage', 1.0)
         self.max_leverage_default = risk_cfg.get('max_leverage', 5.0)
         self.max_exposure_pct = risk_cfg.get('max_exposure_pct', 0.05)  # 5% баланса

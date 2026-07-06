@@ -48,7 +48,8 @@ class ClassicSnapshot:
             self.tags = []
 
 class ClassicTF:
-    def __init__(self):
+    def __init__(self, config=None):
+        self.config = config
         self.buffers: Dict[int, List[Dict[str, Any]]] = {}
         # Стандартные таймфреймы (секунды)
         self.tfs = [
