@@ -17,8 +17,8 @@ bot:
 # Получить можно на: https://testnet.binancefuture.com
 # ==========================================
 api_keys:
-  binance_testnet_api_key: ""  # Вставь свой API ключ
-  binance_testnet_api_secret: ""  # Вставь свой API секрет
+  binance_testnet_api_key: "mYVqkHL4mSwEiHrHC6PaurPUHOV7auYwXXpkSmMX7hSSY8KT7teRmbQV6BY9YD3i"
+  binance_testnet_api_secret: "ym3B6HkI6ervEsc4We0jr47O51tueW8CRTqpU6TxbpwzKsxAtLWtGKtbeUQ86aBf"
 
 # ==========================================
 # НАСТРОЙКИ ДАННЫХ
