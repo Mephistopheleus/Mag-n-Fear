@@ -13,10 +13,20 @@ bot:
     # - "bybit"
 
 # ==========================================
+# API КЛЮЧИ (BINANCE FUTURES TESTNET)
+# Получить можно на: https://testnet.binancefuture.com
+# ==========================================
+api_keys:
+  binance_testnet_api_key: ""  # Вставь свой API ключ
+  binance_testnet_api_secret: ""  # Вставь свой API секрет
+
+# ==========================================
 # НАСТРОЙКИ ДАННЫХ
 # ==========================================
 data:
-  symbols: ["BTCUSDT", "ETHUSDT"]
+  symbols: ["DOGEUSDT", "BTCUSDT"]  # Основная пара + корреляция
+  primary_symbol: "DOGEUSDT"
+  correlation_symbol: "BTCUSDT"
   timeframes: ["1m", "5m"]
   order_book_depth: 20  # Глубина стакана для анализа
   snapshot_interval_sec: 1  # Как часто делать снимки состояния
