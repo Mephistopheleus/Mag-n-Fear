@@ -20,14 +20,20 @@ class BinanceFuturesFeed:
     - WebSocket для потоковых обновлений (стакан, сделки, тикеры)
     """
     
-    def __init__(self, config: Dict[str, Any]):
-        self.config = config
-        self.api_key = config.get("api_keys", {}).get("binance_testnet_api_key", "")
-        self.api_secret = config.get("api_keys", {}).get("binance_testnet_api_secret", "")
+    def __init__(self, config: Any):
+        # Конвертируем Pydantic модель в dict для совместимости
+        if hasattr(config, 'model_dump'):
+            self.config = config.model_dump()
+        else:
+            self.config = config
+            
+        self.api_key = self.config.get("api_keys", {}).get("binance_testnet_api_key", "")
+        self.api_secret = self.config.get("api_keys", {}).get("binance_testnet_api_secret", "")
         
         # Символы для отслеживания
-        self.symbols = config.get("data", {}).get("symbols", ["DOGEUSDT", "BTCUSDT"])
-        self.primary_symbol = config.get("data", {}).get("primary_symbol", "DOGEUSDT")
+        data_cfg = self.config.get("data", {})
+        self.symbols = data_cfg.get("symbols", ["DOGEUSDT", "BTCUSDT"]) if isinstance(data_cfg, dict) else getattr(data_cfg, 'symbols', ["DOGEUSDT", "BTCUSDT"])
+        self.primary_symbol = data_cfg.get("primary_symbol", "DOGEUSDT") if isinstance(data_cfg, dict) else getattr(data_cfg, 'primary_symbol', "DOGEUSDT")
         
         # Клиент инициализируется при старте
         self.client: Optional[AsyncClient] = None
@@ -48,12 +54,12 @@ class BinanceFuturesFeed:
         """Инициализация клиента и подключение."""
         logger.info("Initializing Binance Futures client...")
         
-        # Определяем testnet режим
-        testnet = self.config.get("bot", {}).get("mode", "shadow") == "shadow"
+        # Определяем testnet режим - всегда True для тестнета
+        testnet = True
         
         self.client = await AsyncClient.create(
-            api_key=self.api_key if self.api_key else None,
-            api_secret=self.api_secret if self.api_secret else None,
+            api_key=self.api_key,
+            api_secret=self.api_secret,
             testnet=testnet,
             requests_params={"timeout": 10}
         )
@@ -237,6 +243,22 @@ class BinanceFuturesFeed:
             return (ob['bids'][0][0] + ob['asks'][0][0]) / 2
         return None
     
+    async def get_initial_price(self, symbol: str) -> Optional[float]:
+        """Получение начальной цены для символа (REST API)."""
+        if not self.client:
+            logger.error(f"Client not initialized for {symbol}")
+            return None
+            
+        try:
+            # Используем правильный метод для фьючерсов
+            ticker = await self.client.futures_symbol_ticker(symbol=symbol)
+            price = float(ticker.get('price', 0))
+            logger.info(f"[DataFeed] Initial price for {symbol}: {price}")
+            return price
+        except Exception as e:
+            logger.error(f"Error getting initial price for {symbol}: {e}")
+            return None
+    
     async def get_account_balance(self) -> Optional[Dict]:
         """Получение баланса фьючерсного аккаунта."""
         if not self.api_key or not self.api_secret:
@@ -274,14 +296,48 @@ class BinanceFuturesFeed:
 class DataFeed:
     """Обертка для обратной совместимости."""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], prob_field=None):
         self.feed = BinanceFuturesFeed(config)
+        self.prob_field = prob_field
+        self.config = config
+        
+        # Подписка на обновления и отправка в ProbabilityField
+        self.feed.subscribe_orderbook(self._on_orderbook)
+        self.feed.subscribe_trades(self._on_trade)
     
     async def start(self):
         await self.feed.start()
+        await self.feed.start_websocket_streams()
     
     async def stop(self):
         await self.feed.stop()
+    
+    async def get_initial_price(self, symbol: str) -> Optional[float]:
+        """Проксирование вызова к BinanceFuturesFeed."""
+        return await self.feed.get_initial_price(symbol)
+    
+    def _on_orderbook(self, symbol: str, orderbook: Dict):
+        """Отправка стакана в ProbabilityField."""
+        if self.prob_field:
+            # Формируем DataCard с данными стакана
+            from src.core.data_card import DataCard
+            card = DataCard(
+                symbol=symbol,
+                timestamp=orderbook['timestamp'],
+                raw_data={'orderbook': orderbook}
+            )
+            self.prob_field.update(card)
+    
+    def _on_trade(self, symbol: str, trade: Dict):
+        """Отправка сделки в ProbabilityField."""
+        if self.prob_field:
+            from src.core.data_card import DataCard
+            card = DataCard(
+                symbol=symbol,
+                timestamp=datetime.utcnow(),
+                raw_data={'trade': trade}
+            )
+            self.prob_field.update(card)
     
     def get_orderbook(self, symbol: str) -> Optional[Dict]:
         return self.feed.get_orderbook(symbol)

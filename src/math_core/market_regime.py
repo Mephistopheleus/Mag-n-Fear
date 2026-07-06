@@ -26,12 +26,23 @@ class RegimeResult:
     timestamp: float
 
 class MarketRegimeDetector:
-    def __init__(self, config: dict):
+    def __init__(self, config=None):
         self.config = config
-        # Пороги из конфига
-        self.volatility_threshold_high = config.get("regime", {}).get("volatility_high", 0.05)
-        self.volatility_threshold_low = config.get("regime", {}).get("volatility_low", 0.01)
-        self.trend_threshold = config.get("regime", {}).get("trend_threshold", 0.25) # Для ADX или аналога
+        # Пороги из конфига или дефолтные
+        if config:
+            regime_cfg = getattr(config, 'regime', None) or getattr(config, 'data', {})
+            if isinstance(regime_cfg, dict):
+                self.volatility_threshold_high = regime_cfg.get("volatility_high", 0.05)
+                self.volatility_threshold_low = regime_cfg.get("volatility_low", 0.01)
+                self.trend_threshold = regime_cfg.get("trend_threshold", 0.25)
+            else:
+                self.volatility_threshold_high = getattr(regime_cfg, 'volatility_high', 0.05)
+                self.volatility_threshold_low = getattr(regime_cfg, 'volatility_low', 0.01)
+                self.trend_threshold = getattr(regime_cfg, 'trend_threshold', 0.25)
+        else:
+            self.volatility_threshold_high = 0.05
+            self.volatility_threshold_low = 0.01
+            self.trend_threshold = 0.25
 
     def analyze(self, prices: List[float], volumes: List[float]) -> RegimeResult:
         """

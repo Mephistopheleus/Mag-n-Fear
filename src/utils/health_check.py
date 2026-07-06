@@ -4,16 +4,27 @@ Health Check - Мониторинг здоровья системы.
 """
 import asyncio
 import time
-from typing import Dict, List
+from typing import Dict, List, Any
 import logging
 
 logger = logging.getLogger(__name__)
 
 class HealthCheck:
-    def __init__(self, config: dict):
+    def __init__(self, config: Any):
         self.config = config
-        self.max_latency_ms = config.get("health", {}).get("max_latency_ms", 500)
-        self.check_interval_sec = config.get("health", {}).get("check_interval_sec", 30)
+        # Config теперь Pydantic модель, доступ через атрибуты
+        # Проверяем наличие секции health в конфиге
+        try:
+            health_cfg = getattr(config, 'health', None)
+            if health_cfg:
+                self.max_latency_ms = getattr(health_cfg, 'max_latency_ms', 500)
+                self.check_interval_sec = getattr(health_cfg, 'check_interval_sec', 30)
+            else:
+                self.max_latency_ms = 500
+                self.check_interval_sec = 30
+        except Exception:
+            self.max_latency_ms = 500
+            self.check_interval_sec = 30
         
         self.components: Dict[str, float] = {}  # {name: last_heartbeat}
         self.is_healthy = True

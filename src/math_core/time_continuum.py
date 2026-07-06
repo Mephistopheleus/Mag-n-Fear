@@ -17,27 +17,41 @@ class ContinuumSnapshot:
     method: str = "CONTINUUM"
     
     # Основные метрики
-    price_current: float
-    vwap_continuum: float  # Взвешенная средняя цена за окно
-    momentum: float        # Инерция цены
-    volatility: float      # Локальная волатильность
+    price_current: float = 0.0
+    vwap_continuum: float = 0.0  # Взвешенная средняя цена за окно
+    momentum: float = 0.0        # Инерция цены
+    volatility: float = 0.0      # Локальная волатильность
     
     # Метаданные для матрицы
-    confidence_raw: float  # Сырая уверенность (на основе плотности данных)
-    time_horizon_sec: int  # Горизонт прогноза
-    data_density: float    # Плотность данных в окне (0.0 - 1.0)
+    confidence_raw: float = 0.0  # Сырая уверенность (на основе плотности данных)
+    time_horizon_sec: int = 300  # Горизонт прогноза
+    data_density: float = 0.0    # Плотность данных в окне (0.0 - 1.0)
     
     # Для маркировки в матрице
-    tags: List[str]
+    tags: List[str] = None
+    
+    def __post_init__(self):
+        if self.tags is None:
+            self.tags = []
 
 class TimeContinuum:
-    def __init__(self, window_sec: int = 300, decay_factor: float = 0.95):
+    def __init__(self, config=None, window_sec: int = 300, decay_factor: float = 0.95):
         """
+        :param config: Конфигурация (опционально)
         :param window_sec: Размер скользящего окна в секундах (по умолчанию 5 мин)
         :param decay_factor: Коэффициент затухания (чем ближе к 1, тем дольше память)
         """
-        self.window_sec = window_sec
-        self.decay_factor = decay_factor
+        self.config = config
+        # Если есть конфиг, берем параметры оттуда
+        if config:
+            matrix_cfg = getattr(config, 'matrix', None)
+            if matrix_cfg:
+                self.window_sec = getattr(matrix_cfg, 'time_horizon_sec', window_sec)
+                self.decay_factor = getattr(matrix_cfg, 'decay_factor', decay_factor)
+        else:
+            self.window_sec = window_sec
+            self.decay_factor = decay_factor
+            
         self.buffer: List[Dict[str, Any]] = []
         
     def add_tick(self, timestamp: datetime, price: float, volume: float):

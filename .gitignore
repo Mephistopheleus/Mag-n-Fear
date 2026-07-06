@@ -5,35 +5,30 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-*.so
-.coverage
-.coverage.*
-.cache
-.pytest_cache/
-.mypy_cache/
-.hypothesis/
-
-# Virtual environments
+env/
 venv/
 .venv/
-env/
-ENV/
-.ENV/
-.envrc
+.ENV
+.ENV.*
+.venv.bak/
+env.bak/
 
 # Build artifacts
 build/
 dist/
-*.egg
 *.egg-info/
-.installed.cfg
-*.egg-info
+.eggs/
 
 # Testing
 .coverage
 htmlcov/
-.tox/
-.nox/
+.coverage.*
+.nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
 
 # Logs
 *.log
@@ -46,12 +41,35 @@ htmlcov/
 .Trashes
 ehthumbs.db
 Thumbs.db
-desktop.ini
+Icon?
+apidoc/
+
+# Environment variables
+.env
+.env.local
+.env.*
+!.env.example
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# Distribution / packaging
+*.tar.gz
+*.whl
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Coverage
+.coverage*
+
+# Temporary files
+*.tmp
 *~
 ```
+
+# Original rules preserved
+*.log
