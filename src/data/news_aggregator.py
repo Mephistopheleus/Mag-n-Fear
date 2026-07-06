@@ -1,98 +1,195 @@
 """
-Агрегатор новостей и анализ тональности (Sentiment Analysis).
-Скелет для интеграции с внешними источниками (Twitter, NewsAPI, Telegram channels).
+News Aggregator Module.
+Parses news sources, calculates impact vectors, and writes to ProbabilityField.
 """
 import asyncio
+import time
+from typing import List, Dict, Any, Optional
+import feedparser
 import aiohttp
-from typing import List, Dict, Optional
-from datetime import datetime
-import logging
+from src.core.models import NewsVector
+from src.core.field import ProbabilityField
 
-logger = logging.getLogger(__name__)
-
-class NewsItem:
-    def __init__(self, source: str, headline: str, sentiment: float, timestamp: datetime, impact_score: float):
-        self.source = source
-        self.headline = headline
-        self.sentiment = sentiment  # -1.0 (негатив) до 1.0 (позитив)
-        self.timestamp = timestamp
-        self.impact_score = impact_score  # 0.0 до 1.0 (сила влияния)
-
-    def to_dict(self) -> dict:
-        return {
-            "source": self.source,
-            "headline": self.headline,
-            "sentiment": self.sentiment,
-            "timestamp": self.timestamp.isoformat(),
-            "impact_score": self.impact_score
-        }
 
 class NewsAggregator:
-    def __init__(self, config: dict):
+    """
+    Агрегатор новостей.
+    
+    Функции:
+    1. Парсинг RSS/Atom лент крипто-источников.
+    2. Фильтрация по ключевым словам (DOGE, BTC, futures, SEC и т.д.).
+    3. Расчет вектора влияния: [Направление, Сила, Время, Вероятность].
+    4. Запись векторов в ProbabilityField.
+    
+    Источники (публичные RSS):
+    - CoinDesk
+    - Cointelegraph
+    - CryptoSlate
+    - The Block
+    """
+    
+    def __init__(self, config: Dict[str, Any], probability_field: ProbabilityField):
         self.config = config
-        self.enabled = config.get("news", {}).get("enabled", False)
-        self.sources = config.get("news", {}).get("sources", [])
-        self.session: Optional[aiohttp.ClientSession] = None
-        self.latest_news: List[NewsItem] = []
-        self.aggregate_sentiment = 0.0  # Скользящее среднее тональности
+        self.field = probability_field
+        
+        # Ключевые слова для анализа
+        self.bullish_keywords = [
+            'bull', 'surge', 'rally', 'moon', 'breakout', 'adoption', 
+            'partnership', 'upgrade', 'halving', 'etf', 'approval', 'buy'
+        ]
+        self.bearish_keywords = [
+            'bear', 'crash', 'dump', 'hack', 'exploit', 'ban', 'lawsuit',
+            'sec', 'investigation', 'ftx', 'collapse', 'sell', 'warning'
+        ]
+        self.asset_keywords = {
+            'DOGE': ['doge', 'dogecoin', 'shib', 'meme coin'],
+            'BTC': ['btc', 'bitcoin', 'crypto', 'cryptocurrency', 'futures']
+        }
+        
+        # RSS источники
+        self.feeds = [
+            "https://www.coindesk.com/arc/outboundfeeds/rss/",
+            "https://cointelegraph.com/rss",
+            "https://www.cryptoslate.com/feed/",
+            "https://www.theblockcrypto.com/rss",
+        ]
+        
+        self._last_fetch = 0
+        self._fetch_interval = 60  # Обновление каждые 60 сек
+        self._session: Optional[aiohttp.ClientSession] = None
 
     async def start(self):
-        if not self.enabled:
-            logger.info("News Aggregator disabled in config.")
-            return
-        self.session = aiohttp.ClientSession()
-        logger.info("News Aggregator started.")
-        asyncio.create_task(self._polling_loop())
+        """Запуск HTTP сессии."""
+        if not self._session:
+            self._session = aiohttp.ClientSession()
 
     async def stop(self):
-        if self.session:
-            await self.session.close()
-        logger.info("News Aggregator stopped.")
+        """Остановка HTTP сессии."""
+        if self._session:
+            await self._session.close()
+            self._session = None
 
-    async def _polling_loop(self):
-        interval = self.config.get("news", {}).get("poll_interval_sec", 60)
-        while True:
-            try:
-                await self._fetch_news()
-            except Exception as e:
-                logger.error(f"Error fetching news: {e}")
-            await asyncio.sleep(interval)
-
-    async def _fetch_news(self):
+    async def run_cycle(self, symbols: List[str]):
         """
-        Здесь должна быть логика подключения к API новостей.
-        Сейчас - заглушка, генерирующая тестовые данные.
+        Основной цикл: парсинг -> анализ -> запись в матрицу.
         """
-        # TODO: Реализовать парсинг реальных источников
-        # Пример: CryptoPanic API, Twitter API v2, Telegram Scraper
-        pass
+        if time.time() - self._last_fetch < self._fetch_interval:
+            return
+            
+        await self.start()
+        self._last_fetch = time.time()
+        
+        tasks = [self._fetch_feed(url) for url in self.feeds]
+        try:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            all_entries = []
+            for res in results:
+                if isinstance(res, list):
+                    all_entries.extend(res)
+            
+            # Анализ каждой новости
+            for entry in all_entries:
+                await self._analyze_and_dispatch(entry, symbols)
+                
+        except Exception as e:
+            print(f"[NewsAggregator] Error in cycle: {e}")
 
-    def _analyze_sentiment(self, text: str) -> float:
+    async def _fetch_feed(self, url: str) -> List[Dict]:
+        """Парсинг одного RSS канала."""
+        if not self._session:
+            return []
+            
+        try:
+            async with self._session.get(url, timeout=10) as response:
+                content = await response.text()
+                feed = feedparser.parse(content)
+                
+                entries = []
+                for item in feed.entries[:5]:  # Топ 5 последних
+                    entries.append({
+                        'title': item.title,
+                        'summary': item.get('summary', ''),
+                        'published': item.get('published_parsed'),
+                        'link': item.get('link', '')
+                    })
+                return entries
+        except Exception as e:
+            print(f"[NewsAggregator] Failed to fetch {url}: {e}")
+            return []
+
+    def _analyze_sentiment(self, text: str) -> tuple[float, float]:
         """
         Анализ тональности текста.
-        Можно использовать NLTK, VADER, или готовую ML-модель.
+        Возвращает (direction, strength).
+        direction: -1.0 (медвежье) до 1.0 (бычье).
+        strength: 0.0 до 1.0.
         """
-        # Заглушка: случайное значение для демонстрации
-        import random
-        return random.uniform(-0.5, 0.5)
-
-    def get_current_sentiment_factor(self) -> float:
-        """
-        Возвращает текущий агрегированный фактор тональности (-1.0 ... 1.0).
-        Используется как входной параметр для индикаторов или сценариев.
-        """
-        return self.aggregate_sentiment
-
-    def add_news_item(self, item: NewsItem):
-        self.latest_news.append(item)
-        # Обновляем скользящее среднее (упрощенно)
-        if len(self.latest_news) > 10:
-            self.latest_news.pop(0)
+        text_lower = text.lower()
         
-        if self.latest_news:
-            weights = [n.impact_score for n in self.latest_news]
-            total_weight = sum(weights)
-            if total_weight > 0:
-                self.aggregate_sentiment = sum(n.sentiment * n.impact_score for n in self.latest_news) / total_weight
-            else:
-                self.aggregate_sentiment = 0.0
+        bull_count = sum(1 for kw in self.bullish_keywords if kw in text_lower)
+        bear_count = sum(1 for kw in self.bearish_keywords if kw in text_lower)
+        
+        total = bull_count + bear_count
+        if total == 0:
+            return 0.0, 0.0
+            
+        # Направление
+        direction = (bull_count - bear_count) / total
+        
+        # Сила (зависит от количества триггеров)
+        strength = min(1.0, total / 5.0)  # Нормализация
+        
+        return direction, strength
+
+    def _detect_asset(self, text: str) -> Optional[str]:
+        """Определение, к какому активу относится новость."""
+        text_lower = text.lower()
+        
+        # Проверка DOGE
+        for kw in self.asset_keywords['DOGE']:
+            if kw in text_lower:
+                return 'DOGEUSDT'
+                
+        # Проверка BTC (как коррелятор)
+        for kw in self.asset_keywords['BTC']:
+            if kw in text_lower:
+                return 'BTCUSDT'
+                
+        return None
+
+    async def _analyze_and_dispatch(self, entry: Dict, symbols: List[str]):
+        """Анализ новости и отправка вектора в матрицу."""
+        title = entry.get('title', '')
+        summary = entry.get('summary', '')
+        full_text = f"{title} {summary}"
+        
+        # Определение актива
+        asset = self._detect_asset(full_text)
+        if not asset or asset not in symbols:
+            return  # Новость не относится к нашим символам
+            
+        # Анализ тональности
+        direction, strength = self._analyze_sentiment(full_text)
+        if strength == 0:
+            return  # Нейтральная новость
+            
+        # Оценка вероятности (зависит от источника)
+        # Для простоты: 0.7 для известных источников
+        probability = 0.7
+        
+        # Время действия (в секундах)
+        # Важные новости живут дольше
+        duration = 300 if strength > 0.5 else 120
+        
+        vector = NewsVector(
+            direction=direction,
+            strength=strength,
+            duration_sec=duration,
+            probability=probability,
+            source_id="rss_aggregator",
+            headline=title
+        )
+        
+        # Запись в матрицу
+        await self.field.update_news_vector(asset, vector)
+        print(f"[NewsAggregator] News for {asset}: {title[:50]}... (dir={direction:.2f}, str={strength:.2f})")

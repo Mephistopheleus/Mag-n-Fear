@@ -13,12 +13,12 @@ from datetime import datetime, timedelta
 class Candle:
     """Стандартная свеча"""
     timestamp: datetime
-    open: float
-    high: float
-    low: float
-    close: float
-    volume: float
-    tf_sec: int
+    open: float = 0.0
+    high: float = 0.0
+    low: float = 0.0
+    close: float = 0.0
+    volume: float = 0.0
+    tf_sec: int = 300
 
 @dataclass
 class ClassicSnapshot:
@@ -27,21 +27,25 @@ class ClassicSnapshot:
     method: str = "STEPS"
     
     # Таймфрейм
-    tf_sec: int
-    tf_label: str  # "5m", "1h", etc.
+    tf_sec: int = 300
+    tf_label: str = "5m"  # "5m", "1h", etc.
     
     # Данные свечи
-    candle: Candle
+    candle: Optional[Candle] = None
     
     # Базовые метрики
-    price_current: float
-    vwap: float      # VWAP за свечу
-    range_pct: float # Процентный диапазон свечи
+    price_current: float = 0.0
+    vwap: float = 0.0      # VWAP за свечу
+    range_pct: float = 0.0 # Процентный диапазон свечи
     
     # Метаданные
-    confidence_raw: float
-    time_horizon_sec: int
-    tags: List[str]
+    confidence_raw: float = 0.0
+    time_horizon_sec: int = 300
+    tags: List[str] = None
+    
+    def __post_init__(self):
+        if self.tags is None:
+            self.tags = []
 
 class ClassicTF:
     def __init__(self):

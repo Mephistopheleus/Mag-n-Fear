@@ -17,18 +17,22 @@ class ContinuumSnapshot:
     method: str = "CONTINUUM"
     
     # Основные метрики
-    price_current: float
-    vwap_continuum: float  # Взвешенная средняя цена за окно
-    momentum: float        # Инерция цены
-    volatility: float      # Локальная волатильность
+    price_current: float = 0.0
+    vwap_continuum: float = 0.0  # Взвешенная средняя цена за окно
+    momentum: float = 0.0        # Инерция цены
+    volatility: float = 0.0      # Локальная волатильность
     
     # Метаданные для матрицы
-    confidence_raw: float  # Сырая уверенность (на основе плотности данных)
-    time_horizon_sec: int  # Горизонт прогноза
-    data_density: float    # Плотность данных в окне (0.0 - 1.0)
+    confidence_raw: float = 0.0  # Сырая уверенность (на основе плотности данных)
+    time_horizon_sec: int = 300  # Горизонт прогноза
+    data_density: float = 0.0    # Плотность данных в окне (0.0 - 1.0)
     
     # Для маркировки в матрице
-    tags: List[str]
+    tags: List[str] = None
+    
+    def __post_init__(self):
+        if self.tags is None:
+            self.tags = []
 
 class TimeContinuum:
     def __init__(self, window_sec: int = 300, decay_factor: float = 0.95):
