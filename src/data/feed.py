@@ -352,7 +352,7 @@ class DataFeed:
             card = DataCard(
                 symbol=symbol,
                 timestamp=orderbook['timestamp'],
-                raw_data={'orderbook': orderbook}
+                
             )
             self.prob_field.update(card)
     
@@ -363,7 +363,7 @@ class DataFeed:
             card = DataCard(
                 symbol=symbol,
                 timestamp=datetime.utcnow(),
-                raw_data={'trade': trade}
+                
             )
             self.prob_field.update(card)
     
