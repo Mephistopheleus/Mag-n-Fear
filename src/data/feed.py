@@ -348,7 +348,7 @@ class DataFeed:
         """Отправка стакана в ProbabilityField."""
         if self.prob_field:
             # Формируем DataCard с данными стакана
-            from src.core.data_card import DataCard
+            from src.core.models import DataCard
             card = DataCard(
                 symbol=symbol,
                 timestamp=orderbook['timestamp'],
@@ -359,7 +359,7 @@ class DataFeed:
     def _on_trade(self, symbol: str, trade: Dict):
         """Отправка сделки в ProbabilityField."""
         if self.prob_field:
-            from src.core.data_card import DataCard
+            from src.core.models import DataCard
             card = DataCard(
                 symbol=symbol,
                 timestamp=datetime.utcnow(),
