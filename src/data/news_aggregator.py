@@ -89,7 +89,7 @@ class NewsAggregator:
             
             # Анализ каждой новости
             for entry in all_entries:
-                await self._analyze_and_dispatch(entry, symbols)
+                self._analyze_and_dispatch(entry, symbols)
                 
         except Exception as e:
             print(f"[NewsAggregator] Error in cycle: {e}")
@@ -199,7 +199,7 @@ class NewsAggregator:
         
         # === ЗАПИСЬ ПРОГНОЗА В МАТРИЦУ ВЕРОЯТНОСТЕЙ ===
         # Это делает новостной анализатор равноправным участником системы
-        await self.field.add_prediction_point(
+        self.field.add_point(
             symbol=asset,
             price=target_price,
             time_sec=predicted_time_sec,
@@ -217,5 +217,5 @@ class NewsAggregator:
             headline=title
         )
         
-        await self.field.update_news_vector(asset, vector)
+        self.field.update_news_vector(asset, vector)
         print(f"[NewsAggregator] News for {asset}: {title[:50]}... (dir={direction:.2f}, str={strength:.2f}, target={target_price:.6f}, time={predicted_time_sec}s)")

@@ -79,10 +79,10 @@ class ProbabilityField:
                 return card.price
         return 0.0
     
-    async def add_prediction_point(self, symbol: str, price: float, time_sec: int, probability: float, source: str):
+    def add_point(self, symbol: str, price: float, time_sec: int, probability: float, source: str):
         """
         Добавляет точку прогноза в поле вероятностей.
-        ВЫЗЫВАЕТСЯ АНАЛИЗАТОРАМИ напрямую.
+        ВЫЗЫВАЕТСЯ АНАЛИЗАТОРАМИ напрямую (синхронно).
         
         :param symbol: Символ (DOGEUSDT)
         :param price: Прогнозируемая цена
@@ -90,19 +90,24 @@ class ProbabilityField:
         :param probability: Вероятность прогноза (0.0 - 1.0)
         :param source: Тип анализатора (например, "trend", "news", "fractal")
         """
-        async with self._lock:
-            point = PredictionPoint(
-                price=price,
-                time_sec=time_sec,
-                probability=probability,
-                source=source
-            )
-            
-            self._prediction_points[symbol].append(point)
-            
-            # Удаляем старые точки, если превышен лимит
-            if len(self._prediction_points[symbol]) > self._max_points_per_symbol:
-                self._prediction_points[symbol] = self._prediction_points[symbol][-self._max_points_per_symbol:]
+        point = PredictionPoint(
+            price=price,
+            time_sec=time_sec,
+            probability=probability,
+            source=source
+        )
+        
+        self._prediction_points[symbol].append(point)
+        
+        # Удаляем старые точки, если превышен лимит
+        if len(self._prediction_points[symbol]) > self._max_points_per_symbol:
+            self._prediction_points[symbol] = self._prediction_points[symbol][-self._max_points_per_symbol:]
+    
+    async def add_prediction_point(self, symbol: str, price: float, time_sec: int, probability: float, source: str):
+        """
+        Устаревший метод для совместимости. Вызывает add_point().
+        """
+        self.add_point(symbol, price, time_sec, probability, source)
     
     async def get_prediction_points(self, symbol: str, time_range: Optional[tuple] = None) -> List[PredictionPoint]:
         """
@@ -136,15 +141,15 @@ class ProbabilityField:
             card.timestamp = time.time()
             await self._notify_subscribers(symbol, card)
 
-    async def update_news_vector(self, symbol: str, vector: NewsVector):
-        """NewsAggregator добавляет вектор новости."""
-        async with self._lock:
-            if symbol not in self._data_store:
-                return
-            card = self._data_store[symbol]
-            card.add_news_vector(vector)
-            card.timestamp = time.time()
-            await self._notify_subscribers(symbol, card)
+    def update_news_vector(self, symbol: str, vector: NewsVector):
+        """NewsAggregator добавляет вектор новости (синхронно)."""
+        if symbol not in self._data_store:
+            return
+        card = self._data_store[symbol]
+        card.add_news_vector(vector)
+        card.timestamp = time.time()
+        # Уведомление подписчиков (асинхронно, но без ожидания)
+        asyncio.create_task(self._notify_subscribers(symbol, card))
 
     async def update_risk_metrics(self, symbol: str, metrics: RiskMetrics):
         """RiskManager записывает метрики риска."""
