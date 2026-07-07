@@ -1,12 +1,14 @@
 """
 Data Feed Module: Binance Futures Connector
-Использует python-binance (AsyncClient) для получения данных через WebSocket и REST API.
-Заменяет ccxt на легковесную библиотеку.
+Использует python-binance (AsyncClient) для REST и aiohttp для WebSocket.
+Заменяет ccxt и ThreadedWebsocketManager для избежания конфликтов циклов.
 """
 import asyncio
 import logging
+import json
+import aiohttp
 from typing import Dict, List, Optional, Callable, Any
-from binance import AsyncClient, ThreadedWebsocketManager
+from binance import AsyncClient
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -37,7 +39,7 @@ class BinanceFuturesFeed:
         
         # Клиент инициализируется при старте
         self.client: Optional[AsyncClient] = None
-        self.ws_manager: Optional[ThreadedWebsocketManager] = None
+        self.ws_session: Optional[aiohttp.ClientSession] = None
         
         # Кэши данных
         self.order_books: Dict[str, Dict] = {}
@@ -49,6 +51,7 @@ class BinanceFuturesFeed:
         self._trade_callbacks: List[Callable] = []
         
         self._running = False
+        self._ws_tasks: List[asyncio.Task] = []
     
     async def start(self):
         """Инициализация клиента и подключение."""
@@ -136,36 +139,61 @@ class BinanceFuturesFeed:
         self._trade_callbacks.append(callback)
     
     async def start_websocket_streams(self):
-        """Запуск WebSocket потоков для реального времени."""
+        """Запуск WebSocket потоков для реального времени через aiohttp."""
         if not self._running:
             return
         
-        logger.info("Starting WebSocket streams...")
+        logger.info("Starting WebSocket streams (aiohttp)...")
         
-        # Глубина стакана (обновления) - используем futures stream
-        for symbol in self.symbols:
-            try:
-                self.ws_manager.start_futures_depth_socket(
-                    callback=self._handle_orderbook_update,
-                    symbol=symbol.lower(),
-                    depth=20
-                )
-                await asyncio.sleep(0.5) # Даем время на инициализацию сокета
-                logger.info(f"Started orderbook stream for {symbol}")
-            except Exception as e:
-                logger.error(f"Failed to start orderbook stream for {symbol}: {e}")
+        # Создаем сессию aiohttp если нет
+        if not self.ws_session:
+            self.ws_session = aiohttp.ClientSession()
         
-        # Агрегированные сделки
+        # Запускаем задачи для каждого символа
         for symbol in self.symbols:
+            # Стакан
+            task_ob = asyncio.create_task(self._run_orderbook_ws(symbol))
+            self._ws_tasks.append(task_ob)
+            
+            # Сделки
+            task_tr = asyncio.create_task(self._run_trades_ws(symbol))
+            self._ws_tasks.append(task_tr)
+            
+        logger.info(f"WebSocket tasks created for {len(self.symbols)} symbols.")
+
+    async def _run_orderbook_ws(self, symbol: str):
+        """WS задача для стакана."""
+        url = f"wss://fstream.binancefuture.com/ws/{symbol.lower()}@depth20@100ms"
+        while self._running:
             try:
-                self.ws_manager.start_futures_aggtrade_socket(
-                    callback=self._handle_trade_update,
-                    symbol=symbol.lower()
-                )
-                await asyncio.sleep(0.5)
-                logger.info(f"Started trade stream for {symbol}")
+                async with self.ws_session.ws_connect(url) as ws:
+                    logger.info(f"Connected to orderbook WS for {symbol}")
+                    async for msg in ws:
+                        if msg.type == aiohttp.WSMsgType.TEXT:
+                            data = json.loads(msg.data)
+                            self._handle_orderbook_update(data)
+                        elif msg.type == aiohttp.WSMsgType.ERROR:
+                            break
             except Exception as e:
-                logger.error(f"Failed to start trade stream for {symbol}: {e}")
+                logger.error(f"Orderbook WS error for {symbol}: {e}. Reconnecting in 5s...")
+                await asyncio.sleep(5)
+
+    async def _run_trades_ws(self, symbol: str):
+        """WS задача для сделок."""
+        url = f"wss://fstream.binancefuture.com/ws/{symbol.lower()}@aggTrade"
+        while self._running:
+            try:
+                async with self.ws_session.ws_connect(url) as ws:
+                    logger.info(f"Connected to trades WS for {symbol}")
+                    async for msg in ws:
+                        if msg.type == aiohttp.WSMsgType.TEXT:
+                            data = json.loads(msg.data)
+                            self._handle_trade_update(data)
+                        elif msg.type == aiohttp.WSMsgType.ERROR:
+                            break
+            except Exception as e:
+                logger.error(f"Trades WS error for {symbol}: {e}. Reconnecting in 5s...")
+                await asyncio.sleep(5)
     
     def _handle_orderbook_update(self, msg: Dict):
         """Обработчик обновлений стакана."""
