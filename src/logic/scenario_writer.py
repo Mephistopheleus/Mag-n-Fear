@@ -72,7 +72,7 @@ class ScenarioWriter:
         # Настройки из конфига
         scenario_cfg = self.config.get('scenario', {})
         self.min_confidence = scenario_cfg.get('min_confidence', 0.65)
-        self.max_scenarios_per_hour = scenario_cfg.get('max_scenarios_per_hour', 5)
+        # Лимит сценариев удален - используется только проверка маржи в RiskManager
         
         exec_cfg = self.config.get('executor', {})
         self.default_leverage = exec_cfg.get('default_leverage', 3)
@@ -81,7 +81,6 @@ class ScenarioWriter:
         # Состояние
         self._scenario_count = 0
         self._last_scenario_time = 0
-        self._scenario_timestamps: List[float] = []  # Список временных штампов сценариев за последний час
         self.active_scenarios: Dict[str, TradeScenario] = {}
         
         logger.info(f"ScenarioWriter initialized. Min confidence: {self.min_confidence}")
@@ -122,10 +121,7 @@ class ScenarioWriter:
             logger.debug(f"[{symbol}] Уверенность ({combined_confidence:.2f}) ниже порога ({self.min_confidence})")
             return None
         
-        # 5. Проверка лимита сценариев в час
-        if not self._check_scenario_rate_limit():
-            logger.warning(f"[{symbol}] Превышен лимит сценариев в час")
-            return None
+        # 5. Проверка лимита удалена - ограничение только по марже в RiskManager
             
         # 6. Определение направления и точки входа
         direction, entry_price = self._determine_direction_and_entry(card)
@@ -314,22 +310,6 @@ class ScenarioWriter:
         take_profit = round(take_profit, precision)
         
         return stop_loss, take_profit
-
-    def _check_scenario_rate_limit(self) -> bool:
-        """Проверка лимита сценариев в час."""
-        now = datetime.now().timestamp()
-        # Очищаем старые записи (старше 1 часа)
-        self._scenario_timestamps = [ts for ts in self._scenario_timestamps if now - ts < 3600]
-        
-        # Проверка количества сценариев за последний час
-        if len(self._scenario_timestamps) >= self.max_scenarios_per_hour:
-            logger.warning(f"Лимит сценариев в час достигнут ({len(self._scenario_timestamps)}/{self.max_scenarios_per_hour})")
-            return False
-            
-        # Добавляем текущий временной штамп
-        self._scenario_timestamps.append(now)
-        self._last_scenario_time = now
-        return True
 
     async def validate_and_submit(self, scenario: TradeScenario, executor_callback) -> bool:
         """
