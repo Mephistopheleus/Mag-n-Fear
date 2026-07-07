@@ -23,7 +23,7 @@ class G_TrendChannel(BaseIndicator):
         self.std_dev = self.config.get('std_dev', 2.0)
         self.use_volume_weights = self.config.get('use_volume_weights', True)
 
-    def calculate(self, data: pl.DataFrame) -> Dict[str, Any]:
+    def calculate(self, data: pl.DataFrame, current_price: float) -> Dict[str, Any]:
         if not self.validate_data(data):
             return {'error': 'Invalid data'}
 
@@ -31,7 +31,13 @@ class G_TrendChannel(BaseIndicator):
         df = data.tail(self.period)
         
         if len(df) < 10:
-            return {'value': None, 'signal': 0, 'confidence': 0.0, 'tags': ['trend']}
+            return {
+                'target_price': current_price,
+                'time_sec': 300,
+                'probability': 0.0,
+                'tags': ['trend'],
+                'metadata': {}
+            }
 
         prices = df['price'].to_numpy()
         volumes = df['volume'].to_numpy()
@@ -73,22 +79,43 @@ class G_TrendChannel(BaseIndicator):
         upper_band = current_center + (std_err * self.std_dev)
         lower_band = current_center - (std_err * self.std_dev)
         
-        current_price = prices[-1]
-
-        # Определение сигнала
-        signal = 0
-        if current_price > upper_band:
-            signal = -1  # Перекупленность (возврат к среднему)
-        elif current_price < lower_band:
-            signal = 1   # Перепроданность
-        else:
-            # Направление тренда
-            signal = 1 if m > 0 else (-1 if m < 0 else 0)
-
-        # Уверенность: зависит от расстояния до полос и крутизны тренда
-        distance_to_center = abs(current_price - current_center)
-        confidence = min(1.0, distance_to_center / (std_err * self.std_dev + 1e-9))
+        # Определение прогноза
+        target_price = current_price
+        time_sec = 300
+        probability = 0.5
+        tags = ['trend', 'g_channel', 'regression']
         
+        # Прогноз на основе направления тренда и положения цены
+        if m > 0.0001:  # Восходящий тренд
+            target_price = current_price + abs(m) * 5  # Проекция на 5 шагов вперед
+            time_sec = int(300 / (abs(m) * 1000 + 0.1))  # Чем круче тренд, тем быстрее
+            probability = min(0.9, 0.5 + abs(m) * 500)
+            tags.append('uptrend')
+        elif m < -0.0001:  # Нисходящий тренд
+            target_price = current_price - abs(m) * 5
+            time_sec = int(300 / (abs(m) * 1000 + 0.1))
+            probability = min(0.9, 0.5 + abs(m) * 500)
+            tags.append('downtrend')
+        else:  # Флэт
+            target_price = current_center  # Возврат к среднему
+            time_sec = 600
+            probability = 0.6
+            tags.append('sideways')
+        
+        # Проверка на перекупленность/перепроданность
+        if current_price > upper_band:
+            # Перекупленность - прогноз возврата к средней линии
+            target_price = current_center
+            time_sec = 180  # Быстрый возврат
+            probability = 0.75
+            tags.append('overbought_reversal')
+        elif current_price < lower_band:
+            # Перепроданность - прогноз возврата к средней линии
+            target_price = current_center
+            time_sec = 180
+            probability = 0.75
+            tags.append('oversold_bounce')
+
         # Метаданные
         metadata = {
             'center': current_center,
@@ -99,9 +126,9 @@ class G_TrendChannel(BaseIndicator):
         }
 
         return {
-            'value': current_center,
-            'signal': signal,
-            'confidence': float(confidence),
-            'metadata': metadata,
-            'tags': ['trend', 'g_channel', 'regression']
+            'target_price': float(target_price),
+            'time_sec': time_sec,
+            'probability': float(probability),
+            'tags': tags,
+            'metadata': metadata
         }

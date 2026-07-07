@@ -24,7 +24,7 @@ class BTCCorrelation(BaseIndicator):
         # В реальном проекте здесь будет подключение к источнику данных BTC
         self.btc_data_cache = [] 
 
-    def calculate(self, data: pl.DataFrame) -> Dict[str, Any]:
+    def calculate(self, data: pl.DataFrame, current_price: float) -> Dict[str, Any]:
         if not self.validate_data(data):
             return {'error': 'Invalid data'}
 
@@ -55,23 +55,34 @@ class BTCCorrelation(BaseIndicator):
                 else:
                     corr_value = np.corrcoef(ar, br)[0, 1]
 
-        # Сигнал на основе силы корреляции
-        signal = 0
-        confidence = abs(corr_value)
+        # Прогноз на основе корреляции
+        target_price = current_price
+        time_sec = 300  # 5 минут
+        probability = 0.5
+        tags = ['btc_correlation']
         
         if corr_value > 0.7:
-            signal = 1  # Сильная прямая корреляция (движемся с BTC)
-            tags = ['corr_btc_strong_pos']
+            # Сильная прямая корреляция - следуем за BTC
+            # Предполагаем, что BTC продолжит движение
+            target_price = current_price * (1 + corr_value * 0.01)  # +0.7% макс
+            time_sec = int(300 / corr_value)
+            probability = 0.5 + abs(corr_value) * 0.4
+            tags.append('corr_btc_strong_pos')
         elif corr_value < -0.7:
-            signal = -1 # Сильная обратная корреляция
-            tags = ['corr_btc_strong_neg']
+            # Сильная обратная корреляция
+            target_price = current_price * (1 + corr_value * 0.01)  # -0.7% макс
+            time_sec = int(300 / abs(corr_value))
+            probability = 0.5 + abs(corr_value) * 0.4
+            tags.append('corr_btc_strong_neg')
         else:
-            tags = ['corr_btc_weak']
+            # Слабая корреляция - не даем сильного прогноза
+            probability = 0.3
+            tags.append('corr_btc_weak')
 
         return {
-            'value': float(corr_value),
-            'signal': signal,
-            'confidence': float(confidence),
-            'metadata': {'period': self.period},
-            'tags': tags
+            'target_price': float(target_price),
+            'time_sec': time_sec,
+            'probability': float(probability),
+            'tags': tags,
+            'metadata': {'period': self.period, 'correlation': corr_value}
         }

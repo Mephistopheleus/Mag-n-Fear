@@ -199,12 +199,12 @@ class NewsAggregator:
         
         # === ЗАПИСЬ ПРОГНОЗА В МАТРИЦУ ВЕРОЯТНОСТЕЙ ===
         # Это делает новостной анализатор равноправным участником системы
-        await self.field.add_prediction_to_matrix(
+        await self.field.add_prediction_point(
             symbol=asset,
-            predicted_price=target_price,
-            predicted_time_sec=predicted_time_sec,
+            price=target_price,
+            time_sec=predicted_time_sec,
             probability=probability,
-            analyzer_type="news_sentiment"
+            source="news_sentiment"
         )
         
         # === СОХРАНЯЕМ СТАРЫЙ МЕХАНИЗМ ДЛЯ СОВМЕСТИМОСТИ ===

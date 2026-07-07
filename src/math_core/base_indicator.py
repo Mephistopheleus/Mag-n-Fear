@@ -20,7 +20,7 @@ class BaseIndicator(ABC):
         self._state: Dict[str, Any] = {}
 
     @abstractmethod
-    def calculate(self, data: pl.DataFrame) -> Dict[str, Any]:
+    def calculate(self, data: pl.DataFrame, current_price: float) -> Dict[str, Any]:
         """
         Основной метод расчета.
         
@@ -28,14 +28,15 @@ class BaseIndicator(ABC):
             data: DataFrame с рыночными данными (ticks или свечи).
                   Обязательные колонки: ['timestamp', 'price', 'volume']
                   Опционально: ['bid', 'ask', 'oi', 'funding']
+            current_price: Текущая цена актива для расчета целевых уровней.
         
         Returns:
-            Dict с результатами:
-            - 'value': основное числовое значение
-            - 'signal': направление (-1, 0, 1) или None
-            - 'confidence': уверенность (0.0 - 1.0)
-            - 'metadata': дополнительные данные (уровни, паттерны и т.д.)
-            - 'tags': список тегов для маркировки в Матрице (напр. ['trend', 'btc_corr'])
+            Dict с результатами прогноза:
+            - 'target_price': Прогнозируемая цена достижения
+            - 'time_sec': Время достижения в секундах (горизонт прогноза)
+            - 'probability': Вероятность достижения цели (0.0 - 1.0)
+            - 'tags': Список тегов для маркировки в Матрице (напр. ['trend', 'btc_corr'])
+            - 'metadata': Дополнительные данные (уровни, паттерны, индекс Херста и т.д.)
         """
         pass
 

@@ -1,6 +1,7 @@
 """
-ProbabilityField: Thread-safe asynchronous data matrix.
-Central hub where all analyzers write their calculations and ScenarioWriter reads the aggregated state.
+ProbabilityField: Thread-safe asynchronous data storage ("Dumb Warehouse").
+Central hub where all analyzers write their predictions as points {price, time, probability, source}.
+NO formulas, NO grids, NO analysis - just storage and retrieval.
 """
 import asyncio
 import threading
@@ -8,7 +9,25 @@ import time
 from typing import Dict, Any, Optional, List, Callable
 from collections import defaultdict
 from src.core.models import DataCard, RiskMetrics, NewsVector
-from src.matrix.probability_field import MatrixProbabilityField
+
+
+class PredictionPoint:
+    """Одна точка прогноза в поле вероятностей."""
+    def __init__(self, price: float, time_sec: int, probability: float, source: str, timestamp: float = None):
+        self.price = price  # Прогнозируемая цена
+        self.time_sec = time_sec  # Время достижения (секунды от текущего момента)
+        self.probability = probability  # Вероятность (0.0 - 1.0)
+        self.source = source  # Тип анализатора (например, "trend", "news", "matrix")
+        self.timestamp = timestamp or time.time()  # Время добавления точки
+    
+    def to_dict(self) -> Dict:
+        return {
+            "price": self.price,
+            "time_sec": self.time_sec,
+            "probability": self.probability,
+            "source": self.source,
+            "timestamp": self.timestamp
+        }
 
 
 class ProbabilityField:
@@ -16,17 +35,18 @@ class ProbabilityField:
     Потокобезопасное хранилище данных (Матрица).
     
     Архитектура:
-    - Ключи: символы (DOGEUSDT) или категории данных.
-    - Значения: последние актуальные DataCard + история метрик.
+    - Ключи: символы (DOGEUSDT)
+    - Значения: список точек прогнозов + последние актуальные DataCard
     - Все операции асинхронные и потокобезопасные.
     
     Модули пишут в свои "слои":
-    - math_core -> layer 'math'
-    - news_aggregator -> layer 'news'
-    - risk_manager -> layer 'risk'
-    - auto_tuner -> layer 'tuner'
+    - Анализаторы -> добавляют точки в _prediction_points
+    - MathCore -> записывает индикаторы в math_surfaces
+    - NewsAggregator -> добавляет векторы новостей
+    - RiskManager -> записывает метрики риска
     
-    Также содержит MatrixProbabilityField для агрегации прогнозов от всех анализаторов.
+    ВАЖНО: Этот класс НЕ анализирует, НЕ считает формулы.
+    Только хранение и предоставление данных.
     """
     
     def __init__(self):
@@ -36,8 +56,9 @@ class ProbabilityField:
         self._subscribers: List[Callable] = []
         self._max_history_len = 100  # Храним последние N обновлений для анализа
         
-        # Матрица вероятностей для каждого символа (Время × Цена × Вероятность)
-        self._matrix_fields: Dict[str, MatrixProbabilityField] = {}
+        # Поле вероятностей: символ -> список точек прогнозов
+        self._prediction_points: Dict[str, List[PredictionPoint]] = defaultdict(list)
+        self._max_points_per_symbol = 1000  # Максимум точек на символ (старые удаляются)
         
     async def initialize_symbol(self, symbol: str, initial_price: float):
         """Инициализация DataCard для нового символа."""
@@ -49,15 +70,6 @@ class ProbabilityField:
                     price=initial_price,
                     volume_24h=0.0
                 )
-            
-            # Инициализация матрицы вероятностей для символа
-            if symbol not in self._matrix_fields:
-                self._matrix_fields[symbol] = MatrixProbabilityField(
-                    time_bins=10,
-                    price_bins=20,
-                    time_horizon_sec=600,  # 10 минут горизонт
-                    current_price=initial_price
-                )
     
     @property
     def current_price(self) -> float:
@@ -66,6 +78,53 @@ class ProbabilityField:
             for card in self._data_store.values():
                 return card.price
         return 0.0
+    
+    async def add_prediction_point(self, symbol: str, price: float, time_sec: int, probability: float, source: str):
+        """
+        Добавляет точку прогноза в поле вероятностей.
+        ВЫЗЫВАЕТСЯ АНАЛИЗАТОРАМИ напрямую.
+        
+        :param symbol: Символ (DOGEUSDT)
+        :param price: Прогнозируемая цена
+        :param time_sec: Время достижения в секундах от текущего момента
+        :param probability: Вероятность прогноза (0.0 - 1.0)
+        :param source: Тип анализатора (например, "trend", "news", "fractal")
+        """
+        async with self._lock:
+            point = PredictionPoint(
+                price=price,
+                time_sec=time_sec,
+                probability=probability,
+                source=source
+            )
+            
+            self._prediction_points[symbol].append(point)
+            
+            # Удаляем старые точки, если превышен лимит
+            if len(self._prediction_points[symbol]) > self._max_points_per_symbol:
+                self._prediction_points[symbol] = self._prediction_points[symbol][-self._max_points_per_symbol:]
+    
+    async def get_prediction_points(self, symbol: str, time_range: Optional[tuple] = None) -> List[PredictionPoint]:
+        """
+        Получает список точек прогнозов для символа.
+        
+        :param symbol: Символ
+        :param time_range: Опциональный фильтр по времени (min_sec, max_sec)
+        :return: Список точек
+        """
+        async with self._lock:
+            points = self._prediction_points.get(symbol, []).copy()
+            
+            if time_range:
+                min_sec, max_sec = time_range
+                points = [p for p in points if min_sec <= p.time_sec <= max_sec]
+            
+            return points
+    
+    async def clear_predictions(self, symbol: str):
+        """Очищает все точки прогнозов для символа (для нового цикла)."""
+        async with self._lock:
+            self._prediction_points[symbol] = []
     
     async def update_math_surface(self, symbol: str, key: str, value: Any):
         """MathCore записывает результаты расчетов (индикаторы, свечи)."""
@@ -180,23 +239,4 @@ class ProbabilityField:
         """Очистка поля (для тестов)."""
         self._data_store.clear()
         self._history.clear()
-        self._matrix_fields.clear()
-    
-    async def add_prediction_to_matrix(self, symbol: str, predicted_price: float, predicted_time_sec: int, probability: float, analyzer_type: str):
-        """Добавляет прогноз от анализатора в матрицу вероятностей для указанного символа."""
-        async with self._lock:
-            if symbol not in self._matrix_fields:
-                return  # Матрица еще не инициализирована
-            matrix = self._matrix_fields[symbol]
-            matrix.add_prediction(
-                predicted_price=predicted_price,
-                predicted_time_sec=predicted_time_sec,
-                probability=probability,
-                analyzer_type=analyzer_type
-            )
-    
-    def get_matrix_snapshot(self, symbol: str):
-        """Получает снимок матрицы вероятностей для анализа."""
-        if symbol not in self._matrix_fields:
-            return None
-        return self._matrix_fields[symbol].get_snapshot()
+        self._prediction_points.clear()
