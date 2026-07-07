@@ -184,7 +184,7 @@ class RiskManager:
     async def _shadow_check(self, symbol: str, card: DataCard, metrics: RiskMetrics):
         """
         Теневой расчет: сравнение текущего состояния с идеальным сценарием.
-        1. Считает текущий PnL теневой позиции.
+        1. Считает текущий PnL теневой позиции и MAE.
         2. Обновляет уровень стоп-лосса по логике адаптивного трейлинга.
         3. Фиксирует расхождения для обучения AutoTuner.
         """
@@ -198,12 +198,29 @@ class RiskManager:
         shadow['current_pnl'] = current_pnl
         shadow['last_price'] = card.price
         
+        # --- НОВОЕ: Расчет MAE (Max Adverse Excursion) ---
+        entry_price = shadow.get('entry_price', 0)
+        side = shadow.get('side', 'LONG')
+        if entry_price > 0:
+            if side == 'LONG':
+                adverse_move = (entry_price - card.price) / entry_price
+            else:
+                adverse_move = (card.price - entry_price) / entry_price
+            
+            if adverse_move > 0: # Если движение против нас
+                current_mae = adverse_move
+                if 'max_adverse_excursion' not in shadow or current_mae > shadow['max_adverse_excursion']:
+                    shadow['max_adverse_excursion'] = current_mae
+            elif 'max_adverse_excursion' not in shadow:
+                shadow['max_adverse_excursion'] = 0.0
+        # -----------------------------------------------
+        
         # 2. Адаптивный трейлинг-стоп
         new_stop = self._update_trailing_stop(shadow, card.price, metrics.volatility_index)
         if new_stop != shadow['current_stop_loss']:
             old_stop = shadow['current_stop_loss']
             shadow['current_stop_loss'] = new_stop
-            print(f"[RiskManager] Shadow Trailing Update {symbol}: Stop {old_stop:.5f} -> {new_stop:.5f} (PnL: {current_pnl:.2f})")
+            print(f"[RiskManager] Shadow Trailing Update {symbol}: Stop {old_stop:.5f} -> {new_stop:.5f} (PnL: {current_pnl:.2f}, MAE: {shadow.get('max_adverse_excursion', 0):.4f})")
             
             # Здесь будет отправка команды Executor на обновление реального стопа, если позиция открыта
             # await self.executor.update_stop(symbol, new_stop) 
@@ -219,7 +236,8 @@ class RiskManager:
                 
         # 4. Проверка на срабатывание стопа в тени
         if self._check_stop_hit(shadow, card.price):
-            print(f"[RiskManager] Shadow Stop Hit for {symbol} at {card.price}. PnL: {current_pnl:.2f}")
+            mae = shadow.get('max_adverse_excursion', 0)
+            print(f"[RiskManager] Shadow Stop Hit for {symbol} at {card.price}. PnL: {current_pnl:.2f}, MAE: {mae:.4f}")
             # Логика закрытия тени и отправки статистики в AutoTuner
             self._close_shadow_position(symbol, card.price)
 

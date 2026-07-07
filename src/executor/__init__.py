@@ -190,6 +190,7 @@ class Executor:
             'stop_loss': command.get('stop_loss'),
             'take_profit': command.get('take_profit'),
             'order_id': order['orderId'],
+            'stop_order_id': None,  # Пока стопа нет, будет заполнен при установке
             'opened_at': time.time()
         }
         
@@ -252,8 +253,16 @@ class Executor:
         # Определение стороны стопа
         stop_side = 'SELL' if side == 'LONG' else 'BUY'
         
-        # Отмена предыдущего стопа (если был)
-        # TODO: Трекинг ID стопа для отмены
+        # Отмена предыдущего стопа (если был сохранен ID)
+        if 'stop_order_id' in pos and pos['stop_order_id']:
+            try:
+                await self._client.futures_cancel_order(
+                    symbol=symbol,
+                    orderId=pos['stop_order_id']
+                )
+                print(f"[Executor] Cancelled old stop order {pos['stop_order_id']} for {symbol}")
+            except Exception as e:
+                print(f"[Executor] Error cancelling old stop: {e}")
         
         # Размещение нового Stop Market ордера
         order = await self._client.futures_create_order(
@@ -266,6 +275,9 @@ class Executor:
         )
         
         print(f"[Executor] UPDATE_STOP {symbol}: new_stop={new_stop_price}, order_id={order['orderId']}")
+        
+        # Сохранение ID стопа для будущей отмены
+        pos['stop_order_id'] = order['orderId']
         
         # Обновление локального состояния
         pos['stop_loss'] = new_stop_price
