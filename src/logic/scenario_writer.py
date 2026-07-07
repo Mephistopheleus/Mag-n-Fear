@@ -1,7 +1,10 @@
 """
 Scenario Writer Module.
 Центральный узел принятия решений.
-Формирует полный сценарий сделки на основе агрегированных данных из ProbabilityField.
+Формирует полный сценарий сделки на основе:
+1. Кластеров от MatrixAnalyzer (кросс-валидация прогнозов)
+2. Прямых точек из ProbabilityField (для альтернативных сценариев)
+3. Данных о рисках и новостях
 """
 
 import asyncio
@@ -11,8 +14,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from src.core.models import DataCard, NewsVector, RiskMetrics
-from src.core.field import ProbabilityField
+from src.core.field import ProbabilityField, PredictionPoint
 from src.risk.manager import RiskManager
+from src.logic.matrix_analyzer import MatrixAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +43,9 @@ class TradeScenario:
     trail_enabled: bool = True
     trail_step: Optional[float] = None
     
+    # Тип сценария (горизонт)
+    scenario_type: str = "scalp"  # "scalp", "trap", "trend", "sideways"
+    
     # Обоснование (метрики)
     confidence_score: float = 0.0  # Итоговая уверенность (0-1)
     risk_score: float = 0.0        # Оценка риска (0-1)
@@ -56,10 +63,13 @@ class TradeScenario:
 class ScenarioWriter:
     """
     Генератор торговых сценариев.
-    Анализирует ВСЕ доступные данные из ProbabilityField и формирует план действий.
+    Анализирует ВСЕ доступные данные:
+    - Кластеры от MatrixAnalyzer (основной источник)
+    - Отдельные точки из ProbabilityField (альтернативные сценарии)
+    - Новости и риски
     """
     
-    def __init__(self, config: Any, probability_field: ProbabilityField, risk_manager: RiskManager):
+    def __init__(self, config: Any, probability_field: ProbabilityField, risk_manager: RiskManager, matrix_analyzer: MatrixAnalyzer):
         # Конвертируем Pydantic модель в dict для совместимости
         if hasattr(config, 'model_dump'):
             self.config = config.model_dump()
@@ -68,11 +78,11 @@ class ScenarioWriter:
             
         self.field = probability_field
         self.risk_manager = risk_manager
+        self.matrix_analyzer = matrix_analyzer
         
         # Настройки из конфига
         scenario_cfg = self.config.get('scenario', {})
         self.min_confidence = scenario_cfg.get('min_confidence', 0.65)
-        # Лимит сценариев удален - используется только проверка маржи в RiskManager
         
         exec_cfg = self.config.get('executor', {})
         self.default_leverage = exec_cfg.get('default_leverage', 3)
@@ -80,7 +90,6 @@ class ScenarioWriter:
         
         # Состояние
         self._scenario_count = 0
-        self._last_scenario_time = 0
         self.active_scenarios: Dict[str, TradeScenario] = {}
         
         logger.info(f"ScenarioWriter initialized. Min confidence: {self.min_confidence}")
@@ -88,53 +97,73 @@ class ScenarioWriter:
     async def analyze_market(self, symbol: str) -> Optional[TradeScenario]:
         """
         Основной метод анализа рынка и генерации сценария.
-        Читает данные из ProbabilityField и формирует сценарий.
+        1. Получает кластеры от MatrixAnalyzer
+        2. Проверяет альтернативные точки из ProbabilityField
+        3. Формирует сценарий с лучшим соотношением риск/прибыль
         """
         logger.debug(f"[{symbol}] Начинаем анализ рынка...")
         
-        # 1. Получаем свежие данные из поля вероятностей
-        card = await self.field.get_card(symbol)
-        if not card:
+        # 1. Получаем все точки из ProbabilityField
+        points = self.field.points  # Прямой доступ к списку точек
+        current_price = self.field.current_price or 0.0
+        
+        if not points or current_price == 0:
             logger.warning(f"[{symbol}] Нет данных в ProbabilityField")
             return None
-            
-        # 2. Извлекаем метрики
-        tech_confidence = card.tuner_confidence  # Доверие от AutoTuner к стратегии
-        risk_metrics = card.risk_metrics or RiskMetrics(
-            max_leverage=self.max_leverage,
-            liquidity_risk=0.5,
-            drawdown_prob=0.1,
-            volatility_index=0.02,
-            exposure_limit=0.05,
-            is_emergency=False
-        )
-        news_vectors = card.news_vectors or []
         
-        # 3. Рассчитываем агрегированную уверенность
+        # 2. Запрашиваем у MatrixAnalyzer лучший кластер (кросс-валидация)
+        cluster_result = self.matrix_analyzer.analyze(points, current_price)
+        
+        # 3. Если кластер не найден, пробуем найти отдельные сильные точки
+        if not cluster_result:
+            logger.debug(f"[{symbol}] Кластеры не найдены, ищем отдельные сигналы...")
+            best_point = self._find_best_single_point(points, current_price)
+            if not best_point:
+                return None
+            # Создаём псевдо-результат из одной точки
+            cluster_result = {
+                "target_price": best_point.price,
+                "target_time_sec": best_point.time_sec,
+                "probability": best_point.probability,
+                "pattern_type": "single_signal",
+                "confidence": best_point.probability,
+                "metadata": {"source": best_point.source}
+            }
+        
+        # 4. Извлекаем метрики
+        target_price = cluster_result["target_price"]
+        target_time = cluster_result["target_time_sec"]
+        base_probability = cluster_result["probability"]
+        pattern_type = cluster_result["pattern_type"]
+        
+        # 5. Определяем направление и тип сценария
+        direction = "LONG" if target_price > current_price else "SHORT"
+        scenario_type = self._map_pattern_to_scenario(pattern_type)
+        
+        logger.info(f"[{symbol}] Паттерн: {pattern_type}, Направление: {direction}, Цель: {target_price}, Время: {target_time}с")
+        
+        # 6. Рассчитываем влияние новостей
+        card = await self.field.get_card(symbol)
+        news_vectors = card.news_vectors if card else []
         news_impact_score = self._calculate_news_impact(news_vectors)
-        combined_confidence = self._combine_confidence(tech_confidence, news_impact_score, risk_metrics)
         
-        logger.info(f"[{symbol}] Confidence: Tech={tech_confidence:.2f}, News={news_impact_score:.2f}, Combined={combined_confidence:.2f}")
+        # 7. Комбинируем вероятность с новостями
+        combined_confidence = self._combine_confidence(base_probability, news_impact_score)
         
-        # 4. Проверка порога уверенности
+        logger.info(f"[{symbol}] Confidence: Base={base_probability:.2f}, News={news_impact_score:.2f}, Combined={combined_confidence:.2f}")
+        
+        # 8. Проверка порога уверенности
         if combined_confidence < self.min_confidence:
             logger.debug(f"[{symbol}] Уверенность ({combined_confidence:.2f}) ниже порога ({self.min_confidence})")
             return None
         
-        # 5. Проверка лимита удалена - ограничение только по марже в RiskManager
-            
-        # 6. Определение направления и точки входа
-        direction, entry_price = self._determine_direction_and_entry(card)
-        if not direction or direction == 'WAIT':
-            logger.debug(f"[{symbol}] Нет четкого направления для входа")
-            return None
-            
-        # 7. Расчет параметров сделки (объем, плечо, стопы)
-        leverage = self._calculate_leverage(risk_metrics, combined_confidence)
-        quantity = self._calculate_quantity(entry_price, leverage, risk_metrics)
-        stop_loss, take_profit = self._calculate_levels(direction, entry_price, card, risk_metrics)
+        # 9. Расчет параметров сделки
+        entry_price = current_price
+        leverage = self._calculate_leverage(combined_confidence, target_time)
+        quantity = self._calculate_quantity(entry_price, leverage)
+        stop_loss, take_profit = self._calculate_levels(direction, entry_price, target_price, target_time)
         
-        # 8. Формирование сценария
+        # 10. Формирование сценария
         self._scenario_count += 1
         scenario = TradeScenario(
             scenario_id=f"SCN_{self._scenario_count}_{int(datetime.now().timestamp())}",
@@ -147,24 +176,47 @@ class ScenarioWriter:
             stop_loss=stop_loss,
             take_profit=take_profit,
             trail_step=abs(entry_price - stop_loss) / 2 if stop_loss else None,
+            scenario_type=scenario_type,
             confidence_score=combined_confidence,
-            risk_score=risk_metrics.drawdown_prob,
+            risk_score=0.1,  # Заглушка, будет от RiskManager
             news_impact=news_impact_score,
             reasoning=[
-                f"TunerConfidence={tech_confidence:.2f}",
-                f"NewsImpact={news_impact_score:.2f}",
-                f"Volatility={risk_metrics.volatility_index:.4f}",
-                f"LiquidityRisk={risk_metrics.liquidity_risk:.2f}"
+                f"PatternType={pattern_type}",
+                f"TargetPrice={target_price}",
+                f"TargetTime={target_time}s",
+                f"TunerConfidence={base_probability:.2f}",
+                f"NewsImpact={news_impact_score:.2f}"
             ],
             metadata={
-                'card_timestamp': card.timestamp,
-                'risk_metrics': risk_metrics.__dict__ if risk_metrics else {}
+                'cluster_result': cluster_result,
+                'points_count': len(points)
             }
         )
         
-        logger.info(f"[{symbol}] Сценарий сформирован: {scenario.scenario_id} | {direction} @{entry_price} | Qty={quantity} | Lev={leverage}")
+        logger.info(f"[{symbol}] Сценарий сформирован: {scenario.scenario_id} | {direction} @{entry_price} | Type={scenario_type}")
         return scenario
-
+    
+    def _find_best_single_point(self, points: List[PredictionPoint], current_price: float) -> Optional[PredictionPoint]:
+        """Находит лучшую отдельную точку, если кластеры не найдены."""
+        significant = [p for p in points if p.probability >= self.min_confidence]
+        if not significant:
+            return None
+        # Возвращаем точку с максимальной вероятностью
+        return max(significant, key=lambda p: p.probability)
+    
+    def _map_pattern_to_scenario(self, pattern_type: str) -> str:
+        """Преобразует тип паттерна в тип сценария."""
+        if "scalp" in pattern_type:
+            return "scalp"
+        elif "trap" in pattern_type:
+            return "trap"
+        elif "trend" in pattern_type:
+            return "trend"
+        elif "consolidation" in pattern_type or "sideways" in pattern_type:
+            return "sideways"
+        else:
+            return "swing"
+    
     def _calculate_news_impact(self, news_vectors: List[NewsVector]) -> float:
         """
         Рассчитывает суммарное влияние новостей (-1.0 ... 1.0).
@@ -196,86 +248,52 @@ class ScenarioWriter:
         # Нормализация к [-1, 1]
         return max(-1.0, min(1.0, total_impact / weight_sum))
 
-    def _combine_confidence(self, tech_conf: float, news_impact: float, risk_metrics: RiskMetrics) -> float:
+    def _combine_confidence(self, base_prob: float, news_impact: float) -> float:
         """
-        Комбинирует техническую уверенность, новости и риски в итоговый скор.
-        Формула: Tech + NewsBonus - RiskPenalty
+        Комбинирует базовую вероятность от матрицы и влияние новостей.
+        Формула: Base + NewsBonus (до +/- 15%)
         """
-        # Штраф за риск (до 20%)
-        risk_penalty = risk_metrics.drawdown_prob * 0.2
-        
-        # Бонус/штраф от новостей (до +/- 15%)
         news_bonus = news_impact * 0.15
-        
-        combined = tech_conf + news_bonus - risk_penalty
+        combined = base_prob + news_bonus
         return max(0.0, min(1.0, combined))
 
-    def _determine_direction_and_entry(self, card: DataCard) -> tuple:
+    def _calculate_leverage(self, confidence: float, time_horizon: int) -> int:
         """
-        Определяет направление сделки и цену входа.
-        Использует данные из math_surfaces и агрегированный сентимент.
-        """
-        current_price = card.price
-        if current_price <= 0:
-            return None, None
-            
-        # Получаем агрегированный сентимент
-        sentiment = card.get_aggregated_sentiment()
-        
-        # Проверяем технические индикаторы (если есть в math_surfaces)
-        # Пример: если есть RSI или другие сигналы
-        tech_signal = 0.0
-        if 'rsi' in card.math_surfaces:
-            rsi = card.math_surfaces['rsi']
-            if rsi < 30:
-                tech_signal = 0.5  # Перепроданность -> LONG
-            elif rsi > 70:
-                tech_signal = -0.5  # Перекупленность -> SHORT
-        
-        # Комбинируем сентимент и технику
-        combined_signal = sentiment + tech_signal
-        
-        threshold = 0.2  # Минимальный перевес для входа
-        
-        if combined_signal > threshold:
-            return 'LONG', current_price
-        elif combined_signal < -threshold:
-            return 'SHORT', current_price
-            
-        return 'WAIT', current_price
-
-    def _calculate_leverage(self, risk_metrics: RiskMetrics, confidence: float) -> int:
-        """
-        Динамический расчет плеча на основе рисков и уверенности.
+        Динамический расчет плеча на основе уверенности и горизонта.
+        Краткосрочные сценарии -> выше плечо, долгосрочные -> ниже.
         """
         # Базовое плечо
         base_lev = self.default_leverage
         
-        # Корректировка на риск
-        risk_factor = 1.0 - risk_metrics.drawdown_prob
-        adjusted_lev = base_lev * risk_factor
+        # Корректировка на уверенность (0.5x ... 1.5x)
+        conf_factor = 0.5 + confidence
         
-        # Корректировка на уверенность
-        conf_factor = 0.5 + confidence  # От 0.5 до 1.5
-        final_lev = adjusted_lev * conf_factor
+        # Корректировка на время (краткосрок -> выше плечо)
+        if time_horizon < 60:
+            time_factor = 1.2
+        elif time_horizon > 300:
+            time_factor = 0.8
+        else:
+            time_factor = 1.0
+        
+        final_lev = base_lev * conf_factor * time_factor
         
         # Ограничения
-        max_allowed = min(self.max_leverage, risk_metrics.max_leverage)
-        calculated = int(max(1, min(max_allowed, final_lev)))
+        calculated = int(max(1, min(self.max_leverage, final_lev)))
         
-        logger.debug(f"Расчет плеча: Base={base_lev}, RiskFactor={risk_factor:.2f}, Conf={conf_factor:.2f} -> {calculated}")
+        logger.debug(f"Расчет плеча: Base={base_lev}, Conf={conf_factor:.2f}, Time={time_factor:.2f} -> {calculated}")
         return calculated
 
-    def _calculate_quantity(self, price: float, leverage: int, risk_metrics: RiskMetrics) -> float:
+    def _calculate_quantity(self, price: float, leverage: int) -> float:
         """
         Расчет количества монет для позиции.
-        Использует лимиты экспозиции от RiskManager.
+        Использует лимиты экспозиции из конфига.
         """
         # Не рискуем более чем X% от доступной маржи
         risk_per_trade_pct = self.config.get('risk', {}).get('margin_per_trade', 0.1)  # 10%
         
-        # Доступная маржа (пока заглушка, потом брать из Executor/Binance)
-        available_margin = 1000.0  # USDT (заглушка)
+        # Доступная маржа (заглушка, потом брать из Executor)
+        available_margin = 1000.0  # USDT
         trade_margin = available_margin * risk_per_trade_pct
         
         if price <= 0:
@@ -284,30 +302,36 @@ class ScenarioWriter:
         # Объем = (Маржа * Плечо) / Цена
         quantity = (trade_margin * leverage) / price
         
-        # Округление
         return round(quantity, 1)
 
-    def _calculate_levels(self, direction: str, entry: float, card: DataCard, risk_metrics: RiskMetrics) -> tuple:
+    def _calculate_levels(self, direction: str, entry: float, target: float, time_sec: int) -> tuple:
         """
         Расчет уровней Stop-Loss и Take-Profit.
-        Использует волатильность (ATR подход).
+        StopLoss = середина между входом и целью (R:R минимум 1:1)
+        TakeProfit = цель или чуть раньше для фиксации
         """
-        volatility = risk_metrics.volatility_index or 0.02
-        
-        # Стоп на основе волатильности (1.5 ATR)
-        stop_distance = entry * (volatility * 1.5)
+        # Расстояние до цели
+        target_distance = abs(target - entry)
         
         if direction == 'LONG':
-            stop_loss = entry - stop_distance
-            take_profit = entry + (stop_distance * 2.5)  # R:R 1:2.5
+            # Стоп посередине или ближе к входу для безопасности
+            stop_loss = entry - (target_distance * 0.5)
+            # Тейк = цель или чуть раньше
+            take_profit = target * 0.995  # Фиксируем чуть раньше цели
         else:
-            stop_loss = entry + stop_distance
-            take_profit = entry - (stop_distance * 2.5)
-            
+            stop_loss = entry + (target_distance * 0.5)
+            take_profit = target * 1.005
+        
         # Округление
         precision = 4 if entry < 1 else 2
         stop_loss = round(stop_loss, precision)
         take_profit = round(take_profit, precision)
+        
+        # Проверка: стоп не должен быть дальше цели
+        if direction == 'LONG' and stop_loss >= entry:
+            stop_loss = entry * 0.99
+        if direction == 'SHORT' and stop_loss <= entry:
+            stop_loss = entry * 1.01
         
         return stop_loss, take_profit
 
@@ -337,7 +361,7 @@ class ScenarioWriter:
         # 2. Сохраняем активный сценарий
         self.active_scenarios[scenario.scenario_id] = scenario
         
-        # 3. Регистрация в RiskManager для теневого отслеживания
+        # 3. Регистрация в RiskManager для отслеживания
         self.risk_manager.register_scenario(scenario.symbol, {
             'entry_price': scenario.entry_price,
             'stop_loss': scenario.stop_loss,
