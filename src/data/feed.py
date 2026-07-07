@@ -144,20 +144,28 @@ class BinanceFuturesFeed:
         
         # Глубина стакана (обновления) - используем futures stream
         for symbol in self.symbols:
-            self.ws_manager.start_futures_depth_socket(
-                callback=self._handle_orderbook_update,
-                symbol=symbol.lower(),
-                depth=20
-            )
-            logger.info(f"Started orderbook stream for {symbol}")
+            try:
+                self.ws_manager.start_futures_depth_socket(
+                    callback=self._handle_orderbook_update,
+                    symbol=symbol.lower(),
+                    depth=20
+                )
+                await asyncio.sleep(0.5) # Даем время на инициализацию сокета
+                logger.info(f"Started orderbook stream for {symbol}")
+            except Exception as e:
+                logger.error(f"Failed to start orderbook stream for {symbol}: {e}")
         
         # Агрегированные сделки
         for symbol in self.symbols:
-            self.ws_manager.start_futures_aggtrade_socket(
-                callback=self._handle_trade_update,
-                symbol=symbol.lower()
-            )
-            logger.info(f"Started trade stream for {symbol}")
+            try:
+                self.ws_manager.start_futures_aggtrade_socket(
+                    callback=self._handle_trade_update,
+                    symbol=symbol.lower()
+                )
+                await asyncio.sleep(0.5)
+                logger.info(f"Started trade stream for {symbol}")
+            except Exception as e:
+                logger.error(f"Failed to start trade stream for {symbol}: {e}")
     
     def _handle_orderbook_update(self, msg: Dict):
         """Обработчик обновлений стакана."""
