@@ -69,14 +69,6 @@ class BinanceFuturesFeed:
         
         logger.info(f"Binance client initialized (testnet={testnet})")
         
-        # Инициализация WebSocket менеджера
-        self.ws_manager = ThreadedWebsocketManager(
-            api_key=self.api_key if self.api_key else None,
-            api_secret=self.api_secret if self.api_secret else None,
-            testnet=testnet
-        )
-        self.ws_manager.start()
-        
         # Предзагрузка начальных данных
         await self._preload_data()
         
