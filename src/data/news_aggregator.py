@@ -158,7 +158,7 @@ class NewsAggregator:
         return None
 
     async def _analyze_and_dispatch(self, entry: Dict, symbols: List[str]):
-        """Анализ новости и отправка вектора в матрицу."""
+        """Анализ новости и отправка прогноза в матрицу вероятностей."""
         title = entry.get('title', '')
         summary = entry.get('summary', '')
         full_text = f"{title} {summary}"
@@ -173,14 +173,41 @@ class NewsAggregator:
         if strength == 0:
             return  # Нейтральная новость
             
-        # Оценка вероятности (зависит от источника)
-        # Для простоты: 0.7 для известных источников
-        probability = 0.7
+        # Оценка вероятности (зависит от источника и силы новости)
+        # Для простоты: базовая 0.7, усиливается со strength
+        probability = min(0.95, 0.7 + strength * 0.25)
         
-        # Время действия (в секундах)
-        # Важные новости живут дольше
-        duration = 300 if strength > 0.5 else 120
+        # Время действия новости (горизонт влияния)
+        # Важные новости живут дольше: от 2 до 10 минут
+        duration = int(120 + strength * 480)  # 120-600 секунд
         
+        # === ПРЕОБРАЗОВАНИЕ НОВОСТИ В ПРОГНОЗ ЦЕНЫ И ВРЕМЕНИ ===
+        # Получаем текущую цену из поля вероятностей (если есть)
+        current_price = self.field.current_price if hasattr(self.field, 'current_price') else 0.0
+        if current_price <= 0:
+            # Если цены нет, пропускаем (будет обновлено в следующем цикле)
+            return
+        
+        # Рассчитываем целевую цену на основе силы новости
+        # Сила 1.0 = движение на 2% (для мемкоинов типа DOGE это нормально)
+        price_impact_pct = strength * 0.02  # 0-2%
+        target_price = current_price * (1 + direction * price_impact_pct)
+        
+        # Прогнозируемое время достижения цели (чем сильнее новость, тем быстрее)
+        # Сила 1.0 = 60 секунд, сила 0.3 = 300 секунд
+        predicted_time_sec = int(60 + (1.0 - strength) * 300)
+        
+        # === ЗАПИСЬ ПРОГНОЗА В МАТРИЦУ ВЕРОЯТНОСТЕЙ ===
+        # Это делает новостной анализатор равноправным участником системы
+        await self.field.add_prediction_to_matrix(
+            symbol=asset,
+            predicted_price=target_price,
+            predicted_time_sec=predicted_time_sec,
+            probability=probability,
+            analyzer_type="news_sentiment"
+        )
+        
+        # === СОХРАНЯЕМ СТАРЫЙ МЕХАНИЗМ ДЛЯ СОВМЕСТИМОСТИ ===
         vector = NewsVector(
             direction=direction,
             strength=strength,
@@ -190,6 +217,5 @@ class NewsAggregator:
             headline=title
         )
         
-        # Запись в матрицу
         await self.field.update_news_vector(asset, vector)
-        print(f"[NewsAggregator] News for {asset}: {title[:50]}... (dir={direction:.2f}, str={strength:.2f})")
+        print(f"[NewsAggregator] News for {asset}: {title[:50]}... (dir={direction:.2f}, str={strength:.2f}, target={target_price:.6f}, time={predicted_time_sec}s)")

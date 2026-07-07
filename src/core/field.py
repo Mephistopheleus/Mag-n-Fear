@@ -8,6 +8,7 @@ import time
 from typing import Dict, Any, Optional, List, Callable
 from collections import defaultdict
 from src.core.models import DataCard, RiskMetrics, NewsVector
+from src.matrix.probability_field import MatrixProbabilityField
 
 
 class ProbabilityField:
@@ -24,6 +25,8 @@ class ProbabilityField:
     - news_aggregator -> layer 'news'
     - risk_manager -> layer 'risk'
     - auto_tuner -> layer 'tuner'
+    
+    Также содержит MatrixProbabilityField для агрегации прогнозов от всех анализаторов.
     """
     
     def __init__(self):
@@ -32,6 +35,9 @@ class ProbabilityField:
         self._history: Dict[str, List[Dict]] = defaultdict(list)
         self._subscribers: List[Callable] = []
         self._max_history_len = 100  # Храним последние N обновлений для анализа
+        
+        # Матрица вероятностей для каждого символа (Время × Цена × Вероятность)
+        self._matrix_fields: Dict[str, MatrixProbabilityField] = {}
         
     async def initialize_symbol(self, symbol: str, initial_price: float):
         """Инициализация DataCard для нового символа."""
@@ -43,6 +49,23 @@ class ProbabilityField:
                     price=initial_price,
                     volume_24h=0.0
                 )
+            
+            # Инициализация матрицы вероятностей для символа
+            if symbol not in self._matrix_fields:
+                self._matrix_fields[symbol] = MatrixProbabilityField(
+                    time_bins=10,
+                    price_bins=20,
+                    time_horizon_sec=600,  # 10 минут горизонт
+                    current_price=initial_price
+                )
+    
+    @property
+    def current_price(self) -> float:
+        """Возвращает цену первого доступного символа (для совместимости)."""
+        if self._data_store:
+            for card in self._data_store.values():
+                return card.price
+        return 0.0
     
     async def update_math_surface(self, symbol: str, key: str, value: Any):
         """MathCore записывает результаты расчетов (индикаторы, свечи)."""
@@ -157,3 +180,23 @@ class ProbabilityField:
         """Очистка поля (для тестов)."""
         self._data_store.clear()
         self._history.clear()
+        self._matrix_fields.clear()
+    
+    async def add_prediction_to_matrix(self, symbol: str, predicted_price: float, predicted_time_sec: int, probability: float, analyzer_type: str):
+        """Добавляет прогноз от анализатора в матрицу вероятностей для указанного символа."""
+        async with self._lock:
+            if symbol not in self._matrix_fields:
+                return  # Матрица еще не инициализирована
+            matrix = self._matrix_fields[symbol]
+            matrix.add_prediction(
+                predicted_price=predicted_price,
+                predicted_time_sec=predicted_time_sec,
+                probability=probability,
+                analyzer_type=analyzer_type
+            )
+    
+    def get_matrix_snapshot(self, symbol: str):
+        """Получает снимок матрицы вероятностей для анализа."""
+        if symbol not in self._matrix_fields:
+            return None
+        return self._matrix_fields[symbol].get_snapshot()
