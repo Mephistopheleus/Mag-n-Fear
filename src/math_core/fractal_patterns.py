@@ -84,7 +84,7 @@ class FractalPatternAnalyzer(BaseIndicator):
                 
         return False
 
-    def calculate(self, data: pl.DataFrame) -> Dict[str, Any]:
+    def calculate(self, data: pl.DataFrame, current_price: float) -> Dict[str, Any]:
         if not self.validate_data(data):
             return {'error': 'Invalid data'}
 
@@ -92,7 +92,14 @@ class FractalPatternAnalyzer(BaseIndicator):
         prices = df['price'].to_numpy()
 
         if len(prices) < 20:
-            return {'value': 0.5, 'signal': 0, 'confidence': 0.0, 'tags': ['fractal']}
+            # Недостаточно данных для прогноза
+            return {
+                'target_price': current_price,
+                'time_sec': 300,  # 5 минут по умолчанию
+                'probability': 0.0,
+                'tags': ['fractal'],
+                'metadata': {'hurst': 0.5, 'patterns_found': []}
+            }
 
         # 1. Расчет Херста
         hurst = self._calculate_hurst(prices)
@@ -100,32 +107,57 @@ class FractalPatternAnalyzer(BaseIndicator):
         # 2. Поиск паттернов
         is_hs = self._find_head_shoulders(prices)
         
-        # Определение сигнала
-        signal = 0
+        # Определение направления и параметров прогноза
         tags = ['fractal']
+        target_price = current_price
+        time_sec = 300  # 5 минут по умолчанию
+        probability = 0.5
         
         if hurst > self.hurst_threshold:
-            trend_signal = 1 if prices[-1] > prices[0] else -1
-            signal = trend_signal
+            # Трендовый режим: цена продолжит движение
+            direction = 1 if prices[-1] > prices[0] else -1
+            impulse = abs(prices[-1] - prices[0]) / prices[0]
+            
+            # Цель: продолжение тренда на X%
+            target_change = impulse * 1.5  # Усиливаем импульс
+            target_price = current_price * (1 + direction * target_change)
+            
+            # Время: чем сильнее тренд, тем быстрее достижение
+            time_sec = int(300 / (hurst + 0.1))  # От 150 до 600 секунд
+            
+            # Вероятность: зависит от силы тренда
+            probability = min(0.95, 0.5 + (hurst - 0.5) * 1.5)
+            
             tags.append('trend_mode')
+            
         elif hurst < (1 - self.hurst_threshold):
-            signal = 0 # Флэт, сигнал нейтрален или на возврат к среднему
+            # Флэт: возврат к среднему
+            mean_price = np.mean(prices)
+            target_price = mean_price
+            time_sec = 600  # Возврат медленнее
+            probability = 0.6  # Средняя вероятность возврата
             tags.append('mean_reversion_mode')
         
         if is_hs:
             tags.append('pattern_head_shoulders')
             # Паттерн Голова-Плечи обычно разворотный
-            if prices[-1] < prices[-5]: # После правого плеча цена пошла вниз
-                signal = -1 
+            if prices[-1] < prices[-5]:  # После правого плеча цена пошла вниз
+                direction = -1
+                target_price = current_price * (1 - 0.02)  # Цель -2%
+                time_sec = 180  # Быстрое движение
+                probability = 0.75
                 tags.append('reversal_short')
-
-        confidence = abs(hurst - 0.5) * 2 # Нормализация 0..1 относительно 0.5
-        confidence = min(1.0, confidence + (0.2 if is_hs else 0))
+            else:
+                direction = 1
+                target_price = current_price * (1 + 0.02)  # Цель +2%
+                time_sec = 180
+                probability = 0.75
+                tags.append('reversal_long')
 
         return {
-            'value': float(hurst),
-            'signal': signal,
-            'confidence': float(confidence),
-            'metadata': {'hurst': hurst, 'patterns_found': ['HS'] if is_hs else []},
-            'tags': tags
+            'target_price': float(target_price),
+            'time_sec': time_sec,
+            'probability': float(probability),
+            'tags': tags,
+            'metadata': {'hurst': hurst, 'patterns_found': ['HS'] if is_hs else []}
         }
