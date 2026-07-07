@@ -363,9 +363,12 @@ class DataFeed:
             card = DataCard(
                 symbol=symbol,
                 timestamp=datetime.utcnow(),
-                
+                price=trade['price'],
+                volume_24h=trade['qty'], # Используем объем текущей сделки как заглушку
+                recent_trades=[trade] # Передаем текущую сделку как список
             )
-            self.prob_field.update(card)
+            # Используем актуальный метод update_card
+            asyncio.create_task(self.prob_field.update_card(card))
     
     def get_orderbook(self, symbol: str) -> Optional[Dict]:
         return self.feed.get_orderbook(symbol)
