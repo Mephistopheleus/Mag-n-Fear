@@ -13,7 +13,7 @@ from collections import defaultdict
 import yaml
 
 if TYPE_CHECKING:
-    from src.math_core.probability_field import ProbabilityField
+    from src.core.field import ProbabilityField
 
 
 class AutoTuner:

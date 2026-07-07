@@ -60,7 +60,7 @@ class MatrixSnapshot:
         }
 
 
-class ProbabilityField:
+class MatrixProbabilityField:
     """
     Матрица Полей Вероятности.
     
