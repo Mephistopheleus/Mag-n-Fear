@@ -184,20 +184,154 @@ class RiskManager:
     async def _shadow_check(self, symbol: str, card: DataCard, metrics: RiskMetrics):
         """
         Теневой расчет: сравнение текущего состояния с идеальным сценарием.
-        Если расхождение велико -> сигнал на корректировку.
+        1. Считает текущий PnL теневой позиции.
+        2. Обновляет уровень стоп-лосса по логике адаптивного трейлинга.
+        3. Фиксирует расхождения для обучения AutoTuner.
         """
         if symbol not in self._shadow_scenarios:
             return
             
         shadow = self._shadow_scenarios[symbol]
+        
+        # 1. Расчет текущего PnL тени
+        current_pnl = self._calculate_shadow_pnl(shadow, card.price)
+        shadow['current_pnl'] = current_pnl
+        shadow['last_price'] = card.price
+        
+        # 2. Адаптивный трейлинг-стоп
+        new_stop = self._update_trailing_stop(shadow, card.price, metrics.volatility_index)
+        if new_stop != shadow['current_stop_loss']:
+            old_stop = shadow['current_stop_loss']
+            shadow['current_stop_loss'] = new_stop
+            print(f"[RiskManager] Shadow Trailing Update {symbol}: Stop {old_stop:.5f} -> {new_stop:.5f} (PnL: {current_pnl:.2f})")
+            
+            # Здесь будет отправка команды Executor на обновление реального стопа, если позиция открыта
+            # await self.executor.update_stop(symbol, new_stop) 
+        
+        # 3. Проверка расхождений (дивергенции)
         ideal_sl = shadow.get('ideal_stop_loss')
-        current_sl = shadow.get('current_stop_loss')
+        current_sl = shadow['current_stop_loss']
         
         if ideal_sl and current_sl:
-            divergence = abs(ideal_sl - current_sl) / card.price
+            divergence = abs(ideal_sl - current_sl) / card.price if card.price > 0 else 0
             if divergence > 0.005:  # Расхождение > 0.5%
-                # Тут можно отправить команду Executor на обновление стопа
                 print(f"[RiskManager] Shadow divergence detected for {symbol}: {divergence:.4f}")
+                
+        # 4. Проверка на срабатывание стопа в тени
+        if self._check_stop_hit(shadow, card.price):
+            print(f"[RiskManager] Shadow Stop Hit for {symbol} at {card.price}. PnL: {current_pnl:.2f}")
+            # Логика закрытия тени и отправки статистики в AutoTuner
+            self._close_shadow_position(symbol, card.price)
+
+    def _calculate_shadow_pnl(self, shadow: Dict, current_price: float) -> float:
+        """
+        Расчет PnL для теневой позиции с учетом комиссий и проскальзывания.
+        Возвращает прибыль/убыток в валюте котировки (USDT).
+        """
+        entry_price = shadow.get('entry_price', 0)
+        quantity = shadow.get('quantity', 0)
+        leverage = shadow.get('leverage', 1)
+        side = shadow.get('side', 'LONG')
+        
+        if entry_price == 0 or quantity == 0:
+            return 0.0
+            
+        # Расчет сырого PnL
+        if side == 'LONG':
+            raw_pnl = (current_price - entry_price) * quantity * leverage
+        else:
+            raw_pnl = (entry_price - current_price) * quantity * leverage
+            
+        # Учет комиссий (вход + выход) и проскальзывания
+        # Комиссия Binance Futures ~0.02% - 0.04%, берем с запасом 0.05%
+        fee_rate = 0.0005 
+        notional = entry_price * quantity * leverage
+        fees = notional * fee_rate * 2 # Вход и выход
+        
+        # Проскальзывание (зависит от волатильности, упрощенно 0.02%)
+        slippage = notional * 0.0002
+        
+        return raw_pnl - fees - slippage
+
+    def _update_trailing_stop(self, shadow: Dict, current_price: float, volatility: float) -> float:
+        """
+        Логика адаптивного трейлинг-стопа.
+        Двигает стоп только в направлении прибыли.
+        Расстояние до стопа зависит от волатильности (ATR аналог).
+        """
+        side = shadow.get('side', 'LONG')
+        current_stop = shadow.get('current_stop_loss', 0)
+        entry_price = shadow.get('entry_price', current_price)
+        
+        # Динамическое расстояние стопа: база + волатильность * коэффициент
+        # Коэффициент можно крутить через AutoTuner (пока хардкод 2.0 для примера)
+        trail_multiplier = self.config.get('risk', {}).get('trail_multiplier', 2.0)
+        base_distance = entry_price * 0.005 # Базовый отступ 0.5%
+        vol_distance = current_price * volatility * trail_multiplier
+        
+        dynamic_distance = max(base_distance, vol_distance)
+        
+        new_stop = current_stop
+        
+        if side == 'LONG':
+            # Для лонга стоп двигается только вверх
+            potential_stop = current_price - dynamic_distance
+            if potential_stop > current_stop:
+                new_stop = potential_stop
+            # Не ниже цены входа (безубыток), если настроено
+            if self.config.get('risk', {}).get('break_even', False):
+                if potential_stop > entry_price and current_stop < entry_price:
+                    new_stop = entry_price
+                    
+        elif side == 'SHORT':
+            # Для шорта стоп двигается только вниз
+            potential_stop = current_price + dynamic_distance
+            if potential_stop < current_stop:
+                new_stop = potential_stop
+            # Безубыток
+            if self.config.get('risk', {}).get('break_even', False):
+                if potential_stop < entry_price and current_stop > entry_price:
+                    new_stop = entry_price
+                    
+        return new_stop
+
+    def _check_stop_hit(self, shadow: Dict, current_price: float) -> bool:
+        """Проверка, достигла ли цена стоп-лосса."""
+        side = shadow.get('side', 'LONG')
+        stop_loss = shadow.get('current_stop_loss', 0)
+        
+        if side == 'LONG' and current_price <= stop_loss:
+            return True
+        if side == 'SHORT' and current_price >= stop_loss:
+            return True
+        return False
+
+    def _close_shadow_position(self, symbol: str, close_price: float):
+        """Закрытие теневой позиции и подготовка данных для AutoTuner."""
+        if symbol not in self._shadow_scenarios:
+            return
+            
+        shadow = self._shadow_scenarios[symbol]
+        pnl = shadow.get('current_pnl', 0)
+        
+        # Формируем результат для обучения
+        result_data = {
+            'symbol': symbol,
+            'pnl': pnl,
+            'entry_time': shadow.get('timestamp'),
+            'exit_time': time.time(),
+            'duration': time.time() - shadow.get('timestamp', 0),
+            'max_adverse_excursion': shadow.get('max_drawdown', 0), # TODO: считать в цикле
+            'strategy_type': shadow.get('strategy_type', 'unknown')
+        }
+        
+        print(f"[RiskManager] Shadow Closed {symbol}. Result: {pnl:.2f} USDT")
+        
+        # Отправка в ProbabilityField или напрямую в AutoTuner
+        # await self.field.add_trade_result(result_data) 
+        
+        # Удаление из активных теней
+        del self._shadow_scenarios[symbol]
 
     def register_scenario(self, symbol: str, scenario: Dict[str, Any]):
         """Регистрация сценария для теневого отслеживания."""
