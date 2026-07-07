@@ -58,8 +58,23 @@ class Executor:
         
     async def start(self):
         """Инициализация клиента Binance."""
-        api_key = self.config.get('binance', {}).get('api_key', '')
-        api_secret = self.config.get('binance', {}).get('api_secret', '')
+        # Берем ключи из раздела api_keys в конфиге
+        api_keys_cfg = self.config.get('api_keys', {})
+        if hasattr(api_keys_cfg, 'dict'):
+            api_keys_dict = api_keys_cfg.dict()
+        else:
+            api_keys_dict = api_keys_cfg
+            
+        api_key = api_keys_dict.get('binance_testnet_api_key', '')
+        api_secret = api_keys_dict.get('binance_testnet_api_secret', '')
+        
+        if not api_key or not api_secret:
+            print("[Executor] WARNING: API keys not found in config. Running in simulation mode.")
+            self._client = None
+            self._running = True
+            asyncio.create_task(self._process_queue())
+            print(f"[Executor] Started (testnet={self.testnet}, simulation_mode=True)")
+            return
         
         self._client = await AsyncClient.create(
             api_key=api_key,

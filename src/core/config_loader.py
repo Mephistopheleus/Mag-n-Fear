@@ -37,6 +37,7 @@ class TunerConfig(BaseModel):
 
 
 class RiskConfig(BaseModel):
+    trading_balance_usd: float = 50.0
     max_daily_loss_pct: float = 2.0
     max_position_size_usd: float = 1000.0
     risk_per_trade_pct: float = 0.5

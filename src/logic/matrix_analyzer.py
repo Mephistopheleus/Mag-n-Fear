@@ -7,7 +7,7 @@ Logic Module: Matrix Analyzer
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime
-from src.matrix.probability_field import MatrixSnapshot, ProbabilityCell
+from src.matrix.probability_field import MatrixSnapshot, ProbabilityCell, MatrixProbabilityField
 
 
 class MatrixAnalyzer:
