@@ -83,6 +83,8 @@ class DataCard:
     # --- Мета-данные от AutoTuner ---
     tuner_confidence: float = 0.5  # Доверие к текущей стратегии (0-1)
     active_strategy_id: str = "default"
+    # --- Результаты теневого расчета (от RiskManager) ---
+    shadow_results: Dict[str, Any] = field(default_factory=dict)
     
     # --- Служебное ---
     sequence_id: int = 0  # Для отслеживания порядка событий

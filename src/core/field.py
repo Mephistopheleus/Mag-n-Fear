@@ -100,6 +100,19 @@ class ProbabilityField:
             card.timestamp = time.time()
             await self._notify_subscribers(symbol, card)
 
+    async def update_shadow_result(self, symbol: str, result: Dict[str, Any]):
+        """RiskManager записывает результаты теневого расчета для обучения AutoTuner."""
+        async with self._lock:
+            if symbol not in self._data_store:
+                return
+            card = self._data_store[symbol]
+            # Добавляем результаты тени в специальное поле
+            if not hasattr(card, 'shadow_results'):
+                card.shadow_results = {}
+            card.shadow_results = result
+            card.timestamp = time.time()
+            await self._notify_subscribers(symbol, card)
+
     async def get_card(self, symbol: str) -> Optional[DataCard]:
         """Получение актуальной DataCard для чтения (ScenarioWriter)."""
         async with self._lock:
