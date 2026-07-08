@@ -254,3 +254,16 @@ class ProbabilityField:
         self._data_store.clear()
         self._history.clear()
         self._prediction_points.clear()
+
+    def get_matrix_snapshot(self, symbol: str = None) -> List[PredictionPoint]:
+        """
+        Вернуть снимок всех текущих точек (прогнозов) для символа.
+        Для совместимости с main.py.
+        """
+        if symbol:
+            return self._prediction_points.get(symbol, []).copy()
+        # Если символ не указан, возвращаем все точки со всех символов
+        all_points = []
+        for points_list in self._prediction_points.values():
+            all_points.extend(points_list)
+        return all_points

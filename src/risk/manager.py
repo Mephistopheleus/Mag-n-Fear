@@ -41,6 +41,7 @@ class RiskManager:
         # Состояние
         self._active_positions: Dict[str, Dict] = {}  # symbol -> position info
         self._shadow_scenarios: Dict[str, Dict] = {}  # symbol -> last shadow calc
+        self.shadow_positions: Dict[str, list] = {}  # symbol -> list of shadow positions (для main.py)
         
     async def analyze_and_update(self, symbol: str):
         """

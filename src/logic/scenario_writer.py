@@ -35,8 +35,11 @@ class TradeScenario:
         return asdict(self)
 
 class ScenarioWriter:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], prob_field, risk_manager, matrix_analyzer):
         self.config = config
+        self.prob_field = prob_field
+        self.risk_manager = risk_manager
+        self.matrix_analyzer = matrix_analyzer
         self.symbol = config.get('symbol', 'DOGEUSDT')
         self.min_confidence = config.get('min_scenario_confidence', 0.6)
         

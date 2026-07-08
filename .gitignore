@@ -5,20 +5,14 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Logs and temp files
+# Logs
 *.log
-*.tmp
+bot_run.log
 
 # Environment
 .env
 .env.local
 *.env.*
-
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
 
 # Dependencies
 .venv/
@@ -30,12 +24,20 @@ dist/
 build/
 target/
 
+# Editors
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
 # Coverage
 .coverage
 coverage/
 htmlcov/
 
-# Cache
-.mypy_cache/
+# Testing
 .pytest_cache/
+.mypy_cache/
 ```
