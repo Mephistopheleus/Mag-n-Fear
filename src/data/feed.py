@@ -367,8 +367,14 @@ class DataFeed:
                 volume_24h=trade['qty'], # Используем объем текущей сделки как заглушку
                 recent_trades=[trade] # Передаем текущую сделку как список
             )
-            # Используем актуальный метод update_card
-            asyncio.create_task(self.prob_field.update_card(card))
+            # Используем актуальный метод update_market_data
+            asyncio.create_task(self.prob_field.update_market_data(
+                symbol=symbol,
+                price=trade['price'],
+                volume=trade['qty'],
+                orderbook=self.get_orderbook(symbol) or {},
+                trades=[trade]
+            ))
     
     def get_orderbook(self, symbol: str) -> Optional[Dict]:
         return self.feed.get_orderbook(symbol)

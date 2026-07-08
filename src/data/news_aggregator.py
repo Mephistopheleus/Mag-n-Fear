@@ -87,7 +87,7 @@ class NewsAggregator:
                 if isinstance(res, list):
                     all_entries.extend(res)
             
-            # Анализ каждой новости
+            # Анализ каждой новости (синхронно, т.к. _analyze_and_dispatch теперь синхронный)
             for entry in all_entries:
                 self._analyze_and_dispatch(entry, symbols)
                 
@@ -157,8 +157,8 @@ class NewsAggregator:
                 
         return None
 
-    async def _analyze_and_dispatch(self, entry: Dict, symbols: List[str]):
-        """Анализ новости и отправка прогноза в матрицу вероятностей."""
+    def _analyze_and_dispatch(self, entry: Dict, symbols: List[str]):
+        """Анализ новости и отправка прогноза в матрицу вероятностей (синхронно)."""
         title = entry.get('title', '')
         summary = entry.get('summary', '')
         full_text = f"{title} {summary}"

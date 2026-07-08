@@ -27,6 +27,7 @@ from src.logic.scenario_writer import ScenarioWriter
 from src.risk.manager import RiskManager
 from src.tuner.auto_tuner import AutoTuner
 from src.executor import Executor
+from src.logic.matrix_analyzer import MatrixAnalyzer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -62,13 +63,16 @@ class TradingBot:
         # 6. Инициализация риск-менеджера
         self.risk_manager = RiskManager(self.config, self.prob_field)
         
-        # 7. Инициализация сценариста
-        self.scenario_writer = ScenarioWriter(self.config, self.prob_field, self.risk_manager)
+        # 7. Инициализация матричного анализатора (кросс-валидация)
+        self.matrix_analyzer = MatrixAnalyzer()
         
-        # 8. Инициализация тюнера
+        # 8. Инициализация сценариста
+        self.scenario_writer = ScenarioWriter(self.config, self.prob_field, self.risk_manager, self.matrix_analyzer)
+        
+        # 9. Инициализация тюнера
         self.tuner = AutoTuner(self.config, self.prob_field)
         
-        # 9. Инициализация исполнителя
+        # 10. Инициализация исполнителя
         self.executor = Executor(self.config, self.prob_field, self.risk_manager)
         
         # Символы для торговли
