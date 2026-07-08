@@ -171,29 +171,53 @@ class TradingBot:
                 self.health.heartbeat("trading_decision")
                 
                 for symbol in self.symbols:
-                    # 1. Анализ рынка и генерация сценария
-                    scenario = await self.scenario_writer.analyze_market(symbol)
+                    # 1. Получаем модель рынка от синтезатора (если есть) или собираем данные
+                    ticker = self.feed.get_ticker(symbol)
+                    if not ticker:
+                        continue
+                    current_price = ticker.get('price')
+                    if not current_price:
+                        continue
                     
-                    if scenario:
-                        # 2. Валидация и отправка в Executor
-                        success = await self.scenario_writer.validate_and_submit(
-                            scenario, 
-                            self.executor.submit_command
-                        )
+                    # Получаем снимок матрицы для анализа
+                    matrix_snapshot = self.prob_field.get_matrix_snapshot(symbol)
+                    
+                    # Запускаем матричный анализатор для поиска кластеров
+                    clusters = self.matrix_analyzer.find_clusters(matrix_snapshot, current_price)
+                    
+                    # Формируем простую модель рынка для сценариста
+                    market_model = {
+                        'symbol': symbol,
+                        'current_price': current_price,
+                        'clusters': clusters,
+                        'trend': 'NEUTRAL',  # Пока заглушка, потом от синтезатора
+                        'levels': []
+                    }
+                    
+                    # 2. Генерация сценариев на основе модели
+                    scenarios = self.scenario_writer.generate_scenarios(market_model, current_price)
+                    
+                    if scenarios:
+                        # Берем лучший сценарий (с максимальной уверенностью)
+                        best_scenario = max(scenarios, key=lambda s: s.confidence)
                         
-                        if success:
-                            await self.notifier.notify_trade(scenario.__dict__, "OPEN")
+                        # 3. Валидация риск-менеджером
+                        if self.risk_manager.validate_scenario(best_scenario):
+                            # 4. Отправка в Executor
+                            await self.executor.execute_scenario(best_scenario)
+                            await self.notifier.notify_trade(best_scenario.to_dict(), "OPEN")
                         else:
-                            logger.warning(f"Scenario rejected for {symbol}")
+                            logger.warning(f"Scenario rejected by RiskManager for {symbol}")
+                    else:
+                        logger.debug(f"No valid scenarios for {symbol}")
                     
-                    # 3. Обновление трейлинг-стопов для активных позиций
-                    card = await self.prob_field.get_card(symbol)
-                    if card and self.scenario_writer.active_scenarios:
-                        await self.scenario_writer.update_trail(
-                            symbol, 
-                            card.price, 
-                            self.executor.submit_command
-                        )
+                    # 5. Обновление трейлинг-стопов для активных позиций (внутренний метод)
+                    # Риск-менеджер обновляет стоп-лоссы для теневых позиций
+                    # Для реальных позиций это делает Executor через update_trail
+                    for shadow in self.risk_manager.shadow_positions.get(symbol, []):
+                        volatility = self.risk_manager._calculate_volatility([])
+                        new_stop = self.risk_manager._update_trailing_stop(shadow, current_price, volatility)
+                        shadow['stop_loss'] = new_stop
                 
                 await asyncio.sleep(delay)
                 

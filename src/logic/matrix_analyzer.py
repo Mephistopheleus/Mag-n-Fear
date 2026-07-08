@@ -29,10 +29,72 @@ class MatrixAnalyzer:
         """
         self.min_cluster_size = min_cluster_size
         self.probability_threshold = probability_threshold
-    
+
+    def find_clusters(self, points: List[PredictionPoint], current_price: float) -> List[Dict[str, Any]]:
+        """
+        Публичный метод для поиска кластеров. Вызывается из main.py.
+        Возвращает список найденных целей (кластеров).
+        """
+        if not points:
+            return []
+        
+        # Фильтруем точки по порогу вероятности
+        significant_points = [p for p in points if p.probability >= self.probability_threshold]
+        
+        if len(significant_points) < self.min_cluster_size:
+            return []
+        
+        # Ищем кластеры
+        clusters = self._find_clusters(significant_points, current_price)
+        
+        # Преобразуем кластеры в цели
+        targets = []
+        for cluster in clusters:
+            target = self._cluster_to_target(cluster, current_price)
+            if target:
+                targets.append(target)
+        
+        return targets
+
+    def _cluster_to_target(self, cluster: List[PredictionPoint], current_price: float) -> Optional[Dict[str, Any]]:
+        """
+        Преобразует кластер точек в целевой прогноз.
+        """
+        if len(cluster) < self.min_cluster_size:
+            return None
+        
+        # Расчет целевой цены и времени (взвешенное среднее)
+        total_weight = sum(p.probability for p in cluster)
+        if total_weight == 0:
+            return None
+        
+        target_price = sum(p.price * p.probability for p in cluster) / total_weight
+        target_time_sec = sum(p.time_sec * p.probability for p in cluster) / total_weight
+        
+        # Средняя вероятность кластера
+        avg_cluster_probability = sum(p.probability for p in cluster) / len(cluster)
+        
+        # Определение типа паттерна
+        pattern_type = self._detect_pattern_type(cluster, current_price)
+        
+        return {
+            "target_price": target_price,
+            "target_time_sec": int(target_time_sec),
+            "probability": avg_cluster_probability,
+            "pattern_type": pattern_type,
+            "confidence": avg_cluster_probability,
+            "metadata": {
+                "cluster_size": len(cluster),
+                "analyzers_contrib": self._aggregate_analyzers_contrib(cluster),
+                "price_range": (min(p.price for p in cluster), max(p.price for p in cluster)),
+                "time_range": (min(p.time_sec for p in cluster), max(p.time_sec for p in cluster))
+            }
+        }
+
     def analyze(self, points: List[PredictionPoint], current_price: float) -> Optional[Dict[str, Any]]:
         """
-        Анализирует список точек и возвращает цель (если найдена).
+        Анализирует список точек и возвращает лучшую цель (если найдена).
+        Для обратной совместимости.
         
         :param points: Список всех прогнозных точек из ProbabilityField
         :param current_price: Текущая цена актива
@@ -63,33 +125,8 @@ class MatrixAnalyzer:
         # Шаг 3: Выбор лучшего кластера (с максимальной суммарной вероятностью)
         best_cluster = max(clusters, key=lambda c: sum(p.probability for p in c))
         
-        # Шаг 4: Расчет целевой цены и времени (взвешенное среднее)
-        total_weight = sum(p.probability for p in best_cluster)
-        if total_weight == 0:
-            return None
-        
-        target_price = sum(p.price * p.probability for p in best_cluster) / total_weight
-        target_time_sec = sum(p.time_sec * p.probability for p in best_cluster) / total_weight
-        
-        # Средняя вероятность кластера
-        avg_cluster_probability = sum(p.probability for p in best_cluster) / len(best_cluster)
-        
-        # Определение типа паттерна
-        pattern_type = self._detect_pattern_type(best_cluster, current_price)
-        
-        return {
-            "target_price": target_price,
-            "target_time_sec": int(target_time_sec),
-            "probability": avg_cluster_probability,
-            "pattern_type": pattern_type,
-            "confidence": avg_cluster_probability,  # Сырая уверенность
-            "metadata": {
-                "cluster_size": len(best_cluster),
-                "analyzers_contrib": self._aggregate_analyzers_contrib(best_cluster),
-                "price_range": (min(p.price for p in best_cluster), max(p.price for p in best_cluster)),
-                "time_range": (min(p.time_sec for p in best_cluster), max(p.time_sec for p in best_cluster))
-            }
-        }
+        # Преобразуем лучший кластер в цель
+        return self._cluster_to_target(best_cluster, current_price)
     
     def _find_clusters(self, points: List[PredictionPoint], current_price: float, price_tolerance_pct: float = 0.02, time_tolerance_sec: int = 60) -> List[List[PredictionPoint]]:
         """
