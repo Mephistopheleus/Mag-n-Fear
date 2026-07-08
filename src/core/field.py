@@ -131,6 +131,15 @@ class ProbabilityField:
         async with self._lock:
             self._prediction_points[symbol] = []
     
+    @property
+    def points(self) -> Dict[str, List[PredictionPoint]]:
+        """Возвращает словарь всех точек прогнозов по символам (для совместимости)."""
+        return dict(self._prediction_points)
+    
+    def get_points_sync(self, symbol: str) -> List[PredictionPoint]:
+        """Синхронный метод получения точек для символа."""
+        return self._prediction_points.get(symbol, []).copy()
+    
     async def update_math_surface(self, symbol: str, key: str, value: Any):
         """MathCore записывает результаты расчетов (индикаторы, свечи)."""
         async with self._lock:
