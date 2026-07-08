@@ -28,6 +28,8 @@ from src.risk.manager import RiskManager
 from src.tuner.auto_tuner import AutoTuner
 from src.executor import Executor
 from src.logic.matrix_analyzer import MatrixAnalyzer
+from src.logic.market_synthesizer import MarketSynthesizer
+from src.executor.shadow_dealer import ShadowDealer
 
 logging.basicConfig(
     level=logging.INFO,
