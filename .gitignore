@@ -1,18 +1,9 @@
 ```
-# Logs and temp files
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Logs
 *.log
-*.tmp
-*.swp
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
-
-# Original rules preserved
 bot_run.log
 ```

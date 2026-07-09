@@ -32,6 +32,10 @@ class ShadowTrade:
     max_drawdown: float = 0.0
     max_profit: float = 0.0
     duration_sec: float = 0.0
+    
+    # Издержки
+    open_fee: float = 0.0
+    close_fee: float = 0.0
 
 class ShadowDealer:
     """
@@ -47,21 +51,29 @@ class ShadowDealer:
         # Параметры симуляции
         self.slippage = 0.0005  # 0.05% проскальзывание
         self.commission = 0.001  # 0.1% комиссия (как на Binance)
+        self.spread = 0.0002  # 0.02% спред (разница Bid/Ask)
 
     async def execute_scenario(self, scenario: Dict[str, Any]) -> ShadowTrade:
         """
-        Открывает теневую сделку по сценарию.
+        Открывает теневую сделку по сценарию с учетом всех издержек.
         """
         async with self._lock:
             trade_id = f"shadow_{int(time.time() * 1000)}"
             
-            # Симуляция входа с проскальзыванием
+            # Симуляция входа с проскальзыванием и спредом
             entry_price = scenario['entry_price']
+            spread = self.spread  # Добавляем спред к проскальзыванию
+            
             if scenario['direction'] == 'BUY':
-                entry_price *= (1 + self.slippage)
+                # Покупаем по Ask (цена выше)
+                entry_price *= (1 + self.slippage + spread)
             else:
-                entry_price *= (1 - self.slippage)
+                # Продаем по Bid (цена ниже)
+                entry_price *= (1 - self.slippage - spread)
                 
+            # Комиссия при открытии (списывается сразу виртуально)
+            open_fee = scenario['quantity'] * entry_price * self.commission
+            
             trade = ShadowTrade(
                 id=trade_id,
                 symbol=self.symbol,
@@ -70,7 +82,8 @@ class ShadowDealer:
                 quantity=scenario['quantity'],
                 leverage=scenario.get('leverage', 1.0),
                 timestamp_open=time.time(),
-                scenario_id=scenario.get('id', 'unknown')
+                scenario_id=scenario.get('id', 'unknown'),
+                open_fee=open_fee  # Сохраняем комиссию открытия
             )
             
             self.active_trades[trade_id] = trade
@@ -120,9 +133,15 @@ class ShadowDealer:
                     trade.max_drawdown = unrealized_pnl
                     
                 if should_close:
+                    # Комиссия при закрытии
+                    close_fee = trade.quantity * current_price * self.commission
+                    trade.close_fee = close_fee
+                    
                     trade.exit_price = current_price
-                    trade.pnl = unrealized_pnl * trade.quantity * trade.entry_price
-                    trade.pnl_percent = unrealized_pnl
+                    # Чистый PnL за вычетом ВСЕХ комиссий (открытие + закрытие)
+                    gross_pnl = unrealized_pnl * trade.quantity * trade.entry_price
+                    trade.pnl = gross_pnl - trade.open_fee - close_fee
+                    trade.pnl_percent = (trade.pnl / (trade.quantity * trade.entry_price)) * 100
                     trade.timestamp_close = time.time()
                     trade.duration_sec = trade.timestamp_close - trade.timestamp_open
                     trade.reason = reason
