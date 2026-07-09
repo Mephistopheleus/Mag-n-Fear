@@ -120,9 +120,22 @@ class ShadowDealer:
                     trade.max_drawdown = unrealized_pnl
                     
                 if should_close:
+                    # Расчет PnL с учетом комиссии и спреда (реалистичный расчет)
+                    # Комиссия берется дважды: при открытии и закрытии
+                    total_commission = self.commission * 2
+                    
+                    if trade.direction == 'BUY':
+                        raw_pnl_pct = (current_price - trade.entry_price) / trade.entry_price
+                    else:
+                        raw_pnl_pct = (trade.entry_price - current_price) / trade.entry_price
+                    
+                    # Вычитаем комиссию из процента прибыли
+                    net_pnl_pct = raw_pnl_pct - total_commission
+                    net_pnl_pct *= trade.leverage
+                    
                     trade.exit_price = current_price
-                    trade.pnl = unrealized_pnl * trade.quantity * trade.entry_price
-                    trade.pnl_percent = unrealized_pnl
+                    trade.pnl_percent = net_pnl_pct
+                    trade.pnl = net_pnl_pct * trade.quantity * trade.entry_price
                     trade.timestamp_close = time.time()
                     trade.duration_sec = trade.timestamp_close - trade.timestamp_open
                     trade.reason = reason
