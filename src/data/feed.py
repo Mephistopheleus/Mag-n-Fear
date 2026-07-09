@@ -29,13 +29,33 @@ class BinanceFuturesFeed:
         else:
             self.config = config
             
-        self.api_key = self.config.get("api_keys", {}).get("binance_testnet_api_key", "")
-        self.api_secret = self.config.get("api_keys", {}).get("binance_testnet_api_secret", "")
-        
-        # Символы для отслеживания
-        data_cfg = self.config.get("data", {})
-        self.symbols = data_cfg.get("symbols", ["DOGEUSDT", "BTCUSDT"]) if isinstance(data_cfg, dict) else getattr(data_cfg, 'symbols', ["DOGEUSDT", "BTCUSDT"])
-        self.primary_symbol = data_cfg.get("primary_symbol", "DOGEUSDT") if isinstance(data_cfg, dict) else getattr(data_cfg, 'primary_symbol', "DOGEUSDT")
+        # Обработка api_keys с учётом возможного объекта ApiKeysConfig
+        if isinstance(self.config, dict):
+            api_keys = self.config.get("api_keys", {})
+            if hasattr(api_keys, 'model_dump'):
+                api_keys = api_keys.model_dump()
+            self.api_key = api_keys.get("binance_testnet_api_key", "") if isinstance(api_keys, dict) else ""
+            self.api_secret = api_keys.get("binance_testnet_api_secret", "") if isinstance(api_keys, dict) else ""
+            
+            # Символы для отслеживания
+            data_cfg = self.config.get("data", {})
+            self.symbols = data_cfg.get("symbols", ["DOGEUSDT", "BTCUSDT"]) if isinstance(data_cfg, dict) else getattr(data_cfg, 'symbols', ["DOGEUSDT", "BTCUSDT"])
+            self.primary_symbol = data_cfg.get("primary_symbol", "DOGEUSDT") if isinstance(data_cfg, dict) else getattr(data_cfg, 'primary_symbol', "DOGEUSDT")
+        else:
+            # Если config - это объект Config
+            api_keys = getattr(self.config, 'api_keys', None)
+            if hasattr(api_keys, 'model_dump'):
+                api_keys_dict = api_keys.model_dump()
+            elif isinstance(api_keys, dict):
+                api_keys_dict = api_keys
+            else:
+                api_keys_dict = {}
+            self.api_key = api_keys_dict.get("binance_testnet_api_key", "") if api_keys_dict else ""
+            self.api_secret = api_keys_dict.get("binance_testnet_api_secret", "") if api_keys_dict else ""
+            
+            data_cfg = getattr(self.config, 'data', {})
+            self.symbols = getattr(data_cfg, 'symbols', ["DOGEUSDT", "BTCUSDT"]) if hasattr(data_cfg, 'symbols') else ["DOGEUSDT", "BTCUSDT"]
+            self.primary_symbol = getattr(data_cfg, 'primary_symbol', "DOGEUSDT") if hasattr(data_cfg, 'primary_symbol') else "DOGEUSDT"
         
         # Клиент инициализируется при старте
         self.client: Optional[AsyncClient] = None

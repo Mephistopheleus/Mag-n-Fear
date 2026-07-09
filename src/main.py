@@ -28,7 +28,7 @@ from src.risk.manager import RiskManager
 from src.tuner.auto_tuner import AutoTuner
 from src.executor import Executor
 from src.logic.matrix_analyzer import MatrixAnalyzer
-from src.logic.market_synthesizer import MarketSynthesizer
+from src.logic.market_synthesizer import MarketSynthesizer, MarketTrend
 from src.executor.shadow_dealer import ShadowDealer
 
 logging.basicConfig(
@@ -62,19 +62,22 @@ class TradingBot:
         self.regime_detector = MarketRegimeDetector(self.config)
         self.ob_analyzer = OrderBookAnalyzer(self.config)
         
-        # 6. Инициализация риск-менеджера
+        # 6. Инициализация синтезатора рынка (Мозг системы)
+        self.synthesizer = MarketSynthesizer(self.config)
+        
+        # 7. Инициализация риск-менеджера
         self.risk_manager = RiskManager(self.config, self.prob_field)
         
-        # 7. Инициализация матричного анализатора (кросс-валидация)
+        # 8. Инициализация матричного анализатора (кросс-валидация)
         self.matrix_analyzer = MatrixAnalyzer()
         
-        # 8. Инициализация сценариста
+        # 9. Инициализация сценариста
         self.scenario_writer = ScenarioWriter(self.config, self.prob_field, self.risk_manager, self.matrix_analyzer)
         
-        # 9. Инициализация тюнера
+        # 10. Инициализация тюнера
         self.tuner = AutoTuner(self.config, self.prob_field)
         
-        # 10. Инициализация исполнителя
+        # 11. Инициализация исполнителя
         self.executor = Executor(self.config, self.prob_field, self.risk_manager)
         
         # Символы для торговли
@@ -171,7 +174,7 @@ class TradingBot:
                 self.health.heartbeat("trading_decision")
                 
                 for symbol in self.symbols:
-                    # 1. Получаем модель рынка от синтезатора (если есть) или собираем данные
+                    # 1. Получаем данные и синтезируем модель рынка
                     ticker = self.feed.get_ticker(symbol)
                     if not ticker:
                         continue
@@ -179,35 +182,81 @@ class TradingBot:
                     if not current_price:
                         continue
                     
-                    # Получаем снимок матрицы для анализа
+                    # Собираем данные для синтезатора
                     matrix_snapshot = self.prob_field.get_matrix_snapshot(symbol)
-                    
-                    # Запускаем матричный анализатор для поиска кластеров
                     clusters = self.matrix_analyzer.find_clusters(matrix_snapshot, current_price)
                     
-                    # Формируем простую модель рынка для сценариста
+                    # Получаем свежие данные от анализаторов
+                    market_data = {
+                        'current_price': current_price,
+                        'candles_short': [],  # TODO: взять из feed
+                        'candles_mid': [],
+                        'candles_long': [],
+                        'history': [],
+                        'order_flow_imbalance': 0.0,
+                        'news_impact': 0.0
+                    }
+                    
+                    # Синтезируем единую модель рынка
+                    market_model_obj = await self.synthesizer.synthesize(
+                        current_price=current_price,
+                        analysis_points=[],  # TODO: точки из матрицы
+                        market_data=market_data
+                    )
+                    
+                    # Преобразуем в формат для ScenarioWriter
+                    dominant_trend = market_model_obj.get_dominant_trend()
+                    trend_map = {
+                        MarketTrend.BULLISH: 'BULLISH',
+                        MarketTrend.BEARISH: 'BEARISH',
+                        MarketTrend.SIDEWAYS: 'SIDEWAYS',
+                        MarketTrend.UNKNOWN: 'NEUTRAL'
+                    }
+                    
+                    # Вычисляем силу тренда (на основе согласованности таймфреймов)
+                    trends = [market_model_obj.trend_short, market_model_obj.trend_mid, market_model_obj.trend_long]
+                    trend_counts = {t: trends.count(t) for t in set(trends)}
+                    strength = trend_counts.get(dominant_trend, 0) / len(trends) if trends else 0.5
+                    
+                    # Ключевые уровни
+                    levels = {
+                        'support': [l.price for l in market_model_obj.levels if l.type == 'support'],
+                        'resistance': [l.price for l in market_model_obj.levels if l.type == 'resistance']
+                    }
+                    
                     market_model = {
                         'symbol': symbol,
                         'current_price': current_price,
-                        'clusters': clusters,
-                        'trend': 'NEUTRAL',  # Пока заглушка, потом от синтезатора
-                        'levels': []
+                        'trend': trend_map.get(dominant_trend, 'NEUTRAL'),
+                        'strength': strength,
+                        'key_levels': levels,
+                        'sentiment': market_model_obj.sentiment.aggression,
+                        'volatility': market_model_obj.volatility,
+                        'clusters': clusters
                     }
+                    
+                    logger.debug(f"Market Model for {symbol}: Trend={market_model['trend']}, Strength={strength:.2f}, Vol={market_model_obj.volatility:.4f}")
                     
                     # 2. Генерация сценариев на основе модели
                     scenarios = self.scenario_writer.generate_scenarios(market_model, current_price)
                     
                     if scenarios:
-                        # Берем лучший сценарий (с максимальной уверенностью)
-                        best_scenario = max(scenarios, key=lambda s: s.confidence)
-                        
-                        # 3. Валидация риск-менеджером
-                        if self.risk_manager.validate_scenario(best_scenario):
-                            # 4. Отправка в Executor
-                            await self.executor.execute_scenario(best_scenario)
-                            await self.notifier.notify_trade(best_scenario.to_dict(), "OPEN")
-                        else:
-                            logger.warning(f"Scenario rejected by RiskManager for {symbol}")
+                        # ВАЖНО: Проверяем ВСЕ сценарии, не только лучший!
+                        # Каждый сценарий проходит валидацию и попадает в тень или на исполнение
+                        for scenario in scenarios:
+                            # 3. Валидация риск-менеджером (async метод)
+                            is_valid, reason = await self.risk_manager.validate_scenario(symbol, scenario.to_dict())
+                            
+                            if is_valid:
+                                # 4. Отправка в Executor (реальная сделка или тень)
+                                logger.info(f"Scenario ACCEPTED for {symbol}: {scenario.strategy_type} {scenario.direction} - {reason}")
+                                await self.executor.execute_scenario(scenario)
+                                await self.notifier.notify_trade(scenario.to_dict(), "OPEN")
+                            else:
+                                # Даже отклоненные сценарии идут в тень для обучения!
+                                logger.debug(f"Scenario REJECTED for {symbol}: {scenario.strategy_type} {scenario.direction} - {reason}")
+                                # Отправляем в ShadowDealer для сбора статистики
+                                await self.risk_manager.add_to_shadow_learning(symbol, scenario.to_dict(), reason)
                     else:
                         logger.debug(f"No valid scenarios for {symbol}")
                     

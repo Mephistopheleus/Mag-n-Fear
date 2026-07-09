@@ -83,9 +83,15 @@ class MarketSynthesizer:
     """
     Синтезирует единую картину рынка из разрозненных данных.
     """
-    def __init__(self, config: Any):
+    def __init__(self, config: Any, symbol: str = "DOGEUSDT"):
         self.config = config
-        self.symbol = config.trading.symbol
+        # Пытаемся получить символ из разных мест конфига
+        if hasattr(config, 'data') and hasattr(config.data, 'symbols'):
+            self.symbol = config.data.symbols[0] if config.data.symbols else symbol
+        elif isinstance(config, dict):
+            self.symbol = config.get('data', {}).get('symbols', [symbol])[0]
+        else:
+            self.symbol = symbol
         self.latest_model: Optional[MarketModel] = None
         self._lock = asyncio.Lock()
 
