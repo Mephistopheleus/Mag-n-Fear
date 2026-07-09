@@ -36,21 +36,34 @@ class ShadowTrade:
 class ShadowDealer:
     """
     Симулирует исполнение сделок для сбора данных об эффективности стратегий.
+    Использует реальные комиссии и проскальзывание из конфига с запасом для симуляции.
     """
     def __init__(self, config: Any):
         self.config = config
-        self.symbol = config.trading.symbol
+        
+        # Конвертируем Pydantic модель в dict для совместимости
+        if hasattr(config, 'dict'):
+            cfg_dict = config.dict()
+        elif hasattr(config, 'model_dump'):
+            cfg_dict = config.model_dump()
+        else:
+            cfg_dict = config
+            
+        risk_cfg = cfg_dict.get('risk', {})
+        
+        # Параметры симуляции - берем из конфига с запасом для реалистичности
+        self.slippage = risk_cfg.get('slippage_buffer', 0.0005)  # 0.05% проскальзывание
+        self.commission = risk_cfg.get('commission_rate', 0.0002) + risk_cfg.get('commission_buffer', 0.0003)  # 0.05% комиссия с запасом
+        
+        self.symbol = cfg_dict.get('data', {}).get('symbols', ['DOGEUSDT'])[0]
         self.active_trades: Dict[str, ShadowTrade] = {}
         self.closed_trades: List[ShadowTrade] = []
         self._lock = asyncio.Lock()
-        
-        # Параметры симуляции
-        self.slippage = 0.0005  # 0.05% проскальзывание
-        self.commission = 0.001  # 0.1% комиссия (как на Binance)
 
     async def execute_scenario(self, scenario: Dict[str, Any]) -> ShadowTrade:
         """
         Открывает теневую сделку по сценарию.
+        Теперь передает TP и SL из сценария в сделку.
         """
         async with self._lock:
             trade_id = f"shadow_{int(time.time() * 1000)}"
@@ -72,6 +85,10 @@ class ShadowDealer:
                 timestamp_open=time.time(),
                 scenario_id=scenario.get('id', 'unknown')
             )
+            
+            # Сохраняем TP и SL из сценария (теперь они будут использоваться)
+            trade.take_profit = scenario.get('target_price', entry_price * 1.02)
+            trade.stop_loss = scenario.get('stop_loss', entry_price * 0.99)
             
             self.active_trades[trade_id] = trade
             return trade
@@ -147,15 +164,21 @@ class ShadowDealer:
                 self.closed_trades.append(closed_trade)
 
     def _get_tp_from_scenario(self, trade: ShadowTrade) -> float:
-        """Получает TP из сценария (заглушка, нужно передавать в execute_scenario)."""
-        # В реальной реализации брать из сценария
+        """Получает TP из сценария (теперь берет из атрибутов сделки)."""
+        # TP должен передаваться в execute_scenario и сохраняться в trade
+        if hasattr(trade, 'take_profit') and trade.take_profit:
+            return trade.take_profit
+        # Дефолтное значение только если не задано (для совместимости)
         if trade.direction == 'BUY':
             return trade.entry_price * 1.02  # +2%
         else:
             return trade.entry_price * 0.98  # -2%
 
     def _get_sl_from_scenario(self, trade: ShadowTrade) -> float:
-        """Получает SL из сценария (заглушка)."""
+        """Получает SL из сценария (теперь берет из атрибутов сделки)."""
+        if hasattr(trade, 'stop_loss') and trade.stop_loss:
+            return trade.stop_loss
+        # Дефолтное значение только если не задано
         if trade.direction == 'BUY':
             return trade.entry_price * 0.99  # -1%
         else:

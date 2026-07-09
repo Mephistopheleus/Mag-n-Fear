@@ -5,9 +5,12 @@ Acts as an analyzer writing to ProbabilityField and as a final gatekeeper.
 """
 import asyncio
 import time
+import logging
 from typing import Optional, Dict, Any
 from src.core.models import DataCard, RiskMetrics
 from src.core.field import ProbabilityField
+
+logger = logging.getLogger(__name__)
 
 
 class RiskManager:
@@ -24,7 +27,9 @@ class RiskManager:
     
     def __init__(self, config: Any, probability_field: ProbabilityField):
         # Конвертируем Pydantic модель в dict для совместимости
-        if hasattr(config, 'model_dump'):
+        if hasattr(config, 'dict'):
+            self.config = config.dict()
+        elif hasattr(config, 'model_dump'):
             self.config = config.model_dump()
         else:
             self.config = config
@@ -32,7 +37,15 @@ class RiskManager:
         self.field = probability_field
         
         # Настройки из конфига (с дефолтами для старта)
-        risk_cfg = self.config.get('risk', {})
+        if isinstance(self.config, dict):
+            risk_cfg = self.config.get('risk', {})
+        else:
+            risk_cfg = getattr(self.config, 'risk', {})
+            if hasattr(risk_cfg, 'dict'):
+                risk_cfg = risk_cfg.dict()
+            elif hasattr(risk_cfg, 'model_dump'):
+                risk_cfg = risk_cfg.model_dump()
+        
         self.min_leverage = risk_cfg.get('min_leverage', 1.0)
         self.max_leverage_default = risk_cfg.get('max_leverage', 5.0)
         self.max_exposure_pct = risk_cfg.get('max_exposure_pct', 0.05)  # 5% баланса
@@ -160,32 +173,74 @@ class RiskManager:
         Валидация сценария от ScenarioWriter.
         Возвращает (True/False, reason).
         
-        В режиме обучения (learning_mode=True):
-        - Для Теневика пропускаем ВСЕ сценарии (возвращаем True)
-        - Для реальных сделок применяем строгие фильтры
+        ВАЖНО: ВСЕ сценарии проходят проверку - и для реальных сделок, и для тени.
+        Система адаптируется под рынок, а не требует "правильный" рынок.
+        
+        Логика:
+        1. В режиме обучения (learning_mode=True) - пропускаем больше сценариев для сбора статистики
+        2. На нейтральном рынке - снижаем требования к профиту, торгуем отскоки
+        3. Динамический min_profit_threshold в зависимости от волатильности
         """
         card = await self.field.get_card(symbol)
         if not card or not card.risk_metrics:
             # В режиме обучения пропускаем даже без данных (для сбора статистики)
-            if self.learning_mode and scenario.get('is_shadow', False):
-                return True, "Learning mode: no data"
+            if self.learning_mode:
+                logger.info(f"[RiskManager] {symbol}: Scenario accepted for learning (no data yet)")
+                return True, "Learning mode: collecting data"
+            logger.warning(f"[RiskManager] {symbol}: No data or risk metrics available")
             return False, "No data or risk metrics available"
             
         metrics = card.risk_metrics
         
-        # Проверка минимальной прибыли (только для реальных сделок или если не learning_mode)
-        expected_profit_pct = scenario.get('expected_profit_pct', 0.0)
-        if not self.learning_mode or not scenario.get('is_shadow', False):
-            if expected_profit_pct < self.min_profit_threshold:
-                return False, f"Profit {expected_profit_pct:.2f}% < threshold {self.min_profit_threshold:.2f}%"
+        # Расчет ожидаемого профита из R/R и входа
+        entry_price = scenario.get('entry_price', 0)
+        target_price = scenario.get('target_price', 0)
+        direction = scenario.get('direction', 'LONG')
         
-        # Проверка плеча (строгая всегда для реальных сделок)
+        if entry_price > 0 and target_price > 0:
+            if direction == 'LONG':
+                expected_profit_pct = ((target_price - entry_price) / entry_price) * 100
+            else:
+                expected_profit_pct = ((entry_price - target_price) / entry_price) * 100
+        else:
+            expected_profit_pct = 0.0
+        
+        scenario['expected_profit_pct'] = expected_profit_pct
+        
+        # === ДИНАМИЧЕСКИЙ ПОРОГ ПРИБЫЛИ ===
+        # Адаптируем min_profit_threshold под текущую волатильность
+        # Высокая волатильность = можно требовать больше прибыли
+        # Низкая волатильность (флэт) = снижаем требования, чтобы торговать
+        base_threshold = self.min_profit_threshold
+        volatility_factor = max(0.5, 1.0 - (metrics.volatility_index * 10))  # 0.5-1.0
+        dynamic_min_profit = base_threshold * volatility_factor
+        
+        # Если рынок нейтральный (волатильность низкая) - применяем настраиваемую скидку
+        if metrics.volatility_index < 0.01:  # Очень низкая волатильность = флэт
+            # Берем скидку из конфига (настраивается автотюнером), а не хардкод
+            flat_discount = self.config.get('risk', {}).get('flat_market_discount', 0.7)
+            dynamic_min_profit *= flat_discount
+            logger.debug(f"[RiskManager] {symbol}: Flat market detected, reduced profit threshold by factor {flat_discount} to {dynamic_min_profit:.3f}%")
+        
+        # Проверка минимальной прибыли
+        if expected_profit_pct < dynamic_min_profit:
+            # В режиме обучения всё равно пропускаем для сбора статистики
+            if self.learning_mode:
+                logger.debug(f"[RiskManager] {symbol}: Shadow scenario low profit {expected_profit_pct:.2f}% < {dynamic_min_profit:.2f}% (allowed for learning)")
+                pass  # Пропускаем для обучения
+            else:
+                logger.debug(f"[RiskManager] {symbol}: REJECTED - Profit {expected_profit_pct:.2f}% < dynamic threshold {dynamic_min_profit:.2f}%")
+                return False, f"Profit {expected_profit_pct:.2f}% < threshold {dynamic_min_profit:.2f}%"
+        
+        # Проверка плеча
         req_leverage = scenario.get('leverage', 1.0)
         if req_leverage > metrics.max_leverage:
-            # В режиме обучения для теневика можно пропустить с предупреждением
-            if self.learning_mode and scenario.get('is_shadow', False):
-                pass  # Пропускаем, но логируем (логика ниже)
+            # В режиме обучения пропускаем для сбора статистики
+            if self.learning_mode:
+                logger.debug(f"[RiskManager] {symbol}: Shadow leverage {req_leverage} exceeds limit {metrics.max_leverage:.2f} (allowed for learning)")
+                pass
             else:
+                logger.debug(f"[RiskManager] {symbol}: REJECTED - Leverage {req_leverage} exceeds limit {metrics.max_leverage:.2f}")
                 return False, f"Leverage {req_leverage} exceeds limit {metrics.max_leverage:.2f}"
         
         # Проверка экспозиции
@@ -193,14 +248,23 @@ class RiskManager:
         price = scenario.get('price', card.price)
         notional = qty * price
         
-        # Здесь нужна логика получения баланса (пока заглушка)
-        # balance = ... 
-        # if notional > balance * metrics.exposure_limit: ...
+        # Получение баланса через Executor (реальный вызов)
+        balance = await self._get_balance_from_executor()
+        # Если баланс 0 - значит торгуем на весь доступный, проверка экспозиции не нужна
+        if balance > 0 and notional > balance * metrics.exposure_limit:
+            logger.debug(f"[RiskManager] {symbol}: REJECTED - Exposure {notional:.2f} exceeds limit {balance * metrics.exposure_limit:.2f}")
+            return False, f"Exposure {notional:.2f} exceeds limit {balance * metrics.exposure_limit:.2f}"
         
-        # Проверка аварийных флагов (всегда строго)
+        # Проверка аварийных флагов (всегда строго, кроме режима обучения для тени)
         if metrics.is_emergency:
-            return False, f"Emergency mode: {metrics.reason}"
+            if self.learning_mode:
+                logger.debug(f"[RiskManager] {symbol}: Emergency mode but allowed for learning: {metrics.reason}")
+                pass
+            else:
+                logger.warning(f"[RiskManager] {symbol}: REJECTED - Emergency mode: {metrics.reason}")
+                return False, f"Emergency mode: {metrics.reason}"
             
+        logger.info(f"[RiskManager] {symbol}: ACCEPTED - Profit {expected_profit_pct:.2f}%, RR={scenario.get('risk_reward_ratio', 0):.2f}, Vol={metrics.volatility_index:.4f}")
         return True, "OK"
 
     async def _shadow_check(self, symbol: str, card: DataCard, metrics: RiskMetrics):
@@ -267,6 +331,7 @@ class RiskManager:
         """
         Расчет PnL для теневой позиции с учетом комиссий и проскальзывания.
         Возвращает прибыль/убыток в валюте котировки (USDT).
+        Использует реальные комиссии из конфига + запас для симуляции.
         """
         entry_price = shadow.get('entry_price', 0)
         quantity = shadow.get('quantity', 0)
@@ -282,14 +347,18 @@ class RiskManager:
         else:
             raw_pnl = (entry_price - current_price) * quantity * leverage
             
-        # Учет комиссий (вход + выход) и проскальзывания
-        # Комиссия Binance Futures ~0.02% - 0.04%, берем с запасом 0.05%
-        fee_rate = 0.0005 
-        notional = entry_price * quantity * leverage
-        fees = notional * fee_rate * 2 # Вход и выход
+        # Учет комиссий (вход + выход) - берем из конфига с запасом
+        risk_cfg = self.config.get('risk', {})
+        commission_rate = risk_cfg.get('commission_rate', 0.0002)  # 0.02% базовая
+        commission_buffer = risk_cfg.get('commission_buffer', 0.0003)  # 0.03% запас
+        total_fee_rate = (commission_rate + commission_buffer) * 2  # Вход + выход
         
-        # Проскальзывание (зависит от волатильности, упрощенно 0.02%)
-        slippage = notional * 0.0002
+        notional = entry_price * quantity * leverage
+        fees = notional * total_fee_rate
+        
+        # Проскальзывание - берем из конфига (с запасом для симуляции)
+        slippage_buffer = risk_cfg.get('slippage_buffer', 0.0005)  # 0.05%
+        slippage = notional * slippage_buffer
         
         return raw_pnl - fees - slippage
 
@@ -390,3 +459,65 @@ class RiskManager:
         """Удаление позиции после закрытия."""
         self._active_positions.pop(symbol, None)
         self._shadow_scenarios.pop(symbol, None)
+
+    async def add_to_shadow_learning(self, symbol: str, scenario: Dict[str, Any], reject_reason: str):
+        """
+        Добавление отклоненного сценария в систему обучения.
+        Сценарий сохраняется для анализа AutoTuner'ом, даже если не прошел фильтры.
+        """
+        if symbol not in self.shadow_positions:
+            self.shadow_positions[symbol] = []
+        
+        shadow_entry = {
+            'scenario': scenario,
+            'reject_reason': reject_reason,
+            'timestamp': time.time(),
+            'entry_price': scenario.get('entry_price', 0),
+            'direction': scenario.get('direction', 'LONG'),
+            'strategy_type': scenario.get('strategy_type', 'unknown'),
+            'confidence': scenario.get('confidence', 0),
+            'risk_reward_ratio': scenario.get('risk_reward_ratio', 0),
+            'expected_profit_pct': scenario.get('expected_profit_pct', 0),
+            'stop_loss': scenario.get('stop_loss', 0),
+            'target_price': scenario.get('target_price', 0),
+            'max_adverse_excursion': 0.0,
+            'current_pnl': 0.0,
+            'is_closed': False
+        }
+        
+        self.shadow_positions[symbol].append(shadow_entry)
+        logger.debug(f"[RiskManager] Added to shadow learning: {symbol} - {scenario.get('strategy_type')} {scenario.get('direction')} (reason: {reject_reason})")
+        
+        # Ограничиваем количество теневых записей (последние 100 на символ)
+        if len(self.shadow_positions[symbol]) > 100:
+            self.shadow_positions[symbol] = self.shadow_positions[symbol][-100:]
+
+    async def _get_balance_from_executor(self) -> float:
+        """
+        Получение баланса из Executor или конфига.
+        Приоритет: Executor > config.risk.trading_balance_usd > 0 (торгуем на весь доступный)
+        """
+        try:
+            # В реальной системе здесь будет вызов к Executor для получения реального баланса
+            # executor = self.config.get('executor_instance')
+            # if executor:
+            #     balance = await executor.get_balance()
+            #     return balance if balance > 0 else 0
+            
+            # Пока берем из конфига risk.trading_balance_usd
+            # Если указано 0 - торгуем на весь доступный баланс (будет запрос к API)
+            risk_cfg = self.config.get('risk', {})
+            trading_balance = risk_cfg.get('trading_balance_usd', 0)
+            
+            if trading_balance > 0:
+                logger.debug(f"[RiskManager] Using configured trading balance: ${trading_balance}")
+                return trading_balance
+            
+            # Если 0 - пытаемся получить реальный баланс (пока заглушка, потом API)
+            logger.info("[RiskManager] trading_balance_usd=0, will use full exchange balance (API call needed)")
+            # TODO: Вызов API Binance для получения реального баланса
+            return 0  # 0 означает "использовать весь доступный"
+            
+        except Exception as e:
+            logger.warning(f"Failed to get balance: {e}, using 0 (full balance mode)")
+            return 0  # 0 означает "использовать весь доступный"

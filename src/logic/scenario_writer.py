@@ -117,17 +117,16 @@ class ScenarioWriter:
             range_scenarios = self._create_range_scenarios(current_price, key_levels, volatility, timestamp)
             scenarios.extend(range_scenarios)
 
-        # Фильтрация по уверенности и R/R
-        valid_scenarios = []
+        # ВАЖНО: Возвращаем ВСЕ сценарии, фильтрация будет в RiskManager
+        # Это нужно для обучения AutoTuner на полных данных
         for scen in scenarios:
             min_rr_req = self.strategies[scen.strategy_type]['min_rr']
             if scen.confidence >= self.min_confidence and scen.risk_reward_ratio >= min_rr_req:
-                valid_scenarios.append(scen)
-                logger.debug(f"Сценарий принят: {scen.scenario_id} ({scen.strategy_type}) RR={scen.risk_reward_ratio:.2f}")
+                logger.info(f"Сценарий принят: {scen.scenario_id} ({scen.strategy_type}) RR={scen.risk_reward_ratio:.2f}, confidence={scen.confidence:.2f}")
             else:
-                logger.debug(f"Сценарий отклонен: {scen.scenario_id} (низкая уверенность или плохой RR)")
+                logger.debug(f"Сценарий отклонен на уровне Writer: {scen.scenario_id} (низкая уверенность или плохой RR). confidence={scen.confidence:.2f}, RR={scen.risk_reward_ratio:.2f}, required_RR={min_rr_req:.2f}")
 
-        return valid_scenarios
+        return scenarios  # Возвращаем все сценарии для дальнейшей проверки в RiskManager
 
     def _create_trend_scenario(self, strat_type: str, direction: str, price: float, 
                                levels: Dict, vol: float, strength: float, ts: float) -> Optional[TradeScenario]:

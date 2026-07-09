@@ -85,10 +85,30 @@ class AdaptiveMicroscope:
                 print(f"[Microscope] Trigger: Near level {level} (distance: {distance_pct:.6f})")
                 return True
         
-        # Триггер 2: Резкий скачок волатильности (можно добавить позже)
-        # Пока заглушка
+        # Триггер 2: Резкий скачок волатильности
+        # Активируем микроскоп если волатильность выросла более чем в 2 раза за последний тик
+        if len(self.tick_buffer) >= 2:
+            recent_volatility = self._calculate_recent_volatility()
+            if recent_volatility > self.base_volatility * 2.0:
+                print(f"[Microscope] Trigger: Volatility spike detected ({recent_volatility:.6f} vs base {self.base_volatility:.6f})")
+                return True
         
         return False
+    
+    def _calculate_recent_volatility(self) -> float:
+        """Расчет волатильности по последним тикам в буфере."""
+        if len(self.tick_buffer) < 5:
+            return 0.0
+        
+        prices = [t['price'] for t in self.tick_buffer[-10:]]
+        if not prices or min(prices) == 0:
+            return 0.0
+        
+        avg_price = sum(prices) / len(prices)
+        variance = sum((p - avg_price) ** 2 for p in prices) / len(prices)
+        std_dev = variance ** 0.5
+        
+        return std_dev / avg_price if avg_price > 0 else 0.0
     
     def _check_deactivation_triggers(self, current_price: float) -> bool:
         """Проверка условий для деактивации микроскопа."""

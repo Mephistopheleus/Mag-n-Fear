@@ -1,34 +1,45 @@
 ```
-# Python cache files
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Logs
 *.log
-bot_run.log
+bot_output.log
 
 # Environment
 .env
 .env.local
-*.env.*
-
-# Dependencies
+.env.*
 .venv/
 venv/
-node_modules/
+ENV/
 
-# Build artifacts
-build/
-dist/
-target/
-
-# Editors
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS
 .DS_Store
 Thumbs.db
-```bot_run.log
+```

@@ -37,13 +37,33 @@ class TunerConfig(BaseModel):
 
 
 class RiskConfig(BaseModel):
-    trading_balance_usd: float = 50.0
-    max_daily_loss_pct: float = 2.0
-    max_position_size_usd: float = 1000.0
-    risk_per_trade_pct: float = 0.5
-    min_reward_ratio: float = 1.5
-    kelly_fraction: float = 0.25
-    max_correlation_exposure: float = 0.8
+    trading_balance_usd: float = 50.0      # Выделенный баланс для торговли (USDT)
+    max_daily_loss_pct: float = 2.0      # Максимальная просадка за день (%)
+    max_position_size_usd: float = 33    # Максимальный размер позиции ($), не более 2/3 от баланса
+    risk_per_trade_pct: float = 0.5      # Риск на сделку (%)
+    min_reward_ratio: float = 1.5        # Минимальное соотношение Профит/Риск
+
+    # Режим обучения (Learning Mode)
+    learning_mode: bool = True
+
+    # Минимальная целевая прибыль (%) для рассмотрения сценария
+    min_profit_threshold: float = 0.05
+
+    # Скидка к порогу прибыли на флэте (настраивается автотюнером)
+    flat_market_discount: float = 0.7    # 0.7 = снижение на 30%
+
+    # Реальные комиссии Binance Futures (maker/taker)
+    commission_rate: float = 0.0002      # 0.02% базовая комиссия
+    commission_buffer: float = 0.0003    # Дополнительный запас (итого 0.05%)
+    
+    # Проскальзывание (с запасом для симуляции)
+    slippage_buffer: float = 0.0005      # 0.05% запас на проскальзывание
+
+    # Формула размера позиции (Kelly с ограничением)
+    kelly_fraction: float = 0.25         # Доля от оптимального Келли (0.25 = 25%)
+
+    # Корреляционные ограничения
+    max_correlation_exposure: float = 0.8  # Максимальная корреляция между позициями
 
 
 class ScenarioConfig(BaseModel):
