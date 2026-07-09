@@ -32,7 +32,7 @@ from src.logic.market_synthesizer import MarketSynthesizer, MarketTrend
 from src.executor.shadow_dealer import ShadowDealer
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -245,13 +245,18 @@ class TradingBot:
                         # Каждый сценарий проходит валидацию и попадает в тень или на исполнение
                         for scenario in scenarios:
                             # 3. Валидация риск-менеджером (async метод)
-                            is_valid, reason = await self.risk_manager.validate_scenario(symbol, scenario.to_dict())
+                            # is_shadow=True - чтобы в режиме обучения все сценарии шли в тень для статистики
+                            is_valid, reason = await self.risk_manager.validate_scenario(symbol, scenario.to_dict(), is_shadow=True)
                             
                             if is_valid:
                                 # 4. Отправка в Executor (реальная сделка или тень)
                                 logger.info(f"Scenario ACCEPTED for {symbol}: {scenario.strategy_type} {scenario.direction} - {reason}")
                                 await self.executor.execute_scenario(scenario)
                                 await self.notifier.notify_trade(scenario.to_dict(), "OPEN")
+                                
+                                # ВАЖНО: Даже принятые сценарии идут в тень для обучения!
+                                # Это нужно для сбора полной статистики по всем исходам
+                                await self.risk_manager.add_to_shadow_learning(symbol, scenario.to_dict(), "accepted_real_trade")
                             else:
                                 # Даже отклоненные сценарии идут в тень для обучения!
                                 logger.debug(f"Scenario REJECTED for {symbol}: {scenario.strategy_type} {scenario.direction} - {reason}")
