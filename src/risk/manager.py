@@ -168,7 +168,7 @@ class RiskManager:
         dynamic = base * vol_factor * liq_factor
         return max(self.min_leverage, min(dynamic, self.max_leverage_default))
 
-    async def validate_scenario(self, symbol: str, scenario: Dict[str, Any]) -> tuple[bool, str]:
+    async def validate_scenario(self, symbol: str, scenario: Dict[str, Any], is_shadow: bool = False) -> tuple[bool, str]:
         """
         Валидация сценария от ScenarioWriter.
         Возвращает (True/False, reason).
@@ -177,13 +177,23 @@ class RiskManager:
         Система адаптируется под рынок, а не требует "правильный" рынок.
         
         Логика:
-        1. В режиме обучения (learning_mode=True) - пропускаем больше сценариев для сбора статистики
-        2. На нейтральном рынке - снижаем требования к профиту, торгуем отскоки
-        3. Динамический min_profit_threshold в зависимости от волатильности
+        1. В режиме обучения (learning_mode=True) - ВСЕ сценарии идут в тень для сбора статистики
+        2. Реальные сделки проверяются строго
+        3. На нейтральном рынке - снижаем требования к профиту, торгуем отскоки
+        4. Динамический min_profit_threshold в зависимости от волатильности
         """
         card = await self.field.get_card(symbol)
+        
+        # === РЕЖИМ ОБУЧЕНИЯ: ВСЕ СЦЕНАРИИ ИДУТ В ТЕНЬ ===
+        # В learning_mode пропускаем ВСЕ сценарии для тени, чтобы собрать статистику
+        # Проверки работают ТОЛЬКО для реальных сделок (is_shadow=False)
+        if self.learning_mode and is_shadow:
+            # Для тени в режиме обучения - всегда пропускаем
+            logger.debug(f"[RiskManager] {symbol}: Shadow scenario accepted for learning (collecting statistics)")
+            return True, "Learning mode: shadow scenario accepted"
+        
         if not card or not card.risk_metrics:
-            # В режиме обучения пропускаем даже без данных (для сбора статистики)
+            # Для реальных сделок нужны данные
             if self.learning_mode:
                 logger.info(f"[RiskManager] {symbol}: Scenario accepted for learning (no data yet)")
                 return True, "Learning mode: collecting data"
@@ -464,13 +474,16 @@ class RiskManager:
         """
         Добавление отклоненного сценария в систему обучения.
         Сценарий сохраняется для анализа AutoTuner'ом, даже если не прошел фильтры.
+        ВАЖНО: В режиме обучения все сценарии идут в тень для сбора полной статистики.
         """
         if symbol not in self.shadow_positions:
             self.shadow_positions[symbol] = []
         
+        # В режиме обучения добавляем ВСЕ сценарии в тень, даже принятые
+        # Это нужно для сбора полной статистики по всем возможным исходам
         shadow_entry = {
             'scenario': scenario,
-            'reject_reason': reject_reason,
+            'reject_reason': reject_reason,  # Причина отклонения или "learning_mode"
             'timestamp': time.time(),
             'entry_price': scenario.get('entry_price', 0),
             'direction': scenario.get('direction', 'LONG'),
@@ -482,11 +495,12 @@ class RiskManager:
             'target_price': scenario.get('target_price', 0),
             'max_adverse_excursion': 0.0,
             'current_pnl': 0.0,
-            'is_closed': False
+            'is_closed': False,
+            'is_learning_mode': self.learning_mode
         }
         
         self.shadow_positions[symbol].append(shadow_entry)
-        logger.debug(f"[RiskManager] Added to shadow learning: {symbol} - {scenario.get('strategy_type')} {scenario.get('direction')} (reason: {reject_reason})")
+        logger.debug(f"[RiskManager] Added to shadow learning: {symbol} - {scenario.get('strategy_type')} {scenario.get('direction')} (reason: {reject_reason}, learning={self.learning_mode})")
         
         # Ограничиваем количество теневых записей (последние 100 на символ)
         if len(self.shadow_positions[symbol]) > 100:
