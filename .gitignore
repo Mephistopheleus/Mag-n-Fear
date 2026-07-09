@@ -7,7 +7,6 @@ __pycache__/
 
 # Logs
 *.log
-bot_run.log
 
 # Environment
 .env
@@ -20,24 +19,15 @@ venv/
 node_modules/
 
 # Build artifacts
-dist/
 build/
+dist/
 target/
 
 # Editors
 .vscode/
 .idea/
 
-# System
+# OS
 .DS_Store
 Thumbs.db
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Testing
-.pytest_cache/
-.mypy_cache/
 ```
