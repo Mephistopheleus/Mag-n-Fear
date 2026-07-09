@@ -38,6 +38,10 @@ class RiskManager:
         self.max_exposure_pct = risk_cfg.get('max_exposure_pct', 0.05)  # 5% баланса
         self.volatility_threshold = risk_cfg.get('volatility_threshold', 0.05)  # 5% движение
         
+        # Режим обучения (Learning Mode) - чтение из конфига
+        self.learning_mode = risk_cfg.get('learning_mode', False)
+        self.min_profit_threshold = risk_cfg.get('min_profit_threshold', 0.5)  # %
+        
         # Состояние
         self._active_positions: Dict[str, Dict] = {}  # symbol -> position info
         self._shadow_scenarios: Dict[str, Dict] = {}  # symbol -> last shadow calc
@@ -155,17 +159,34 @@ class RiskManager:
         """
         Валидация сценария от ScenarioWriter.
         Возвращает (True/False, reason).
+        
+        В режиме обучения (learning_mode=True):
+        - Для Теневика пропускаем ВСЕ сценарии (возвращаем True)
+        - Для реальных сделок применяем строгие фильтры
         """
         card = await self.field.get_card(symbol)
         if not card or not card.risk_metrics:
+            # В режиме обучения пропускаем даже без данных (для сбора статистики)
+            if self.learning_mode and scenario.get('is_shadow', False):
+                return True, "Learning mode: no data"
             return False, "No data or risk metrics available"
             
         metrics = card.risk_metrics
         
-        # Проверка плеча
+        # Проверка минимальной прибыли (только для реальных сделок или если не learning_mode)
+        expected_profit_pct = scenario.get('expected_profit_pct', 0.0)
+        if not self.learning_mode or not scenario.get('is_shadow', False):
+            if expected_profit_pct < self.min_profit_threshold:
+                return False, f"Profit {expected_profit_pct:.2f}% < threshold {self.min_profit_threshold:.2f}%"
+        
+        # Проверка плеча (строгая всегда для реальных сделок)
         req_leverage = scenario.get('leverage', 1.0)
         if req_leverage > metrics.max_leverage:
-            return False, f"Leverage {req_leverage} exceeds limit {metrics.max_leverage:.2f}"
+            # В режиме обучения для теневика можно пропустить с предупреждением
+            if self.learning_mode and scenario.get('is_shadow', False):
+                pass  # Пропускаем, но логируем (логика ниже)
+            else:
+                return False, f"Leverage {req_leverage} exceeds limit {metrics.max_leverage:.2f}"
         
         # Проверка экспозиции
         qty = scenario.get('quantity', 0)
@@ -176,7 +197,7 @@ class RiskManager:
         # balance = ... 
         # if notional > balance * metrics.exposure_limit: ...
         
-        # Проверка аварийных флагов
+        # Проверка аварийных флагов (всегда строго)
         if metrics.is_emergency:
             return False, f"Emergency mode: {metrics.reason}"
             
