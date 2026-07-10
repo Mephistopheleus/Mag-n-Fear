@@ -3,9 +3,12 @@ Market Synthesizer - "Мозг" системы.
 Объединяет данные от всех анализаторов в единую модель рынка (MarketModel).
 """
 import asyncio
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
+
+# Импорт анализатора стакана
+from math_core.order_book_sr import OrderBookAnalyzer, SRLevel
 
 class MarketTrend(Enum):
     BULLISH = "bullish"
@@ -92,6 +95,10 @@ class MarketSynthesizer:
             self.symbol = config.get('data', {}).get('symbols', [symbol])[0]
         else:
             self.symbol = symbol
+        
+        # Инициализация анализатора стакана
+        self.ob_analyzer = OrderBookAnalyzer(config)
+        
         self.latest_model: Optional[MarketModel] = None
         self._lock = asyncio.Lock()
 
@@ -119,7 +126,34 @@ class MarketSynthesizer:
             trend_long = self._detect_trend(market_data.get('candles_long', []))
 
             # 2. Вычисление уровней поддержки/сопротивления
+            # Объединяем уровни из свечей и из стакана
             levels = self._calculate_levels(market_data.get('history', []), current_price)
+            
+            # Добавляем уровни из стакана, если есть данные
+            order_book = market_data.get('order_book')
+            if order_book and self.ob_analyzer:
+                bids = order_book.get('bids', [])
+                asks = order_book.get('asks', [])
+                ob_levels = self.ob_analyzer.analyze_snapshot(bids, asks, current_price)
+                
+                # Конвертируем SRLevel в MarketLevel и добавляем к общему списку
+                for sr_level in ob_levels.get('support', []):
+                    levels.append(MarketLevel(
+                        price=sr_level.price,
+                        strength=sr_level.strength,
+                        type='support',
+                        timeframe='order_book'
+                    ))
+                for sr_level in ob_levels.get('resistance', []):
+                    levels.append(MarketLevel(
+                        price=sr_level.price,
+                        strength=sr_level.strength,
+                        type='resistance',
+                        timeframe='order_book'
+                    ))
+            
+            # Сортируем уровни по силе и убираем дубликаты (близкие цены)
+            levels = self._merge_close_levels(levels, current_price)
 
             # 3. Оценка настроения (агрессия, страх, жадность)
             sentiment = self._evaluate_sentiment(analysis_points, market_data)
@@ -185,6 +219,52 @@ class MarketSynthesizer:
             ))
             
         return levels
+
+    def _merge_close_levels(self, levels: List[MarketLevel], current_price: float) -> List[MarketLevel]:
+        """
+        Объединяет близкие уровни поддержки/сопротивления и сортирует по силе.
+        Уровни считаются близкими, если разница < 0.1%.
+        """
+        if not levels:
+            return []
+        
+        merged = []
+        tolerance = 0.001  # 0.1%
+        
+        # Сортируем по цене
+        sorted_levels = sorted(levels, key=lambda x: x.price)
+        
+        i = 0
+        while i < len(sorted_levels):
+            current_level = sorted_levels[i]
+            similar_levels = [current_level]
+            
+            # Ищем похожие уровни рядом
+            j = i + 1
+            while j < len(sorted_levels):
+                next_level = sorted_levels[j]
+                diff_pct = abs(next_level.price - current_level.price) / current_price
+                
+                if diff_pct <= tolerance and next_level.type == current_level.type:
+                    similar_levels.append(next_level)
+                    j += 1
+                else:
+                    break
+            
+            # Если нашли несколько похожих, берем самый сильный
+            if len(similar_levels) > 1:
+                best = max(similar_levels, key=lambda x: x.strength)
+                # Усиливаем уровень за счет количества совпадений
+                best.strength = min(1.0, best.strength * (1 + 0.1 * len(similar_levels)))
+                merged.append(best)
+            else:
+                merged.append(current_level)
+            
+            i = j
+        
+        # Сортируем итоговый список по силе (убывание)
+        merged.sort(key=lambda x: x.strength, reverse=True)
+        return merged[:10]  # Возвращаем топ-10 уровней
 
     def _evaluate_sentiment(self, points: List[Any], data: Dict) -> MarketSentiment:
         """Оценивает настроение рынка на основе точек прогнозов."""

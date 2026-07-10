@@ -1,7 +1,19 @@
 ```
-# Compressed files
-*.tar.gz
-
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.ENV.local
+.env
+.env.local
+.env.*
 # Logs
 *.log
+bot_output.log
 ```

@@ -399,6 +399,45 @@ class DataFeed:
     def get_orderbook(self, symbol: str) -> Optional[Dict]:
         return self.feed.get_orderbook(symbol)
     
+    def get_order_book(self, symbol: str) -> Optional[Dict]:
+        """Алиас для get_orderbook для совместимости."""
+        return self.feed.get_orderbook(symbol)
+    
+    def get_candles(self, symbol: str, timeframe: str = '1m', limit: int = 50) -> List[Dict]:
+        """
+        Получает свечи через REST API.
+        Возвращает список словарей: [{'open': ..., 'high': ..., 'low': ..., 'close': ..., 'volume': ...}, ...]
+        """
+        # Маппинг таймфреймов для Binance
+        tf_map = {
+            '1m': '1m', '3m': '3m', '5m': '5m', '15m': '15m',
+            '30m': '30m', '1h': '1h', '2h': '2h', '4h': '4h',
+            '6h': '6h', '12h': '12h', '1d': '1d'
+        }
+        interval = tf_map.get(timeframe, '1m')
+        
+        try:
+            # Используем асинхронный вызов через asyncio.run_coroutine_threadsafe или создаем задачу
+            # Для простоты - создаем задачу в текущем цикле событий
+            loop = asyncio.get_event_loop()
+            coro = self.feed.client.futures_klines(symbol=symbol, interval=interval, limit=limit)
+            klines = loop.run_until_complete(coro)
+            
+            candles = []
+            for k in klines:
+                candles.append({
+                    'timestamp': datetime.fromtimestamp(k[0] / 1000),
+                    'open': float(k[1]),
+                    'high': float(k[2]),
+                    'low': float(k[3]),
+                    'close': float(k[4]),
+                    'volume': float(k[5])
+                })
+            return candles
+        except Exception as e:
+            logger.error(f"Error getting candles for {symbol} {timeframe}: {e}")
+            return []
+    
     def get_last_trades(self, symbol: str, limit: int = 50) -> List[Dict]:
         return self.feed.get_last_trades(symbol, limit)
     

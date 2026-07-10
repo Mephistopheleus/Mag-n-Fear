@@ -4,7 +4,12 @@
 """
 import asyncio
 import logging
+import sys
+import os
 from typing import Optional
+
+# Добавляем корень проекта в путь для импортов
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Импорт конфигурации и утилит
 from src.core.config_loader import load_config, get_config
@@ -187,13 +192,31 @@ class TradingBot:
                     clusters = self.matrix_analyzer.find_clusters(matrix_snapshot, current_price)
                     
                     # Получаем свежие данные от анализаторов
+                    # Берем историю свечей и стакан из DataFeed
+                    candles_short = self.feed.get_candles(symbol, '1m', limit=50) or []
+                    candles_mid = self.feed.get_candles(symbol, '15m', limit=50) or []
+                    candles_long = self.feed.get_candles(symbol, '1h', limit=50) or []
+                    
+                    # Стакан (если есть в фиде)
+                    order_book = self.feed.get_order_book(symbol)
+                    
+                    # Дисбаланс потока ордеров (если есть)
+                    imbalance = 0.0
+                    if order_book and 'bids' in order_book and 'asks' in order_book:
+                        imbalance = self.ob_analyzer.get_imbalance(
+                            order_book['bids'], 
+                            order_book['asks'], 
+                            depth=10
+                        )
+                    
                     market_data = {
                         'current_price': current_price,
-                        'candles_short': [],  # TODO: взять из feed
-                        'candles_mid': [],
-                        'candles_long': [],
-                        'history': [],
-                        'order_flow_imbalance': 0.0,
+                        'candles_short': candles_short,
+                        'candles_mid': candles_mid,
+                        'candles_long': candles_long,
+                        'history': candles_short + candles_mid,  # Объединяем для расчета уровней
+                        'order_book': order_book,  # Передаем стакан в синтезатор
+                        'order_flow_imbalance': imbalance,
                         'news_impact': 0.0
                     }
                     
