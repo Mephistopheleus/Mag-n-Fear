@@ -417,11 +417,9 @@ class DataFeed:
         interval = tf_map.get(timeframe, '1m')
         
         try:
-            # Используем асинхронный вызов через asyncio.run_coroutine_threadsafe или создаем задачу
-            # Для простоты - создаем задачу в текущем цикле событий
-            loop = asyncio.get_event_loop()
-            coro = self.feed.client.futures_klines(symbol=symbol, interval=interval, limit=limit)
-            klines = loop.run_until_complete(coro)
+            # Используем асинхронный вызов через await внутри async функции
+            # Убрано loop.run_until_complete() для работы внутри запущенного event loop
+            klines = await self.feed.client.futures_klines(symbol=symbol, interval=interval, limit=limit)
             
             candles = []
             for k in klines:
