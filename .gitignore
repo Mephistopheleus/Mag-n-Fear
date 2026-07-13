@@ -1,11 +1,45 @@
-```gitignore
-# Python cache files
+```
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Compiled Python files in subdirectories
-**/__pycache__/
-**/*.pyc
+# Data storage - temporary files
+data_storage/cards/*.txt
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Dependencies
+venv/
+.venv/
+.env/
+node_modules/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing and coverage
+.coverage
+htmlcov/
+coverage/
+
+# Build and distribution
+dist/
+build/
+*.egg-info/
 ```
