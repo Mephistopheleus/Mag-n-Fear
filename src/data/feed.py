@@ -369,10 +369,27 @@ class DataFeed:
         if self.prob_field:
             # Формируем DataCard с данными стакана
             from src.core.models import DataCard
+            
+            # Получаем цену из середины стакана или последнее известное значение
+            bids = orderbook.get('bids', [])
+            asks = orderbook.get('asks', [])
+            mid_price = 0.0
+            if bids and asks:
+                mid_price = (float(bids[0][0]) + float(asks[0][0])) / 2
+            elif bids:
+                mid_price = float(bids[0][0])
+            elif asks:
+                mid_price = float(asks[0][0])
+            
+            # Объем за 24ч берем из кэша или ставим заглушку, т.к. в стакане его нет
+            volume_24h = self.feed.get_volume_24h(symbol) if hasattr(self.feed, 'get_volume_24h') else 0.0
+
             card = DataCard(
                 symbol=symbol,
                 timestamp=orderbook['timestamp'],
-                
+                price=mid_price,
+                volume_24h=volume_24h,
+                orderbook_snapshot=orderbook
             )
             self.prob_field.update(card)
     

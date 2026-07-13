@@ -1,0 +1,40 @@
+{
+  "symbol": "DOGEUSDT",
+  "timestamp_open": 1783929486.332465,
+  "timestamp_close": "2026-07-13T07:58:06.332611",
+  "strategy_type": "shadow",
+  "direction": "LONG",
+  "entry_price": 62972.0982,
+  "stop_loss": 62325.1085,
+  "target_price": 64893.708,
+  "confidence": 0.5,
+  "risk_reward_ratio": 0,
+  "leverage": 1.0,
+  "quantity": 1.0,
+  "trade_result": {
+    "pnl_usd": -94.47389819999817,
+    "pnl_percent": -0.0015002501250625023,
+    "exit_price": 63003.6,
+    "duration_sec": 6.723403930664062e-05,
+    "exit_reason": "take_profit",
+    "max_drawdown": -0.0005002501250625024,
+    "max_profit": 0.0
+  },
+  "tuner_notes": {
+    "analyzer_trend_useful": false,
+    "analyzer_mean_reversion_useful": false,
+    "analyzer_order_flow_useful": false,
+    "analyzer_volatility_useful": false,
+    "analyzer_matrix_useful": false,
+    "analyzer_trend_confidence": 0.0,
+    "analyzer_mean_reversion_confidence": 0.0,
+    "analyzer_order_flow_confidence": 0.0,
+    "analyzer_volatility_confidence": 0.0,
+    "analyzer_matrix_confidence": 0.0
+  },
+  "market_conditions": {
+    "trend": "NEUTRAL",
+    "volatility": 0.0,
+    "volume": 0.0
+  }
+}
