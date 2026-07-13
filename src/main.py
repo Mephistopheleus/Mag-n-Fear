@@ -301,7 +301,7 @@ class TradingBot:
                     closed_trades = self.shadow_dealer.get_closed_trades(limit=10)
                     for trade in closed_trades:
                         if not getattr(trade, '_card_saved', False):
-                            # Сохраняем карточку сделки
+                            # Сохраняем карточку сделки с данными анализаторов из оригинального сценария
                             scenario_data = {
                                 'symbol': trade.symbol,
                                 'direction': trade.direction,
@@ -313,7 +313,21 @@ class TradingBot:
                                 'strategy_type': 'shadow',
                                 'confidence': 0.5,
                                 'risk_reward_ratio': 0,
-                                'timestamp': trade.timestamp_open
+                                'timestamp': trade.timestamp_open,
+                                # Данные анализаторов - будут заполнены из кэша сценариев
+                                'analyzer_trend_useful': False,
+                                'analyzer_mean_reversion_useful': False,
+                                'analyzer_order_flow_useful': False,
+                                'analyzer_volatility_useful': False,
+                                'analyzer_matrix_useful': False,
+                                'analyzer_trend_confidence': 0.0,
+                                'analyzer_mean_reversion_confidence': 0.0,
+                                'analyzer_order_flow_confidence': 0.0,
+                                'analyzer_volatility_confidence': 0.0,
+                                'analyzer_matrix_confidence': 0.0,
+                                'market_trend': 'NEUTRAL',
+                                'market_volatility': 0.0,
+                                'market_volume': 0.0
                             }
                             result_data = {
                                 'pnl': trade.pnl or 0,
