@@ -60,7 +60,7 @@ class AutoTuner:
             return 0
         
         # Загрузка карточек (предполагаем формат JSON или Parquet)
-        for card_file in self.cards_path.glob("*.json"):
+        for card_file in self.cards_path.glob("*.txt"):
             with open(card_file, 'r', encoding='utf-8') as f:
                 self.cards.append(json.load(f))
         

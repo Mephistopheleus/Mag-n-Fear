@@ -470,11 +470,17 @@ class RiskManager:
         self._active_positions.pop(symbol, None)
         self._shadow_scenarios.pop(symbol, None)
 
-    async def add_to_shadow_learning(self, symbol: str, scenario: Dict[str, Any], reject_reason: str):
+    async def add_to_shadow_learning(self, symbol: str, scenario: Dict[str, Any], reject_reason: str, shadow_trade=None):
         """
         Добавление отклоненного сценария в систему обучения.
         Сценарий сохраняется для анализа AutoTuner'ом, даже если не прошел фильтры.
         ВАЖНО: В режиме обучения все сценарии идут в тень для сбора полной статистики.
+        
+        Args:
+            symbol: Торговая пара
+            scenario: Параметры сценария
+            reject_reason: Причина отклонения или "accepted_real_trade"
+            shadow_trade: Объект ShadowTrade из ShadowDealer (опционально)
         """
         if symbol not in self.shadow_positions:
             self.shadow_positions[symbol] = []
@@ -496,7 +502,8 @@ class RiskManager:
             'max_adverse_excursion': 0.0,
             'current_pnl': 0.0,
             'is_closed': False,
-            'is_learning_mode': self.learning_mode
+            'is_learning_mode': self.learning_mode,
+            'shadow_trade_id': getattr(shadow_trade, 'id', None) if shadow_trade else None
         }
         
         self.shadow_positions[symbol].append(shadow_entry)

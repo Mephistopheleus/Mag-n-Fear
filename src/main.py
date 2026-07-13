@@ -85,6 +85,9 @@ class TradingBot:
         # 11. Инициализация исполнителя
         self.executor = Executor(self.config, self.prob_field, self.risk_manager)
         
+        # 12. Инициализация ShadowDealer для теневого просчета
+        self.shadow_dealer = ShadowDealer(self.config)
+        
         # Символы для торговли
         self.symbols = self.config.data.symbols
         
@@ -193,9 +196,9 @@ class TradingBot:
                     
                     # Получаем свежие данные от анализаторов
                     # Берем историю свечей и стакан из DataFeed
-                    candles_short = self.feed.get_candles(symbol, '1m', limit=50) or []
-                    candles_mid = self.feed.get_candles(symbol, '15m', limit=50) or []
-                    candles_long = self.feed.get_candles(symbol, '1h', limit=50) or []
+                    candles_short = await self.feed.get_candles(symbol, '1m', limit=50) or []
+                    candles_mid = await self.feed.get_candles(symbol, '15m', limit=50) or []
+                    candles_long = await self.feed.get_candles(symbol, '1h', limit=50) or []
                     
                     # Стакан (если есть в фиде)
                     order_book = self.feed.get_order_book(symbol)
@@ -277,24 +280,52 @@ class TradingBot:
                                 await self.executor.execute_scenario(scenario)
                                 await self.notifier.notify_trade(scenario.to_dict(), "OPEN")
                                 
-                                # ВАЖНО: Даже принятые сценарии идут в тень для обучения!
+                                # ВАЖНО: Даже принятые сценарии идут в ShadowDealer для обучения!
                                 # Это нужно для сбора полной статистики по всем исходам
-                                await self.risk_manager.add_to_shadow_learning(symbol, scenario.to_dict(), "accepted_real_trade")
+                                shadow_trade = await self.shadow_dealer.execute_scenario(scenario.to_dict())
+                                await self.risk_manager.add_to_shadow_learning(symbol, scenario.to_dict(), "accepted_real_trade", shadow_trade)
                             else:
-                                # Даже отклоненные сценарии идут в тень для обучения!
+                                # Даже отклоненные сценарии идут в ShadowDealer для обучения!
                                 logger.debug(f"Scenario REJECTED for {symbol}: {scenario.strategy_type} {scenario.direction} - {reason}")
                                 # Отправляем в ShadowDealer для сбора статистики
-                                await self.risk_manager.add_to_shadow_learning(symbol, scenario.to_dict(), reason)
+                                shadow_trade = await self.shadow_dealer.execute_scenario(scenario.to_dict())
+                                await self.risk_manager.add_to_shadow_learning(symbol, scenario.to_dict(), reason, shadow_trade)
                     else:
                         logger.debug(f"No valid scenarios for {symbol}")
                     
-                    # 5. Обновление трейлинг-стопов для активных позиций (внутренний метод)
-                    # Риск-менеджер обновляет стоп-лоссы для теневых позиций
-                    # Для реальных позиций это делает Executor через update_trail
-                    for shadow in self.risk_manager.shadow_positions.get(symbol, []):
-                        volatility = self.risk_manager._calculate_volatility([])
-                        new_stop = self.risk_manager._update_trailing_stop(shadow, current_price, volatility)
-                        shadow['stop_loss'] = new_stop
+                    # 5. Обновление трейлинг-стопов для активных позиций
+                    # Обновляем цены в ShadowDealer для проверки TP/SL
+                    await self.shadow_dealer.update_prices(current_price)
+                    
+                    # Получаем закрытые сделки из ShadowDealer и сохраняем карточки
+                    closed_trades = self.shadow_dealer.get_closed_trades(limit=10)
+                    for trade in closed_trades:
+                        if not getattr(trade, '_card_saved', False):
+                            # Сохраняем карточку сделки
+                            scenario_data = {
+                                'symbol': trade.symbol,
+                                'direction': trade.direction,
+                                'entry_price': trade.entry_price,
+                                'stop_loss': getattr(trade, 'stop_loss', 0),
+                                'target_price': getattr(trade, 'take_profit', 0),
+                                'quantity': trade.quantity,
+                                'leverage': trade.leverage,
+                                'strategy_type': 'shadow',
+                                'confidence': 0.5,
+                                'risk_reward_ratio': 0,
+                                'timestamp': trade.timestamp_open
+                            }
+                            result_data = {
+                                'pnl': trade.pnl or 0,
+                                'pnl_percent': trade.pnl_percent or 0,
+                                'exit_price': trade.exit_price or 0,
+                                'duration': trade.duration_sec or 0,
+                                'reason': trade.reason or 'unknown',
+                                'max_drawdown': trade.max_drawdown,
+                                'max_profit': trade.max_profit
+                            }
+                            await self.executor.save_trade_card(trade.symbol, scenario_data, result_data)
+                            trade._card_saved = True  # Помечаем что карточка сохранена
                 
                 await asyncio.sleep(delay)
                 

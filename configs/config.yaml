@@ -1,130 +1,70 @@
-# ==========================================
-# КОНФИГУРАЦИЯ ТОРГОВОГО РОБОТА
-# Единый источник истины. Все параметры настраиваемы.
-# Auto-Tuner может изменять эти значения между запусками.
-# ==========================================
-
-bot:
-  name: "HybridMathScalper"
-  version: "0.1.0"
-  mode: "shadow"  # "shadow" (тест без денег), "live" (реальная торговля), "backtest"
-  exchanges:
-    - "binance_futures"
-    # - "bybit"
-
-# ==========================================
-# API КЛЮЧИ (BINANCE FUTURES TESTNET)
-# Получить можно на: https://testnet.binancefuture.com
-# ==========================================
 api_keys:
-  binance_testnet_api_key: "mYVqkHL4mSwEiHrHC6PaurPUHOV7auYwXXpkSmMX7hSSY8KT7teRmbQV6BY9YD3i"
-  binance_testnet_api_secret: "ym3B6HkI6ervEsc4We0jr47O51tueW8CRTqpU6TxbpwzKsxAtLWtGKtbeUQ86aBf"
-
-# ==========================================
-# НАСТРОЙКИ ДАННЫХ
-# ==========================================
+  binance_testnet_api_key: mYVqkHL4mSwEiHrHC6PaurPUHOV7auYwXXpkSmMX7hSSY8KT7teRmbQV6BY9YD3i
+  binance_testnet_api_secret: ym3B6HkI6ervEsc4We0jr47O51tueW8CRTqpU6TxbpwzKsxAtLWtGKtbeUQ86aBf
+bot:
+  exchanges:
+  - binance_futures
+  mode: shadow
+  name: HybridMathScalper
+  version: 0.1.0
 data:
-  symbols: ["DOGEUSDT", "BTCUSDT"]  # Основная пара + корреляция
-  primary_symbol: "DOGEUSDT"
-  correlation_symbol: "BTCUSDT"
-  timeframes: ["1m", "5m"]
-  order_book_depth: 20  # Глубина стакана для анализа
-  snapshot_interval_sec: 1  # Как часто делать снимки состояния
-
-# ==========================================
-# МАТРИЦА ВЕРОЯТНОСТЕЙ
-# ==========================================
-matrix:
-  time_horizon_sec: 300  # Горизонт прогноза (5 минут)
-  price_bins_count: 50   # Количество ценовых корзин
-  time_bins_count: 60    # Количество временных интервалов
-  decay_factor: 0.95     # Коэффициент затухания старых прогнозов
-
-# ==========================================
-# АВТО-ТЮНЕР (ДОВЕРИЕ И ВЛИЯНИЕ)
-# Эти коэффициенты умножаются на сырые вероятности анализаторов
-# ==========================================
-tuner:
-  # Доверие к типам анализаторов (0.0 - 1.0)
-  # Начальные значения, будут обновляться после анализа карточек
-  confidence_factors:
-    trend_analysis: 0.8
-    mean_reversion: 0.7
-    order_flow: 0.9
-    volatility_breakout: 0.6
-    matrix_pattern: 0.75  # Доверие к паттернам из Матрицы
-
-  # Пороги полезности для обновления весов
-  min_trades_for_update: 50  # Минимум сделок для пересчета доверия
-  impact_threshold: 0.05     # Минимальное влияние параметра, чтобы его учитывать
-
-# ==========================================
-# РИСК-МЕНЕДЖМЕНТ
-# Параметры адаптируются Тюнером на основе истории
-# ==========================================
-risk:
-  trading_balance_usd: 50.0      # Выделенный баланс для торговли (USDT)
-  max_daily_loss_pct: 2.0      # Максимальная просадка за день (%)
-  max_position_size_usd: 33    # Максимальный размер позиции ($), не более 2/3 от баланса
-  risk_per_trade_pct: 0.5      # Риск на сделку (%)
-  min_reward_ratio: 1.5        # Минимальное соотношение Профит/Риск
-
-  # Режим обучения (Learning Mode)
-  learning_mode: true
-
-  # Минимальная целевая прибыль (%) для рассмотрения сценария
-  min_profit_threshold: 0.05
-  
-  # Скидка к порогу прибыли на флэте (настраивается автотюнером)
-  flat_market_discount: 0.7    # 0.7 = снижение на 30% для торговли во флэте
-
-  # Реальные комиссии Binance Futures (maker/taker) + запас для симуляции
-  commission_rate: 0.0002      # 0.02% базовая комиссия
-  commission_buffer: 0.0003    # Дополнительный запас (итого 0.05% за сделку)
-  
-  # Проскальзывание (с запасом для симуляции)
-  slippage_buffer: 0.0005      # 0.05% запас на проскальзывание
-
-  # Формула размера позиции (Kelly с ограничением)
-  kelly_fraction: 0.25         # Доля от оптимального Келли (0.25 = 25%)
-  
-  # Корреляционные ограничения
-  max_correlation_exposure: 0.8  # Максимальная корреляция между позициями
-
-# ==========================================
-# СЦЕНАРИИ СДЕЛОК
-# ==========================================
-scenario:
-  min_confidence_threshold: 0.65  # Минимальная итоговая уверенность для входа
-  entry_delay_sec: 2              # Задержка перед входом для подтверждения
-  max_slippage_bps: 10            # Максимальное проскальзывание (базисные пункты)
-
-# ==========================================
-# ИСПОЛНЕНИЕ ОРДЕРОВ
-# ==========================================
+  correlation_symbol: BTCUSDT
+  order_book_depth: 20
+  primary_symbol: DOGEUSDT
+  snapshot_interval_sec: 1
+  symbols:
+  - DOGEUSDT
+  - BTCUSDT
+  timeframes:
+  - 1m
+  - 5m
 executor:
-  default_order_type: "limit"     # "limit" или "market"
-  limit_order_timeout_sec: 30     # Время жизни лимитного ордера
-  use_ioc: false                  # Immediate Or Cancel
+  default_order_type: limit
+  limit_order_timeout_sec: 30
   trailing_stop:
+    activation_pct: 0.5
     enabled: true
-    activation_pct: 0.5           # Активация трейлинга при профите %
-    trail_distance_pct: 0.3       # Расстояние трейлинга %
-
-# ==========================================
-# ЛОГИРОВАНИЕ И АУДИТ
-# ==========================================
+    trail_distance_pct: 0.3
+  use_ioc: false
 logging:
-  level: "INFO"                   # DEBUG, INFO, WARNING, ERROR
-  save_cards: true                # Сохранять карточки снимков для Тюнера
-  cards_path: "data_storage/cards"
-  log_path: "logs/bot.log"
-  rotation: "1 day"
-
-# ==========================================
-# ПАМЯТЬ И ХРАНЕНИЕ
-# ==========================================
+  cards_path: data_storage/cards
+  level: INFO
+  log_path: logs/bot.log
+  rotation: 1 day
+  save_cards: true
+matrix:
+  decay_factor: 0.95
+  price_bins_count: 50
+  time_bins_count: 60
+  time_horizon_sec: 300
+risk:
+  commission_buffer: 0.0003
+  commission_rate: 0.0002
+  flat_market_discount: 0.7
+  kelly_fraction: 0.25
+  learning_mode: true
+  max_correlation_exposure: 0.8
+  max_daily_loss_pct: 2.0
+  max_position_size_usd: 33
+  min_profit_threshold: 0.05
+  min_reward_ratio: 1.5
+  risk_per_trade_pct: 0.5
+  slippage_buffer: 0.0005
+  trading_balance_usd: 50.0
+scenario:
+  entry_delay_sec: 2
+  max_slippage_bps: 10
+  min_confidence_threshold: 0.65
 storage:
-  type: "sqlite"                  # "sqlite" или "parquet"
-  db_path: "data_storage/history.db"
-  matrix_cache_path: "data_storage/matrix_cache.parquet"
+  db_path: data_storage/history.db
+  matrix_cache_path: data_storage/matrix_cache.parquet
+  type: sqlite
+tuner:
+  confidence_factors:
+    matrix: 0.1
+    mean_reversion: 0.1
+    order_flow: 0.1
+    trend: 0.1
+    volatility: 0.1
+  impact_threshold: 0.05
+  min_trades_for_update: 50

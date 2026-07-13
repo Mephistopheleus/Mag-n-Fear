@@ -91,8 +91,8 @@ class LoggingConfig(BaseModel):
 
 class StorageConfig(BaseModel):
     type: str = "sqlite"
-    db_path: str = "data_storage/history.db"
-    matrix_cache_path: str = "data_storage/matrix_cache.parquet"
+    db_path: str = "data_storage/history.txt"
+    matrix_cache_path: str = "data_storage/matrix_cache.txt"
 
 
 class ApiKeysConfig(BaseModel):

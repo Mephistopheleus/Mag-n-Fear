@@ -31,6 +31,24 @@ class TradeScenario:
     reasoning: str      # Текстовое обоснование
     risk_reward_ratio: float
     
+    # Данные анализаторов для обучения AutoTuner
+    analyzer_trend_useful: bool = False
+    analyzer_mean_reversion_useful: bool = False
+    analyzer_order_flow_useful: bool = False
+    analyzer_volatility_useful: bool = False
+    analyzer_matrix_useful: bool = False
+    
+    analyzer_trend_confidence: float = 0.0
+    analyzer_mean_reversion_confidence: float = 0.0
+    analyzer_order_flow_confidence: float = 0.0
+    analyzer_volatility_confidence: float = 0.0
+    analyzer_matrix_confidence: float = 0.0
+    
+    # Данные о рыночных условиях
+    market_trend: str = "NEUTRAL"
+    market_volatility: float = 0.0
+    market_volume: float = 0.0
+    
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
@@ -160,6 +178,27 @@ class ScenarioWriter:
         rr = abs(target - price) / abs(price - stop)
         confidence = strength * 0.8 + 0.2
         
+        # Заполняем данные анализаторов для обучения AutoTuner
+        # Trend analyzer активен когда есть явный тренд
+        trend_useful = strength > 0.6
+        trend_confidence = strength
+        
+        # Mean reversion полезен в боковике или против сильного тренда
+        mean_rev_useful = strength < 0.4 or (direction == 'SHORT' and strength > 0.8) or (direction == 'LONG' and strength > 0.8)
+        mean_rev_confidence = 1.0 - strength if strength < 0.4 else 0.3
+        
+        # Order flow важен при пробоях уровней
+        order_flow_useful = strength > 0.5
+        order_flow_confidence = strength * 0.7
+        
+        # Volatility analyzer всегда полезен для расчета стопов
+        vol_useful = True
+        vol_confidence = 0.8
+        
+        # Matrix analyzer полезен при наличии кластеров
+        matrix_useful = True
+        matrix_confidence = 0.6
+        
         return TradeScenario(
             scenario_id=f"{strat_type}_{direction}_{int(ts)}",
             timestamp=ts,
@@ -172,8 +211,27 @@ class ScenarioWriter:
             confidence=confidence,
             time_horizon_sec=int((params['time_horizon'][0] + params['time_horizon'][1]) / 2),
             reasoning=reasoning,
-            risk_reward_ratio=rr
+            risk_reward_ratio=rr,
+            # Данные анализаторов
+            analyzer_trend_useful=trend_useful,
+            analyzer_mean_reversion_useful=mean_rev_useful,
+            analyzer_order_flow_useful=order_flow_useful,
+            analyzer_volatility_useful=vol_useful,
+            analyzer_matrix_useful=matrix_useful,
+            analyzer_trend_confidence=trend_confidence,
+            analyzer_mean_reversion_confidence=mean_rev_confidence,
+            analyzer_order_flow_confidence=order_flow_confidence,
+            analyzer_volatility_confidence=vol_confidence,
+            analyzer_matrix_confidence=matrix_confidence,
+            # Рыночные условия
+            market_trend=self._get_trend_from_direction(direction),
+            market_volatility=vol,
+            market_volume=1.0  # Заглушка, будет заменено на реальные данные
         )
+    
+    def _get_trend_from_direction(self, direction: str) -> str:
+        """Преобразует направление сделки в тренд."""
+        return "BULLISH" if direction == "LONG" else "BEARISH"
 
     def _create_trap_scenarios(self, price: float, levels: Dict, trend: str, strength: float, ts: float) -> List[TradeScenario]:
         """Создает сценарии ловушек у уровней."""
@@ -193,7 +251,21 @@ class ScenarioWriter:
                         stop_loss=stop, confidence=0.75,
                         time_horizon_sec=600,
                         reasoning=f"Ловушка у сопротивления {level:.4f}.",
-                        risk_reward_ratio=rr
+                        risk_reward_ratio=rr,
+                        # Данные анализаторов для trap-сценариев
+                        analyzer_trend_useful=False,  # Trap играет против тренда
+                        analyzer_mean_reversion_useful=True,  # Mean reversion ключевой для trap
+                        analyzer_order_flow_useful=True,  # Важен поток для подтверждения ложного пробоя
+                        analyzer_volatility_useful=True,
+                        analyzer_matrix_useful=True,
+                        analyzer_trend_confidence=0.2,
+                        analyzer_mean_reversion_confidence=0.85,
+                        analyzer_order_flow_confidence=0.75,
+                        analyzer_volatility_confidence=0.8,
+                        analyzer_matrix_confidence=0.65,
+                        market_trend="BEARISH" if trend == "BULLISH" else "BULLISH",  # Контр-тренд
+                        market_volatility=params['target_mult'][1],
+                        market_volume=1.2  # Повышенный объем у уровней
                     ))
 
         for level in levels.get('support', []):
@@ -209,7 +281,21 @@ class ScenarioWriter:
                         stop_loss=stop, confidence=0.75,
                         time_horizon_sec=600,
                         reasoning=f"Ловушка у поддержки {level:.4f}.",
-                        risk_reward_ratio=rr
+                        risk_reward_ratio=rr,
+                        # Данные анализаторов для trap-сценариев
+                        analyzer_trend_useful=False,  # Trap играет против тренда
+                        analyzer_mean_reversion_useful=True,  # Mean reversion ключевой для trap
+                        analyzer_order_flow_useful=True,  # Важен поток для подтверждения ложного пробоя
+                        analyzer_volatility_useful=True,
+                        analyzer_matrix_useful=True,
+                        analyzer_trend_confidence=0.2,
+                        analyzer_mean_reversion_confidence=0.85,
+                        analyzer_order_flow_confidence=0.75,
+                        analyzer_volatility_confidence=0.8,
+                        analyzer_matrix_confidence=0.65,
+                        market_trend="BULLISH" if trend == "BEARISH" else "BEARISH",  # Контр-тренд
+                        market_volatility=params['target_mult'][1],
+                        market_volume=1.2  # Повышенный объем у уровней
                     ))
         return scenarios
 
@@ -232,7 +318,21 @@ class ScenarioWriter:
                     stop_loss=stop, confidence=0.65,
                     time_horizon_sec=180,
                     reasoning=f"Боковик. Покупка у поддержки {sup:.4f}.",
-                    risk_reward_ratio=rr
+                    risk_reward_ratio=rr,
+                    # Данные анализаторов для range-сценариев
+                    analyzer_trend_useful=False,  # Тренд не важен в боковике
+                    analyzer_mean_reversion_useful=True,  # Mean reversion ключевой
+                    analyzer_order_flow_useful=False,
+                    analyzer_volatility_useful=True,
+                    analyzer_matrix_useful=True,
+                    analyzer_trend_confidence=0.1,
+                    analyzer_mean_reversion_confidence=0.8,
+                    analyzer_order_flow_confidence=0.3,
+                    analyzer_volatility_confidence=0.7,
+                    analyzer_matrix_confidence=0.6,
+                    market_trend="SIDEWAYS",
+                    market_volatility=vol * 0.8,  # В боковике волатильность ниже
+                    market_volume=0.8  # Объем ниже в боковике
                 ))
                 
         if res and (res - price) / price < 0.02:
@@ -247,7 +347,21 @@ class ScenarioWriter:
                     stop_loss=stop, confidence=0.65,
                     time_horizon_sec=180,
                     reasoning=f"Боковик. Продажа у сопротивления {res:.4f}.",
-                    risk_reward_ratio=rr
+                    risk_reward_ratio=rr,
+                    # Данные анализаторов для range-сценариев
+                    analyzer_trend_useful=False,  # Тренд не важен в боковике
+                    analyzer_mean_reversion_useful=True,  # Mean reversion ключевой
+                    analyzer_order_flow_useful=False,
+                    analyzer_volatility_useful=True,
+                    analyzer_matrix_useful=True,
+                    analyzer_trend_confidence=0.1,
+                    analyzer_mean_reversion_confidence=0.8,
+                    analyzer_order_flow_confidence=0.3,
+                    analyzer_volatility_confidence=0.7,
+                    analyzer_matrix_confidence=0.6,
+                    market_trend="SIDEWAYS",
+                    market_volatility=vol * 0.8,  # В боковике волатильность ниже
+                    market_volume=0.8  # Объем ниже в боковике
                 ))
         return scenarios
 

@@ -32,6 +32,13 @@ class ShadowTrade:
     max_drawdown: float = 0.0
     max_profit: float = 0.0
     duration_sec: float = 0.0
+    
+    # Уровни TP/SL из сценария
+    take_profit: Optional[float] = None
+    stop_loss: Optional[float] = None
+    
+    # Флаг сохранения карточки
+    _card_saved: bool = False
 
 class ShadowDealer:
     """
@@ -64,13 +71,18 @@ class ShadowDealer:
         """
         Открывает теневую сделку по сценарию.
         Теперь передает TP и SL из сценария в сделку.
+        Добавляет дефолтное quantity если отсутствует.
         """
         async with self._lock:
             trade_id = f"shadow_{int(time.time() * 1000)}"
             
             # Симуляция входа с проскальзыванием
-            entry_price = scenario['entry_price']
-            if scenario['direction'] == 'BUY':
+            entry_price = scenario.get('entry_price', 0)
+            
+            # Добавляем дефолтное quantity если отсутствует (для совместимости)
+            quantity = scenario.get('quantity', 1.0)
+            
+            if scenario.get('direction') == 'BUY':
                 entry_price *= (1 + self.slippage)
             else:
                 entry_price *= (1 - self.slippage)
@@ -78,9 +90,9 @@ class ShadowDealer:
             trade = ShadowTrade(
                 id=trade_id,
                 symbol=self.symbol,
-                direction=scenario['direction'],
+                direction=scenario.get('direction', 'BUY'),
                 entry_price=entry_price,
-                quantity=scenario['quantity'],
+                quantity=quantity,
                 leverage=scenario.get('leverage', 1.0),
                 timestamp_open=time.time(),
                 scenario_id=scenario.get('id', 'unknown')

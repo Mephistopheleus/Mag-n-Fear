@@ -33,6 +33,9 @@ class Notifier:
 
     async def notify_trade(self, scenario: dict, action: str):
         """Форматирует и отправляет уведомление о сделке."""
+        # Получаем confidence_score или confidence (для обратной совместимости)
+        confidence = scenario.get('confidence_score') or scenario.get('confidence', 0.0)
+        
         msg = (
             f"🚀 **TRADE {action}**\n"
             f"Symbol: {scenario.get('symbol')}\n"
@@ -40,7 +43,7 @@ class Notifier:
             f"Entry: {scenario.get('entry_price')}\n"
             f"Target: {scenario.get('target_prices')}\n"
             f"Stop: {scenario.get('stop_loss')}\n"
-            f"Confidence: {scenario.get('confidence_score'):.2f}"
+            f"Confidence: {confidence:.2f}"
         )
         await self.send_message(msg)
 

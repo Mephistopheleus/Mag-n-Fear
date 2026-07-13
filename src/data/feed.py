@@ -403,7 +403,7 @@ class DataFeed:
         """Алиас для get_orderbook для совместимости."""
         return self.feed.get_orderbook(symbol)
     
-    def get_candles(self, symbol: str, timeframe: str = '1m', limit: int = 50) -> List[Dict]:
+    async def get_candles(self, symbol: str, timeframe: str = '1m', limit: int = 50) -> List[Dict]:
         """
         Получает свечи через REST API.
         Возвращает список словарей: [{'open': ..., 'high': ..., 'low': ..., 'close': ..., 'volume': ...}, ...]
