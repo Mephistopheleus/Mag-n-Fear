@@ -6,6 +6,7 @@ import asyncio
 import logging
 import sys
 import os
+import time
 from typing import Optional
 
 # Добавляем корень проекта в путь для импортов
@@ -391,10 +392,20 @@ class TradingBot:
             try:
                 current_time = time.time()
                 
-                # Подсчет количества карточек
+                # Подсчет количества карточек в SQLite базе данных
                 card_count = 0
-                if cards_path.exists():
-                    card_count = len(list(cards_path.glob("*.txt")))
+                db_path = cards_path.parent / "trading_history.db"
+                if db_path.exists():
+                    try:
+                        import sqlite3
+                        conn = sqlite3.connect(str(db_path))
+                        cursor = conn.cursor()
+                        cursor.execute("SELECT COUNT(*) FROM trades")
+                        card_count = cursor.fetchone()[0]
+                        conn.close()
+                    except Exception as e:
+                        logger.error(f"AutoTuner: Error counting cards in DB: {e}")
+                        card_count = 0
                 
                 # Проверяем появились ли новые карточки
                 new_cards = card_count - self.last_card_count

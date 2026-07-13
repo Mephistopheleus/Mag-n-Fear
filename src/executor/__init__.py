@@ -379,7 +379,7 @@ class Executor:
         Сохранение карточки сделки для обучения AutoTuner.
         
         Карточка содержит полный снимок данных на момент сделки и результат.
-        Файл сохраняется в формате JSON с расширением .txt для совместимости с Git.
+        Данные сохраняются в SQLite базу данных для предотвращения создания тысяч файлов.
         
         Args:
             symbol: Торговая пара
@@ -387,63 +387,84 @@ class Executor:
             result: Результат сделки (PnL, длительность, причина выхода)
             cards_path: Путь к директории для сохранения карточек
         """
-        import json
+        import sqlite3
         import os
         from datetime import datetime
         
         # Создаем директорию если не существует
         os.makedirs(cards_path, exist_ok=True)
         
-        # Формируем уникальное имя файла
-        timestamp = int(datetime.now().timestamp() * 1000)
-        filename = f"{symbol}_{timestamp}.txt"
-        filepath = os.path.join(cards_path, filename)
+        # Путь к SQLite базе данных
+        db_path = os.path.join(os.path.dirname(cards_path), "trading_history.db")
         
         # Создаем карточку со всеми данными
-        card = {
-            "symbol": symbol,
-            "timestamp_open": scenario.get("timestamp", datetime.now().isoformat()),
-            "timestamp_close": result.get("exit_time", datetime.now().isoformat()),
-            "strategy_type": scenario.get("strategy_type", "unknown"),
-            "direction": scenario.get("direction", "LONG"),
-            "entry_price": scenario.get("entry_price", 0),
-            "stop_loss": scenario.get("stop_loss", 0),
-            "target_price": scenario.get("target_price", 0),
-            "confidence": scenario.get("confidence", 0),
-            "risk_reward_ratio": scenario.get("risk_reward_ratio", 0),
-            "leverage": scenario.get("leverage", 1),
-            "quantity": scenario.get("quantity", 0),
-            "trade_result": {
-                "pnl_usd": result.get("pnl", 0),
-                "pnl_percent": result.get("pnl_percent", 0),
-                "exit_price": result.get("exit_price", 0),
-                "duration_sec": result.get("duration", 0),
-                "exit_reason": result.get("reason", "unknown"),
-                "max_drawdown": result.get("max_drawdown", 0),
-                "max_profit": result.get("max_profit", 0)
-            },
-            "tuner_notes": {
-                "analyzer_trend_useful": scenario.get("analyzer_trend_useful", False),
-                "analyzer_mean_reversion_useful": scenario.get("analyzer_mean_reversion_useful", False),
-                "analyzer_order_flow_useful": scenario.get("analyzer_order_flow_useful", False),
-                "analyzer_volatility_useful": scenario.get("analyzer_volatility_useful", False),
-                "analyzer_matrix_useful": scenario.get("analyzer_matrix_useful", False),
-                "analyzer_trend_confidence": scenario.get("analyzer_trend_confidence", 0),
-                "analyzer_mean_reversion_confidence": scenario.get("analyzer_mean_reversion_confidence", 0),
-                "analyzer_order_flow_confidence": scenario.get("analyzer_order_flow_confidence", 0),
-                "analyzer_volatility_confidence": scenario.get("analyzer_volatility_confidence", 0),
-                "analyzer_matrix_confidence": scenario.get("analyzer_matrix_confidence", 0)
-            },
-            "market_conditions": {
-                "trend": scenario.get("market_trend", "NEUTRAL"),
-                "volatility": scenario.get("market_volatility", 0),
-                "volume": scenario.get("market_volume", 0)
-            }
-        }
+        tuner_notes = scenario.get("tuner_notes", {})
+        market_conditions = scenario.get("market_conditions", {})
         
-        # Сохраняем карточку в файл
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(card, f, indent=2, ensure_ascii=False)
+        # Подключение к базе данных
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
         
-        print(f"[Executor] Trade card saved: {filepath}")
-        return filepath
+        try:
+            cursor.execute('''
+                INSERT INTO trades (
+                    symbol, timestamp_open, timestamp_close, strategy_type, direction,
+                    entry_price, stop_loss, target_price, confidence, risk_reward_ratio,
+                    leverage, quantity, pnl_usd, pnl_percent, exit_price, duration_sec,
+                    exit_reason, max_drawdown, max_profit,
+                    analyzer_trend_useful, analyzer_mean_reversion_useful,
+                    analyzer_order_flow_useful, analyzer_volatility_useful, analyzer_matrix_useful,
+                    analyzer_trend_confidence, analyzer_mean_reversion_confidence,
+                    analyzer_order_flow_confidence, analyzer_volatility_confidence,
+                    analyzer_matrix_confidence, market_trend, market_volatility, market_volume
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                symbol,
+                scenario.get("timestamp", datetime.now().timestamp()),
+                result.get("exit_time", datetime.now().isoformat()),
+                scenario.get("strategy_type", "unknown"),
+                scenario.get("direction", "LONG"),
+                scenario.get("entry_price", 0),
+                scenario.get("stop_loss", 0),
+                scenario.get("target_price", 0),
+                scenario.get("confidence", 0),
+                scenario.get("risk_reward_ratio", 0),
+                scenario.get("leverage", 1),
+                scenario.get("quantity", 0),
+                result.get("pnl", 0),
+                result.get("pnl_percent", 0),
+                result.get("exit_price", 0),
+                result.get("duration", 0),
+                result.get("reason", "unknown"),
+                result.get("max_drawdown", 0),
+                result.get("max_profit", 0),
+                tuner_notes.get("analyzer_trend_useful", False),
+                tuner_notes.get("analyzer_mean_reversion_useful", False),
+                tuner_notes.get("analyzer_order_flow_useful", False),
+                tuner_notes.get("analyzer_volatility_useful", False),
+                tuner_notes.get("analyzer_matrix_useful", False),
+                tuner_notes.get("analyzer_trend_confidence", 0),
+                tuner_notes.get("analyzer_mean_reversion_confidence", 0),
+                tuner_notes.get("analyzer_order_flow_confidence", 0),
+                tuner_notes.get("analyzer_volatility_confidence", 0),
+                tuner_notes.get("analyzer_matrix_confidence", 0),
+                market_conditions.get("trend", "NEUTRAL"),
+                market_conditions.get("volatility", 0),
+                market_conditions.get("volume", 0)
+            ))
+            conn.commit()
+            
+            # Получаем общее количество записей
+            cursor.execute("SELECT COUNT(*) FROM trades")
+            total = cursor.fetchone()[0]
+            
+            print(f"[Executor] Trade card saved to SQLite database (total cards: {total})")
+            
+        except Exception as e:
+            print(f"[Executor] Error saving trade card to database: {e}")
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+        
+        return db_path

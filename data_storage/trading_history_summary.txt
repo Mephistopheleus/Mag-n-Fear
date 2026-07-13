@@ -1,0 +1,82 @@
+================================================================================
+TRADING HISTORY SUMMARY
+Generated: 2026-07-13T11:57:05.711243
+================================================================================
+
+OVERVIEW:
+  Total Trades: 353
+  Profitable: 17 (4.82%)
+  Losing: 336 (95.18%)
+  Total PnL: $108747.2136
+  Average PnL: $308.065761
+  Max Profit: $62881.7248
+  Max Loss: $-62989.3577
+
+BY STRATEGY:
+  trap:
+    Trades: 353, WinRate: 4.82%, PnL: $108747.2136
+
+BY DIRECTION:
+  LONG: 321 trades, 0.00% win rate
+  SHORT: 32 trades, 53.12% win rate
+
+BY SYMBOL:
+  DOGEUSDT: 353 trades, 4.82% win rate, PnL: $108747.2136
+
+================================================================================
+DETAILED TRADES (Last 50):
+================================================================================
+1. 2026-07-13 11:39:11 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+2. 2026-07-13 11:39:45 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+3. 2026-07-13 11:38:12 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+4. 2026-07-13 11:36:53 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+5. 2026-07-13 11:38:09 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+6. 2026-07-13 11:38:56 | DOGEUSDT | LONG trap | take_profit | $-94.413468
+7. 2026-07-13 11:38:45 | DOGEUSDT | LONG trap | take_profit | $-94.413468
+8. 2026-07-13 11:35:30 | DOGEUSDT | LONG trap | take_profit | $-94.409870
+9. 2026-07-13 11:35:48 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+10. 2026-07-13 11:39:48 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+11. 2026-07-13 11:37:38 | DOGEUSDT | LONG trap | take_profit | $-94.393525
+12. 2026-07-13 11:38:40 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+13. 2026-07-13 11:39:16 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+14. 2026-07-13 11:38:50 | DOGEUSDT | LONG trap | take_profit | $-94.413468
+15. 2026-07-13 11:36:36 | DOGEUSDT | LONG trap | take_profit | $-94.412869
+16. 2026-07-13 11:37:52 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+17. 2026-07-13 11:36:39 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+18. 2026-07-13 11:38:37 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+19. 2026-07-13 11:36:52 | DOGEUSDT | LONG trap | take_profit | $-94.409870
+20. 2026-07-13 11:37:56 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+21. 2026-07-13 11:37:34 | DOGEUSDT | LONG trap | take_profit | $-94.395474
+22. 2026-07-13 11:38:59 | DOGEUSDT | LONG trap | take_profit | $-94.422015
+23. 2026-07-13 11:37:34 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+24. 2026-07-13 11:38:39 | DOGEUSDT | LONG trap | take_profit | $-94.416317
+25. 2026-07-13 11:36:41 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+26. 2026-07-13 11:37:20 | DOGEUSDT | SHORT trap | stop_loss_trailing | $-62976.157788
+27. 2026-07-13 11:35:56 | DOGEUSDT | LONG trap | take_profit | $-94.416317
+28. 2026-07-13 11:38:32 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+29. 2026-07-13 11:35:24 | DOGEUSDT | LONG trap | take_profit | $-94.481756
+30. 2026-07-13 11:37:52 | DOGEUSDT | LONG trap | take_profit | $-94.401922
+31. 2026-07-13 11:37:50 | DOGEUSDT | SHORT trap | take_profit | +$62861.025978
+32. 2026-07-13 11:38:29 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+33. 2026-07-13 11:38:08 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+34. 2026-07-13 11:38:11 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+35. 2026-07-13 11:36:55 | DOGEUSDT | LONG trap | take_profit | $-94.407920
+36. 2026-07-13 11:37:47 | DOGEUSDT | SHORT trap | take_profit | +$62873.507234
+37. 2026-07-13 11:38:38 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+38. 2026-07-13 11:35:38 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+39. 2026-07-13 11:39:21 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+40. 2026-07-13 11:39:18 | DOGEUSDT | SHORT trap | stop_loss_trailing | $-62967.027808
+41. 2026-07-13 11:39:45 | DOGEUSDT | LONG trap | take_profit | $-94.422015
+42. 2026-07-13 11:38:31 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+43. 2026-07-13 11:38:11 | DOGEUSDT | LONG trap | take_profit | $-94.420516
+44. 2026-07-13 11:35:58 | DOGEUSDT | LONG trap | take_profit | $-94.416317
+45. 2026-07-13 11:38:59 | DOGEUSDT | LONG trap | take_profit | $-94.422015
+46. 2026-07-13 11:37:22 | DOGEUSDT | LONG trap | take_profit | $-0.000108
+47. 2026-07-13 11:36:21 | DOGEUSDT | SHORT trap | take_profit | +$62868.414831
+48. 2026-07-13 11:38:25 | DOGEUSDT | LONG trap | take_profit | $-94.448857
+49. 2026-07-13 11:36:38 | DOGEUSDT | LONG trap | take_profit | $-94.412869
+50. 2026-07-13 11:35:34 | DOGEUSDT | LONG trap | take_profit | $-94.409870
+
+================================================================================
+END OF REPORT
+================================================================================

@@ -5,9 +5,12 @@ Shadow Dealer - "Теневик".
 """
 import asyncio
 import time
+import logging
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 @dataclass
 class ShadowTrade:

@@ -89,7 +89,7 @@ class HarmonicAnalyzer:
             
         x, a, b, c, d = points
         px, pa, pb, pc, pd = [p[1] for p in points]
-        types = [t[2] for p in points]
+        types = [p[2] for p in points]
         
         # Validate pattern structure (alternating High/Low)
         if not all(types[i] != types[i+1] for i in range(4)):

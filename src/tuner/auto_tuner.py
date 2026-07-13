@@ -56,14 +56,93 @@ class AutoTuner:
         """Загружает все карточки из хранилища."""
         self.cards = []
         
-        if not self.cards_path.exists():
-            return 0
+        # Путь к SQLite базе данных
+        db_path = self.cards_path.parent / "trading_history.db"
         
-        # Загрузка карточек (предполагаем формат JSON или Parquet)
+        # Приоритет 1: Загрузка из SQLite базы данных
+        if db_path.exists():
+            try:
+                import sqlite3
+                conn = sqlite3.connect(str(db_path))
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT * FROM trades ORDER BY id DESC
+                """)
+                
+                rows = cursor.fetchall()
+                for row in rows:
+                    card = {
+                        "symbol": row["symbol"],
+                        "timestamp_open": row["timestamp_open"],
+                        "timestamp_close": row["timestamp_close"],
+                        "strategy_type": row["strategy_type"],
+                        "direction": row["direction"],
+                        "entry_price": row["entry_price"],
+                        "stop_loss": row["stop_loss"],
+                        "target_price": row["target_price"],
+                        "confidence": row["confidence"],
+                        "risk_reward_ratio": row["risk_reward_ratio"],
+                        "leverage": row["leverage"],
+                        "quantity": row["quantity"],
+                        "trade_result": {
+                            "pnl_usd": row["pnl_usd"],
+                            "pnl_percent": row["pnl_percent"],
+                            "exit_price": row["exit_price"],
+                            "duration_sec": row["duration_sec"],
+                            "exit_reason": row["exit_reason"],
+                            "max_drawdown": row["max_drawdown"],
+                            "max_profit": row["max_profit"]
+                        },
+                        "tuner_notes": {
+                            "analyzer_trend_useful": bool(row["analyzer_trend_useful"]) if row["analyzer_trend_useful"] is not None else False,
+                            "analyzer_mean_reversion_useful": bool(row["analyzer_mean_reversion_useful"]) if row["analyzer_mean_reversion_useful"] is not None else False,
+                            "analyzer_order_flow_useful": bool(row["analyzer_order_flow_useful"]) if row["analyzer_order_flow_useful"] is not None else False,
+                            "analyzer_volatility_useful": bool(row["analyzer_volatility_useful"]) if row["analyzer_volatility_useful"] is not None else False,
+                            "analyzer_matrix_useful": bool(row["analyzer_matrix_useful"]) if row["analyzer_matrix_useful"] is not None else False,
+                            "analyzer_trend_confidence": row["analyzer_trend_confidence"],
+                            "analyzer_mean_reversion_confidence": row["analyzer_mean_reversion_confidence"],
+                            "analyzer_order_flow_confidence": row["analyzer_order_flow_confidence"],
+                            "analyzer_volatility_confidence": row["analyzer_volatility_confidence"],
+                            "analyzer_matrix_confidence": row["analyzer_matrix_confidence"]
+                        },
+                        "market_conditions": {
+                            "trend": row["market_trend"],
+                            "volatility": row["market_volatility"],
+                            "volume": row["market_volume"]
+                        }
+                    }
+                    self.cards.append(card)
+                
+                conn.close()
+                print(f"[AutoTuner] Loaded {len(self.cards)} cards from SQLite database")
+                return len(self.cards)
+            except Exception as e:
+                print(f"[AutoTuner] Error loading from SQLite: {e}")
+        
+        # Приоритет 2: Загрузка из JSON файла (для обратной совместимости)
+        history_file = self.cards_path / "trading_history.json.txt"
+        if history_file.exists():
+            try:
+                with open(history_file, 'r', encoding='utf-8') as f:
+                    self.cards = json.load(f)
+                print(f"[AutoTuner] Loaded {len(self.cards)} cards from {history_file}")
+                return len(self.cards)
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"[AutoTuner] Error loading history file: {e}")
+        
+        # Приоритет 3: Старые отдельные файлы (для обратной совместимости)
         for card_file in self.cards_path.glob("*.txt"):
-            with open(card_file, 'r', encoding='utf-8') as f:
-                self.cards.append(json.load(f))
+            if card_file.name == "trading_history.json.txt":
+                continue
+            try:
+                with open(card_file, 'r', encoding='utf-8') as f:
+                    self.cards.append(json.load(f))
+            except (json.JSONDecodeError, IOError):
+                continue
         
+        print(f"[AutoTuner] Loaded {len(self.cards)} cards from individual files")
         return len(self.cards)
     
     def load_config(self):

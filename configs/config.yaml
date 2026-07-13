@@ -61,10 +61,10 @@ storage:
   type: sqlite
 tuner:
   confidence_factors:
-    matrix: 0.1
-    mean_reversion: 0.1
-    order_flow: 0.1
-    trend: 0.1
-    volatility: 0.1
+    matrix: 0.334
+    mean_reversion: 0.334
+    order_flow: 0.334
+    trend: 0.334
+    volatility: 0.334
   impact_threshold: 0.05
   min_trades_for_update: 50
