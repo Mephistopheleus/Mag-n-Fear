@@ -37,6 +37,29 @@ class ShadowTrade:
     take_profit: Optional[float] = None
     stop_loss: Optional[float] = None
     
+    # Данные анализаторов для обучения AutoTuner (из оригинального сценария)
+    analyzer_trend_useful: bool = False
+    analyzer_mean_reversion_useful: bool = False
+    analyzer_order_flow_useful: bool = False
+    analyzer_volatility_useful: bool = False
+    analyzer_matrix_useful: bool = False
+    
+    analyzer_trend_confidence: float = 0.0
+    analyzer_mean_reversion_confidence: float = 0.0
+    analyzer_order_flow_confidence: float = 0.0
+    analyzer_volatility_confidence: float = 0.0
+    analyzer_matrix_confidence: float = 0.0
+    
+    # Данные о рыночных условиях
+    market_trend: str = "NEUTRAL"
+    market_volatility: float = 0.0
+    market_volume: float = 0.0
+    
+    # Стратегия и уверенность
+    strategy_type: str = "unknown"
+    confidence: float = 0.0
+    risk_reward_ratio: float = 0.0
+    
     # Флаг сохранения карточки
     _card_saved: bool = False
 
@@ -72,6 +95,7 @@ class ShadowDealer:
         Открывает теневую сделку по сценарию.
         Теперь передает TP и SL из сценария в сделку.
         Добавляет дефолтное quantity если отсутствует.
+        Сохраняет данные анализаторов для обучения AutoTuner.
         """
         async with self._lock:
             trade_id = f"shadow_{int(time.time() * 1000)}"
@@ -95,7 +119,24 @@ class ShadowDealer:
                 quantity=quantity,
                 leverage=scenario.get('leverage', 1.0),
                 timestamp_open=time.time(),
-                scenario_id=scenario.get('id', 'unknown')
+                scenario_id=scenario.get('id', 'unknown'),
+                # Сохраняем данные анализаторов из сценария для обучения AutoTuner
+                analyzer_trend_useful=scenario.get('analyzer_trend_useful', False),
+                analyzer_mean_reversion_useful=scenario.get('analyzer_mean_reversion_useful', False),
+                analyzer_order_flow_useful=scenario.get('analyzer_order_flow_useful', False),
+                analyzer_volatility_useful=scenario.get('analyzer_volatility_useful', False),
+                analyzer_matrix_useful=scenario.get('analyzer_matrix_useful', False),
+                analyzer_trend_confidence=scenario.get('analyzer_trend_confidence', 0.0),
+                analyzer_mean_reversion_confidence=scenario.get('analyzer_mean_reversion_confidence', 0.0),
+                analyzer_order_flow_confidence=scenario.get('analyzer_order_flow_confidence', 0.0),
+                analyzer_volatility_confidence=scenario.get('analyzer_volatility_confidence', 0.0),
+                analyzer_matrix_confidence=scenario.get('analyzer_matrix_confidence', 0.0),
+                market_trend=scenario.get('market_trend', 'NEUTRAL'),
+                market_volatility=scenario.get('market_volatility', 0.0),
+                market_volume=scenario.get('market_volume', 0.0),
+                strategy_type=scenario.get('strategy_type', 'unknown'),
+                confidence=scenario.get('confidence', 0.0),
+                risk_reward_ratio=scenario.get('risk_reward_ratio', 0.0)
             )
             
             # Сохраняем TP и SL из сценария (теперь они будут использоваться)

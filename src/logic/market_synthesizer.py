@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 # Импорт анализатора стакана
-from math_core.order_book_sr import OrderBookAnalyzer, SRLevel
+from src.math_core.order_book_sr import OrderBookAnalyzer, SRLevel
 
 class MarketTrend(Enum):
     BULLISH = "bullish"
