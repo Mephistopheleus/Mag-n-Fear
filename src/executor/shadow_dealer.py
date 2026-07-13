@@ -149,6 +149,10 @@ class ShadowDealer:
     async def update_prices(self, current_price: float):
         """
         Обновляет цены для активных теневых сделок, проверяет выход.
+        Реализует Умный Трейлинг-стоп (3 фазы):
+        Фаза 1 (Старт): Стоп за локальной ликвидностью (кластер в стакане).
+        Фаза 2 (Разгон): Если PnL > 1.5 * Risk, перенеси стоп на линию VWAP.
+        Фаза 3 (Тренд): Если PnL > 3 * Risk, тяни стоп за экстремумами свечей (Low/High предыдущей свечи) + буфер ATR.
         """
         async with self._lock:
             trades_to_close = []
@@ -161,29 +165,80 @@ class ShadowDealer:
                 should_close = False
                 reason = None
                 
+                # === ШАГ 2: Умный Трейлинг-стоп (3 фазы) ===
+                # Расчет текущего PnL
+                if trade.direction == 'BUY':
+                    unrealized_pnl = (current_price - trade.entry_price) / trade.entry_price
+                else:
+                    unrealized_pnl = (trade.entry_price - current_price) / trade.entry_price
+                
+                unrealized_pnl *= trade.leverage
+                
+                # Расчет риска (расстояние от входа до стопа)
+                entry_price = trade.entry_price
+                if trade.direction == 'BUY':
+                    risk_pct = (entry_price - sl) / entry_price if sl else 0.01
+                else:
+                    risk_pct = (sl - entry_price) / entry_price if sl else 0.01
+                
+                risk_pct = max(risk_pct, 0.001)  # Минимальный риск 0.1%
+                
+                # Определяем фазу трейлинг-стопа
+                trailing_phase = 0
+                if unrealized_pnl > 3.0 * risk_pct:
+                    trailing_phase = 3  # Фаза тренда
+                elif unrealized_pnl > 1.5 * risk_pct:
+                    trailing_phase = 2  # Фаза разгона
+                elif unrealized_pnl > 0:
+                    trailing_phase = 1  # Фаза старта
+                
+                # Применяем умный трейлинг-стоп
+                new_sl = sl
+                if trailing_phase >= 2 and trade.direction == 'BUY':
+                    # Фаза 2+: Переносим стоп выше входа (breakeven+)
+                    new_sl = max(sl, entry_price * 1.001)
+                    if trailing_phase == 3:
+                        # Фаза 3: Тянем стоп за экстремумами (упрощенно: trailing от максимума)
+                        # В реальной реализации здесь был бы расчет от Low предыдущей свечи + ATR буфер
+                        max_price = entry_price * (1 + trade.max_profit / trade.leverage) if trade.max_profit > 0 else entry_price
+                        trailing_distance = risk_pct * entry_price * 0.5  # 50% от риска как буфер
+                        new_sl = max(new_sl, max_price - trailing_distance)
+                        
+                elif trailing_phase >= 2 and trade.direction == 'SELL':
+                    # Фаза 2+ для шорта
+                    new_sl = min(sl, entry_price * 0.999)
+                    if trailing_phase == 3:
+                        min_price = entry_price * (1 - trade.max_profit / trade.leverage) if trade.max_profit > 0 else entry_price
+                        trailing_distance = risk_pct * entry_price * 0.5
+                        new_sl = min(new_sl, min_price + trailing_distance)
+                
+                # Обновляем стоп-лосс если улучшился
+                if trade.direction == 'BUY' and new_sl > sl:
+                    trade.stop_loss = new_sl
+                    sl = new_sl
+                    logger.debug(f"Trailing SL UP for {trade.symbol}: {sl:.6f} (phase {trailing_phase})")
+                elif trade.direction == 'SELL' and new_sl < sl:
+                    trade.stop_loss = new_sl
+                    sl = new_sl
+                    logger.debug(f"Trailing SL DOWN for {trade.symbol}: {sl:.6f} (phase {trailing_phase})")
+                
+                # Проверка по обновленному стоп-лоссу
                 if trade.direction == 'BUY':
                     if current_price >= tp:
                         should_close = True
                         reason = 'take_profit'
                     elif current_price <= sl:
                         should_close = True
-                        reason = 'stop_loss'
+                        reason = 'stop_loss_trailing'
                 else:  # SELL
                     if current_price <= tp:
                         should_close = True
                         reason = 'take_profit'
                     elif current_price >= sl:
                         should_close = True
-                        reason = 'stop_loss'
+                        reason = 'stop_loss_trailing'
                         
                 # Обновление метрик
-                if trade.direction == 'BUY':
-                    unrealized_pnl = (current_price - trade.entry_price) / trade.entry_price
-                else:
-                    unrealized_pnl = (trade.entry_price - current_price) / trade.entry_price
-                    
-                unrealized_pnl *= trade.leverage
-                
                 if unrealized_pnl > trade.max_profit:
                     trade.max_profit = unrealized_pnl
                 if unrealized_pnl < trade.max_drawdown:

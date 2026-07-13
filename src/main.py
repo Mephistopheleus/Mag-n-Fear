@@ -35,6 +35,8 @@ from src.executor import Executor
 from src.logic.matrix_analyzer import MatrixAnalyzer
 from src.logic.market_synthesizer import MarketSynthesizer, MarketTrend
 from src.executor.shadow_dealer import ShadowDealer
+from src.correlation_engine import CorrelationEngine
+from src.harmonic_analyzer import HarmonicAnalyzer
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -88,8 +90,18 @@ class TradingBot:
         # 12. Инициализация ShadowDealer для теневого просчета
         self.shadow_dealer = ShadowDealer(self.config)
         
+        # 13. Инициализация корреляционного движка (для кросс-маркет анализа)
+        self.corr_engine = CorrelationEngine(self.config)
+        
+        # 14. Инициализация гармонического анализатора
+        self.harmonic_analyzer = HarmonicAnalyzer(self.config)
+        
         # Символы для торговли
         self.symbols = self.config.data.symbols
+        
+        # Для отслеживания карточек сделок (ШАГ 3: AutoTuner Loop)
+        self.last_card_count = 0
+        self.last_tuner_run = 0
         
         logger.info(f"Trading Bot initialized. Symbols: {self.symbols}")
 
@@ -121,7 +133,9 @@ class TradingBot:
             asyncio.create_task(self._news_loop()),
             asyncio.create_task(self._risk_analysis_loop()),
             asyncio.create_task(self._trading_decision_loop()),
-            asyncio.create_task(self._health_monitor_loop())
+            asyncio.create_task(self._health_monitor_loop()),
+            asyncio.create_task(self._autotuner_loop()),  # ШАГ 3: Автономное обучение
+            asyncio.create_task(self._balance_check_loop())  # ШАГ 4: Сверка балансов
         ]
         
         try:
@@ -360,6 +374,111 @@ class TradingBot:
             except Exception as e:
                 logger.error(f"Error in health monitor: {e}", exc_info=True)
                 await asyncio.sleep(delay)
+
+    async def _autotuner_loop(self):
+        """
+        ШАГ 3: Автономное обучение (AutoTuner Loop).
+        Периодически запускает AutoTuner для обновления весов на основе новых карточек сделок.
+        """
+        import os
+        from pathlib import Path
+        
+        cards_path = Path("data_storage/cards")
+        tuner_interval_sec = 300  # Запускать тюнер каждые 5 минут
+        check_interval_sec = 30   # Проверять наличие новых карточек каждые 30 секунд
+        
+        while True:
+            try:
+                current_time = time.time()
+                
+                # Подсчет количества карточек
+                card_count = 0
+                if cards_path.exists():
+                    card_count = len(list(cards_path.glob("*.txt")))
+                
+                # Проверяем появились ли новые карточки
+                new_cards = card_count - self.last_card_count
+                
+                # Запускаем тюнер если:
+                # 1. Появились новые карточки ИЛИ
+                # 2. Прошло достаточно времени с последнего запуска
+                time_since_last_run = current_time - self.last_tuner_run
+                should_run_tuner = (new_cards > 0 and time_since_last_run > 60) or (time_since_last_run >= tuner_interval_sec and card_count > 0)
+                
+                if should_run_tuner:
+                    logger.info(f"AutoTuner: Starting learning cycle ({new_cards} new cards, {card_count} total)")
+                    
+                    result = self.tuner.run_full_cycle()
+                    
+                    if result.get("status") == "success":
+                        cards_analyzed = result.get("cards_analyzed", 0)
+                        report = result.get("report", {})
+                        
+                        # Логгируем результаты
+                        if "analyzers" in report:
+                            for analyzer_type, metrics in report["analyzers"].items():
+                                logger.info(
+                                    f"AutoTuner updated weights: {analyzer_type} -> "
+                                    f"win_rate={metrics.get('win_rate', 0):.2f}, "
+                                    f"impact_score={metrics.get('impact_score', 0):.3f}"
+                                )
+                        
+                        logger.info(f"AutoTuner updated weights based on {cards_analyzed} trades")
+                        self.last_tuner_run = current_time
+                    
+                    self.last_card_count = card_count
+                
+                await asyncio.sleep(check_interval_sec)
+                
+            except Exception as e:
+                logger.error(f"Error in autotuner loop: {e}", exc_info=True)
+                await asyncio.sleep(check_interval_sec)
+
+    async def _balance_check_loop(self):
+        """
+        ШАГ 4: Сверка балансов.
+        Периодически сравнивает расчетный баланс бота с реальным балансом на бирже.
+        """
+        import time
+        
+        check_interval_sec = 60  # Проверка каждую минуту
+        
+        while True:
+            try:
+                # Запрос баланса через API Binance
+                balance_real = await self.executor.get_balance()
+                balance_real_usdt = balance_real.get('available', 0) + balance_real.get('total', 0) / 2
+                
+                # Расчетный баланс бота (упрощенно: начальный баланс + PnL всех закрытых сделок)
+                # Для точного расчета нужно суммировать PnL из карточек
+                stats = self.shadow_dealer.get_statistics()
+                total_shadow_pnl = stats.get('total_pnl', 0)
+                
+                # Берем начальный баланс из конфига
+                initial_balance = self.config.risk.max_position_size_usd * 10  # Условно 10x от макс позиции
+                
+                balance_bot = initial_balance + total_shadow_pnl
+                
+                diff = balance_bot - balance_real_usdt
+                diff_pct = (diff / balance_real_usdt * 100) if balance_real_usdt > 0 else 0
+                
+                logger.info(
+                    f"[CHECK] Real: ${balance_real_usdt:.2f} | "
+                    f"Bot: ${balance_bot:.2f} | "
+                    f"Diff: ${diff:.2f} ({diff_pct:.2f}%) | "
+                    f"Shadow PnL: ${total_shadow_pnl:.2f}"
+                )
+                
+                # Если расхождение больше 5%, предупреждаем
+                if abs(diff_pct) > 5:
+                    logger.warning(f"[CHECK] Large balance discrepancy detected! {diff_pct:.2f}%")
+                    await self.notifier.notify_error(f"Balance mismatch: {diff_pct:.2f}%")
+                
+                await asyncio.sleep(check_interval_sec)
+                
+            except Exception as e:
+                logger.error(f"Error in balance check loop: {e}", exc_info=True)
+                await asyncio.sleep(check_interval_sec)
 
 if __name__ == "__main__":
     bot = TradingBot()

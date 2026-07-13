@@ -3,12 +3,21 @@ Market Synthesizer - "Мозг" системы.
 Объединяет данные от всех анализаторов в единую модель рынка (MarketModel).
 """
 import asyncio
+import logging
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 
 # Импорт анализатора стакана
 from src.math_core.order_book_sr import OrderBookAnalyzer, SRLevel
+
+# Импорт корреляционного движка
+from src.correlation_engine import CorrelationEngine
+
+# Импорт гармонического анализатора
+from src.harmonic_analyzer import HarmonicAnalyzer
+
+logger = logging.getLogger(__name__)
 
 class MarketTrend(Enum):
     BULLISH = "bullish"
@@ -55,6 +64,14 @@ class MarketModel:
     volume_profile: Dict[str, float] = field(default_factory=dict)
     order_flow_imbalance: float = 0.0
     
+    # Метрики корреляции (добавлено для интеграции CorrelationEngine)
+    corr_btc: float = 0.0
+    divergence_score: float = 0.0
+    
+    # Гармонические паттерны (добавлено для интеграции HarmonicAnalyzer)
+    harmonic_patterns: List[Dict] = field(default_factory=list)
+    g_channel: Optional[Dict] = None
+    
     def get_dominant_trend(self) -> MarketTrend:
         """Определяет доминирующий тренд."""
         trends = [self.trend_short, self.trend_mid, self.trend_long]
@@ -98,6 +115,12 @@ class MarketSynthesizer:
         
         # Инициализация анализатора стакана
         self.ob_analyzer = OrderBookAnalyzer(config)
+        
+        # Инициализация корреляционного движка
+        self.corr_engine = CorrelationEngine(config)
+        
+        # Инициализация гармонического анализатора
+        self.harmonic_analyzer = HarmonicAnalyzer(config)
         
         self.latest_model: Optional[MarketModel] = None
         self._lock = asyncio.Lock()
@@ -152,6 +175,57 @@ class MarketSynthesizer:
                         timeframe='order_book'
                     ))
             
+            # === ШАГ 1: Интеграция Correlation Engine ===
+            # Обновляем цены для корреляционного анализа
+            candles_short = market_data.get('candles_short', [])
+            if candles_short:
+                for candle in candles_short[-10:]:
+                    timestamp = candle.get('time', 0)
+                    price = candle.get('close', current_price)
+                    self.corr_engine.update_price(self.symbol, price, timestamp)
+            
+            # Получаем корреляционные сигналы
+            corr_signals = self.corr_engine.get_correlation_signals()
+            corr_btc = corr_signals.get(self.symbol, {}).get('btc_correlation', 0.0)
+            divergence_score = corr_signals.get(self.symbol, {}).get('divergence_score', 0.0)
+            
+            logger.debug(f"Correlation: {self.symbol}/BTC={corr_btc:.3f}, divergence={divergence_score:.3f}")
+            
+            # === ШАГ 1: Интеграция Harmonic Analyzer ===
+            # Ищем гармонические паттерны и G-Channel
+            harm_patterns = []
+            g_channel = None
+            
+            if candles_short and len(candles_short) >= 20:
+                # Преобразуем свечи в pandas Series для анализатора
+                import pandas as pd
+                prices = pd.Series([c['close'] for c in candles_short])
+                
+                # Поиск паттернов Гартли
+                gartley = self.harmonic_analyzer.detect_pattern(prices, 'gartley')
+                if gartley:
+                    harm_patterns.append(gartley)
+                    logger.info(f"Harmonic pattern detected: Gartley on {self.symbol}")
+                
+                # Поиск G-Trend Channel
+                g_channel = self.harmonic_analyzer.calculate_g_channel(prices)
+                if g_channel:
+                    logger.debug(f"G-Channel on {self.symbol}: position={g_channel['position']:.2f}, trend={g_channel['trend']}")
+                    
+                    # Добавляем уровни из G-Channel в общий пул
+                    levels.append(MarketLevel(
+                        price=g_channel['upper'],
+                        strength=g_channel['confidence'],
+                        type='resistance',
+                        timeframe='g_channel'
+                    ))
+                    levels.append(MarketLevel(
+                        price=g_channel['lower'],
+                        strength=g_channel['confidence'],
+                        type='support',
+                        timeframe='g_channel'
+                    ))
+            
             # Сортируем уровни по силе и убираем дубликаты (близкие цены)
             levels = self._merge_close_levels(levels, current_price)
 
@@ -161,7 +235,7 @@ class MarketSynthesizer:
             # 4. Расчет волатильности
             volatility = self._calculate_volatility(market_data.get('candles_short', []))
 
-            # 5. Сборка модели
+            # 5. Сборка модели с добавлением метаданных корреляции и гармонии
             model = MarketModel(
                 timestamp=asyncio.get_event_loop().time(),
                 symbol=self.symbol,
@@ -174,6 +248,12 @@ class MarketSynthesizer:
                 volatility=volatility,
                 order_flow_imbalance=market_data.get('order_flow_imbalance', 0.0)
             )
+            
+            # Сохраняем корреляционные данные в модели для передачи в сценарии
+            model.corr_btc = corr_btc
+            model.divergence_score = divergence_score
+            model.harmonic_patterns = harm_patterns
+            model.g_channel = g_channel
             
             self.latest_model = model
             return model

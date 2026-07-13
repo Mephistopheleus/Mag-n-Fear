@@ -16,7 +16,7 @@ class HarmonicAnalyzer:
             'bat': {'b': 0.5, 'c': [0.382, 0.886], 'd': 0.886},
             'crab': {'b': 0.618, 'c': [0.382, 0.886], 'd': 1.618}
         }
-        self.min swing_points = 5
+        self.min_swing_points = 5
         
     def find_extremums(self, prices: pd.Series, window: int = 5) -> List[Tuple[int, float, str]]:
         """
