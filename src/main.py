@@ -38,6 +38,7 @@ from src.logic.market_synthesizer import MarketSynthesizer, MarketTrend
 from src.executor.shadow_dealer import ShadowDealer
 from src.correlation_engine import CorrelationEngine
 from src.harmonic_analyzer import HarmonicAnalyzer
+from src.scenario_lab import ScenarioLab
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -97,12 +98,16 @@ class TradingBot:
         # 14. Инициализация гармонического анализатора
         self.harmonic_analyzer = HarmonicAnalyzer(self.config)
         
+        # 15. Инициализация Лаборатории сценариев (ScenarioLab)
+        self.lab = ScenarioLab(self.config)
+        
         # Символы для торговли
         self.symbols = self.config.data.symbols
         
         # Для отслеживания карточек сделок (ШАГ 3: AutoTuner Loop)
         self.last_card_count = 0
         self.last_tuner_run = 0
+        self.last_lab_run = 0  # Для отслеживания запуска Лаборатории
         
         logger.info(f"Trading Bot initialized. Symbols: {self.symbols}")
 
@@ -136,7 +141,8 @@ class TradingBot:
             asyncio.create_task(self._trading_decision_loop()),
             asyncio.create_task(self._health_monitor_loop()),
             asyncio.create_task(self._autotuner_loop()),  # ШАГ 3: Автономное обучение
-            asyncio.create_task(self._balance_check_loop())  # ШАГ 4: Сверка балансов
+            asyncio.create_task(self._balance_check_loop()),  # ШАГ 4: Сверка балансов
+            asyncio.create_task(self._laboratory_loop())  # ШАГ 5: Лаборатория сценариев
         ]
         
         try:
@@ -502,6 +508,202 @@ class TradingBot:
                 
             except Exception as e:
                 logger.error(f"Error in balance check loop: {e}", exc_info=True)
+                await asyncio.sleep(check_interval_sec)
+
+    async def _laboratory_loop(self):
+        """
+        ШАГ 5: Лаборатория сценариев (ScenarioLab Loop).
+        Анализирует все закрытые сделки (реальные и теневые),
+        подбирает оптимальные параметры для максимизации прибыли,
+        передает результаты в AutoTuner.
+        
+        Целевые метрики: 100% PnL/день, 100% WinRate, 0% Drawdown
+        """
+        from pathlib import Path
+        
+        cards_path = Path("data_storage/cards")
+        lab_interval_sec = 600  # Запускать лабораторию каждые 10 минут
+        check_interval_sec = 60  # Проверять наличие новых карточек каждые минуту
+        
+        while True:
+            try:
+                current_time = time.time()
+                
+                # Подсчет количества карточек в SQLite базе данных
+                card_count = 0
+                db_path = cards_path.parent / "trading_history.db"
+                if db_path.exists():
+                    try:
+                        import sqlite3
+                        conn = sqlite3.connect(str(db_path))
+                        cursor = conn.cursor()
+                        cursor.execute("SELECT COUNT(*) FROM trades")
+                        card_count = cursor.fetchone()[0]
+                        conn.close()
+                    except Exception as e:
+                        logger.error(f"Laboratory: Error counting cards in DB: {e}")
+                        card_count = 0
+                
+                # Проверяем появились ли новые карточки или прошло время
+                new_cards = card_count - self.last_card_count
+                time_since_last_run = current_time - self.last_lab_run
+                
+                # Запускаем лабораторию если:
+                # 1. Появились новые карточки И прошло больше минуты с последнего запуска
+                # 2. ИЛИ прошло достаточно времени с последнего запуска И есть карточки
+                should_run_lab = (new_cards > 0 and time_since_last_run > 60) or (time_since_last_run >= lab_interval_sec and card_count > 0)
+                
+                if should_run_lab:
+                    logger.info(f"Laboratory: Starting analysis cycle ({new_cards} new cards, {card_count} total)")
+                    
+                    # Загружаем карточки сделок из базы данных
+                    cards = []
+                    if db_path.exists():
+                        try:
+                            import sqlite3
+                            conn = sqlite3.connect(str(db_path))
+                            conn.row_factory = sqlite3.Row
+                            cursor = conn.cursor()
+                            
+                            cursor.execute("""
+                                SELECT * FROM trades ORDER BY id DESC LIMIT 100
+                            """)
+                            
+                            rows = cursor.fetchall()
+                            for row in rows:
+                                card = {
+                                    "symbol": row["symbol"],
+                                    "timestamp_open": row["timestamp_open"],
+                                    "timestamp_close": row["timestamp_close"],
+                                    "strategy_type": row["strategy_type"],
+                                    "direction": row["direction"],
+                                    "entry_price": row["entry_price"],
+                                    "stop_loss": row["stop_loss"],
+                                    "target_price": row["target_price"],
+                                    "confidence": row["confidence"],
+                                    "risk_reward_ratio": row["risk_reward_ratio"],
+                                    "leverage": row["leverage"],
+                                    "quantity": row["quantity"],
+                                    "trade_result": {
+                                        "pnl_usd": row["pnl_usd"],
+                                        "pnl_percent": row["pnl_percent"],
+                                        "exit_price": row["exit_price"],
+                                        "duration_sec": row["duration_sec"],
+                                        "exit_reason": row["exit_reason"],
+                                        "max_drawdown": row["max_drawdown"],
+                                        "max_profit": row["max_profit"]
+                                    },
+                                    "tuner_notes": {
+                                        "analyzer_trend_useful": bool(row["analyzer_trend_useful"]) if row["analyzer_trend_useful"] is not None else False,
+                                        "analyzer_mean_reversion_useful": bool(row["analyzer_mean_reversion_useful"]) if row["analyzer_mean_reversion_useful"] is not None else False,
+                                        "analyzer_order_flow_useful": bool(row["analyzer_order_flow_useful"]) if row["analyzer_order_flow_useful"] is not None else False,
+                                        "analyzer_volatility_useful": bool(row["analyzer_volatility_useful"]) if row["analyzer_volatility_useful"] is not None else False,
+                                        "analyzer_matrix_useful": bool(row["analyzer_matrix_useful"]) if row["analyzer_matrix_useful"] is not None else False,
+                                        "analyzer_trend_confidence": row["analyzer_trend_confidence"],
+                                        "analyzer_mean_reversion_confidence": row["analyzer_mean_reversion_confidence"],
+                                        "analyzer_order_flow_confidence": row["analyzer_order_flow_confidence"],
+                                        "analyzer_volatility_confidence": row["analyzer_volatility_confidence"],
+                                        "analyzer_matrix_confidence": row["analyzer_matrix_confidence"]
+                                    },
+                                    "market_conditions": {
+                                        "trend": row["market_trend"],
+                                        "volatility": row["market_volatility"],
+                                        "volume": row["market_volume"]
+                                    },
+                                    "is_real": row.get("is_real", False)
+                                }
+                                cards.append(card)
+                            
+                            conn.close()
+                        except Exception as e:
+                            logger.error(f"Laboratory: Error loading cards from DB: {e}")
+                            cards = []
+                    
+                    if not cards:
+                        logger.warning("Laboratory: No cards to analyze")
+                        self.last_lab_run = current_time
+                        await asyncio.sleep(check_interval_sec)
+                        continue
+                    
+                    # Анализируем каждую карточку через Лабораторию
+                    all_snapshots = []
+                    market_context = {
+                        "volatility": sum(c.get("market_conditions", {}).get("volatility", 0.01) for c in cards) / len(cards) if cards else 0.01
+                    }
+                    
+                    for card in cards:
+                        # Создаем псевдо-сценарий из карточки для анализа
+                        scenario = {
+                            "id": f"lab_analysis_{int(card['timestamp_open'])}",
+                            "strategy_type": card.get("strategy_type", "unknown"),
+                            "direction": card.get("direction", "BUY"),
+                            "entry_price": card.get("entry_price", 0),
+                            "parameters": {
+                                "stop_loss_pct": abs((card.get("entry_price", 1) - card.get("stop_loss", 0.99)) / card.get("entry_price", 1)),
+                                "take_profit_pct": abs((card.get("target_price", 1.02) - card.get("entry_price", 1)) / card.get("entry_price", 1)),
+                                "leverage": card.get("leverage", 1.0),
+                                "confidence_threshold": card.get("confidence", 0.5)
+                            },
+                            "simulated_pnl": card.get("trade_result", {}).get("pnl_usd", 0)
+                        }
+                        
+                        # Лаборатория анализирует сценарий и предлагает улучшения
+                        snapshots = self.lab.analyze_scenario(scenario, market_context)
+                        all_snapshots.extend(snapshots)
+                    
+                    if all_snapshots:
+                        # Генерируем отчет оптимизации
+                        report = self.lab.generate_optimization_report(all_snapshots)
+                        
+                        if report.get("status") != "NO_DATA":
+                            logger.info(
+                                f"Laboratory: Best adjustment found - "
+                                f"param={report['best_adjustment']['param']}, "
+                                f"direction={report['best_adjustment']['direction']}, "
+                                f"value={report['best_adjustment']['value']:.4f}, "
+                                f"expected_gain={report['best_adjustment']['expected_gain']:.2f}"
+                            )
+                            
+                            # Передаем результаты в AutoTuner для обновления весов
+                            # AutoTuner использует эти данные для калибровки confidence_factors
+                            logger.info(f"Laboratory: Sending {len(all_snapshots)} snapshots to AutoTuner")
+                            
+                            # Сохраняем снимки лаборатории в базу данных для истории
+                            try:
+                                import sqlite3
+                                conn = sqlite3.connect(str(db_path))
+                                cursor = conn.cursor()
+                                
+                                for snapshot in all_snapshots:
+                                    cursor.execute("""
+                                        INSERT INTO lab_snapshots 
+                                        (scenario_id, original_pnl, modified_pnl, improvement, 
+                                         changed_param, new_value, old_value, recommendation, timestamp)
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    """, (
+                                        snapshot.get("scenario_id", ""),
+                                        snapshot.get("original_pnl", 0),
+                                        snapshot.get("modified_pnl", 0),
+                                        snapshot.get("improvement", 0),
+                                        snapshot.get("changed_param", ""),
+                                        snapshot.get("new_value", 0),
+                                        snapshot.get("old_value", 0),
+                                        snapshot.get("recommendation", ""),
+                                        current_time
+                                    ))
+                                
+                                conn.commit()
+                                conn.close()
+                                logger.info(f"Laboratory: Saved {len(all_snapshots)} snapshots to database")
+                            except Exception as e:
+                                logger.error(f"Laboratory: Error saving snapshots to DB: {e}")
+                    
+                    self.last_lab_run = current_time
+                
+                await asyncio.sleep(check_interval_sec)
+                
+            except Exception as e:
+                logger.error(f"Error in laboratory loop: {e}", exc_info=True)
                 await asyncio.sleep(check_interval_sec)
 
 if __name__ == "__main__":
