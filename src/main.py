@@ -209,6 +209,18 @@ class TradingBot:
                     matrix_snapshot = self.prob_field.get_matrix_snapshot(symbol)
                     clusters = self.matrix_analyzer.find_clusters(matrix_snapshot, current_price)
                     
+                    # Извлекаем analysis_points из кластеров матрицы
+                    analysis_points = []
+                    for cluster in clusters:
+                        # Каждый кластер содержит точки с target_price, probability, time_sec
+                        analysis_points.append({
+                            'target_price': cluster.get('target_price', current_price),
+                            'probability': cluster.get('probability', 0.5),
+                            'time_sec': cluster.get('target_time_sec', 300),
+                            'pattern_type': cluster.get('pattern_type', 'unknown'),
+                            'confidence': cluster.get('confidence', 0.5)
+                        })
+                    
                     # Получаем свежие данные от анализаторов
                     # Берем историю свечей и стакан из DataFeed
                     candles_short = await self.feed.get_candles(symbol, '1m', limit=50) or []
@@ -241,7 +253,7 @@ class TradingBot:
                     # Синтезируем единую модель рынка
                     market_model_obj = await self.synthesizer.synthesize(
                         current_price=current_price,
-                        analysis_points=[],  # TODO: точки из матрицы
+                        analysis_points=analysis_points,  # Теперь передаем точки из матрицы
                         market_data=market_data
                     )
                     

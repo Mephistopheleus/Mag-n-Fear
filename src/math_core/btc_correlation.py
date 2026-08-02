@@ -1,8 +1,9 @@
 """
 Модуль корреляционного анализа.
 Рассчитывает скользящую корреляцию с BTC и другими активами.
+Использует данные из BinanceFuturesFeed для получения цен BTC.
 """
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import polars as pl
 import numpy as np
 
@@ -15,45 +16,82 @@ class BTCCorrelation(BaseIndicator):
     """
     Корреляция с BTC.
     Вычисляет скользящую корреляцию Пирсона между текущим активом и BTC.
-    Требует наличия данных BTC в потоке или отдельном источнике.
+    Использует реальные данные BTC из feed через btc_prices кэш.
     """
 
     def __init__(self, name: str, config: Dict[str, Any] = None):
         super().__init__(name, config)
         self.period = self.config.get('period', 50)
-        # В реальном проекте здесь будет подключение к источнику данных BTC
-        self.btc_data_cache = [] 
+        self.btc_feed = None  # Будет установлен извне при инициализации
+
+    def set_btc_feed(self, btc_feed):
+        """Установка ссылки на feed для получения данных BTC."""
+        self.btc_feed = btc_feed
 
     def calculate(self, data: pl.DataFrame, current_price: float) -> Dict[str, Any]:
         if not self.validate_data(data):
             return {'error': 'Invalid data'}
 
-        # Для примера генерируем "синтетическую" корреляцию или используем заглушку
-        # В реальности: нужно брать цены BTC за те же timestamps из внешнего источника
-        # Здесь эмулируем, что btc_prices уже синхронизированы с data
-        # Если btc нет в данных, возвращаем нейтральное значение
+        # Получаем цены BTC из feed если доступен
+        btc_prices_list = []
+        asset_prices_list = []
         
-        if 'btc_price' not in data.columns:
-            # Заглушка: если BTC нет, считаем корреляцию 0 (нейтрально)
-            # В полной версии тут будет запрос к кэшу BTC
-            corr_value = 0.0
-        else:
-            asset_returns = data['price'].pct_change().drop_nulls()
-            btc_returns = data['btc_price'].pct_change().drop_nulls()
-            
-            # Синхронизируем длины (после pct_change теряется 1 элемент)
-            min_len = min(len(asset_returns), len(btc_returns))
-            if min_len < 10:
-                corr_value = 0.0
-            else:
-                ar = asset_returns[-min_len:].to_numpy()
-                br = btc_returns[-min_len:].to_numpy()
+        if self.btc_feed and hasattr(self.btc_feed, 'btc_prices'):
+            # Синхронизируем данные по timestamp
+            for idx in range(len(data)):
+                try:
+                    ts = int(data[idx, 'timestamp'] * 1000) if 'timestamp' in data.columns else 0
+                    if ts == 0:
+                        # Если timestamp нет, используем индекс
+                        ts = int(idx * 300000)  # предполагаем 5м свечи
+                    
+                    btc_price = self.btc_feed.get_btc_price_for_timestamp(ts)
+                    if btc_price is not None:
+                        btc_prices_list.append(btc_price)
+                        asset_prices_list.append(data[idx, 'price'])
+                except Exception:
+                    continue
+        
+        # Если не удалось получить синхронизированные данные, пробуем альтернативный метод
+        if len(btc_prices_list) < 10:
+            if 'btc_price' in data.columns:
+                # Используем btc_price из данных если есть
+                asset_returns = data['price'].pct_change().drop_nulls()
+                btc_returns = data['btc_price'].pct_change().drop_nulls()
                 
-                # Корреляция Пирсона
+                min_len = min(len(asset_returns), len(btc_returns))
+                if min_len >= 10:
+                    ar = asset_returns[-min_len:].to_numpy()
+                    br = btc_returns[-min_len:].to_numpy()
+                    
+                    if np.std(ar) == 0 or np.std(br) == 0:
+                        corr_value = 0.0
+                    else:
+                        corr_value = np.corrcoef(ar, br)[0, 1]
+                else:
+                    corr_value = 0.0
+            else:
+                # Заглушка: если BTC нет, считаем корреляцию 0 (нейтрально)
+                corr_value = 0.0
+        else:
+            # Вычисляем корреляцию на основе синхронизированных данных
+            asset_np = np.array(asset_prices_list)
+            btc_np = np.array(btc_prices_list)
+            
+            asset_returns = np.diff(asset_np) / asset_np[:-1]
+            btc_returns = np.diff(btc_np) / btc_np[:-1]
+            
+            min_len = min(len(asset_returns), len(btc_returns))
+            if min_len >= 10:
+                ar = asset_returns[-min_len:]
+                br = btc_returns[-min_len:]
+                
                 if np.std(ar) == 0 or np.std(br) == 0:
                     corr_value = 0.0
                 else:
                     corr_value = np.corrcoef(ar, br)[0, 1]
+            else:
+                corr_value = 0.0
 
         # Прогноз на основе корреляции
         target_price = current_price

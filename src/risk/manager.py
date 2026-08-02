@@ -516,16 +516,18 @@ class RiskManager:
     async def _get_balance_from_executor(self) -> float:
         """
         Получение баланса из Executor или конфига.
-        Приоритет: Executor > config.risk.trading_balance_usd > 0 (торгуем на весь доступный)
+        Приоритет: Executor (реальный API баланс) > config.risk.trading_balance_usd > 0 (торгуем на весь доступный)
         """
         try:
             # В реальной системе здесь будет вызов к Executor для получения реального баланса
-            # executor = self.config.get('executor_instance')
-            # if executor:
-            #     balance = await executor.get_balance()
-            #     return balance if balance > 0 else 0
+            executor = self.config.get('executor_instance')
+            if executor and hasattr(executor, 'get_balance'):
+                balance = await executor.get_balance()
+                if balance > 0:
+                    logger.debug(f"[RiskManager] Got real balance from Executor: ${balance}")
+                    return balance
             
-            # Пока берем из конфига risk.trading_balance_usd
+            # Берем из конфига risk.trading_balance_usd
             # Если указано 0 - торгуем на весь доступный баланс (будет запрос к API)
             risk_cfg = self.config.get('risk', {})
             trading_balance = risk_cfg.get('trading_balance_usd', 0)
@@ -534,9 +536,17 @@ class RiskManager:
                 logger.debug(f"[RiskManager] Using configured trading balance: ${trading_balance}")
                 return trading_balance
             
-            # Если 0 - пытаемся получить реальный баланс (пока заглушка, потом API)
-            logger.info("[RiskManager] trading_balance_usd=0, will use full exchange balance (API call needed)")
-            # TODO: Вызов API Binance для получения реального баланса
+            # Если 0 - получаем реальный баланс через feed
+            logger.info("[RiskManager] trading_balance_usd=0, fetching real balance from Binance API")
+            feed_instance = self.config.get('feed_instance')
+            if feed_instance and hasattr(feed_instance, 'get_account_balance'):
+                balance_data = await feed_instance.get_account_balance()
+                if balance_data and 'USDT' in balance_data:
+                    usdt_balance = float(balance_data['USDT'].get('availableBalance', 0))
+                    logger.debug(f"[RiskManager] Real USDT balance from API: ${usdt_balance}")
+                    return usdt_balance
+            
+            logger.warning("[RiskManager] Could not get balance, using 0 (full balance mode)")
             return 0  # 0 означает "использовать весь доступный"
             
         except Exception as e:

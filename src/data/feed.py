@@ -65,6 +65,7 @@ class BinanceFuturesFeed:
         self.order_books: Dict[str, Dict] = {}
         self.last_trades: Dict[str, List] = {}
         self.tickers: Dict[str, Dict] = {}
+        self.btc_prices: Dict[int, float] = {}  # Кэш цен BTC по timestamp для корреляции
         
         # Callbacks для WebSocket событий
         self._orderbook_callbacks: List[Callable] = []
@@ -108,6 +109,21 @@ class BinanceFuturesFeed:
         """Предзагрузка начального состояния стакана и тикеров."""
         logger.info("Preloading market data...")
         
+        # Сначала загружаем данные BTC для корреляции
+        if 'BTCUSDT' not in self.symbols:
+            try:
+                btc_orderbook = await self.client.get_order_book(symbol='BTCUSDT', limit=20)
+                btc_price = float(btc_orderbook['bids'][0][0]) if btc_orderbook['bids'] else 0
+                timestamp = int(datetime.utcnow().timestamp() * 1000)
+                self.btc_prices[timestamp] = btc_price
+                self.tickers['BTCUSDT'] = {
+                    'price': btc_price,
+                    'timestamp': datetime.utcnow()
+                }
+                logger.info(f"Loaded BTC data for correlation: price={btc_price}")
+            except Exception as e:
+                logger.error(f"Error preloading BTC data: {e}")
+        
         for symbol in self.symbols:
             try:
                 # Стакан
@@ -120,10 +136,16 @@ class BinanceFuturesFeed:
                 
                 # Тикер
                 ticker = await self.client.get_symbol_ticker(symbol=symbol)
+                current_price = float(ticker['price'])
                 self.tickers[symbol] = {
-                    'price': float(ticker['price']),
+                    'price': current_price,
                     'timestamp': datetime.utcnow()
                 }
+                
+                # Сохраняем цену BTC для того же timestamp для корреляции
+                if 'BTCUSDT' in self.tickers:
+                    ts = int(datetime.utcnow().timestamp() * 1000)
+                    self.btc_prices[ts] = self.tickers['BTCUSDT']['price']
                 
                 # Последние сделки
                 trades = await self.client.get_recent_trades(symbol=symbol, limit=50)
@@ -137,7 +159,7 @@ class BinanceFuturesFeed:
                     for t in trades
                 ]
                 
-                logger.info(f"Loaded data for {symbol}: price={self.tickers[symbol]['price']}")
+                logger.info(f"Loaded data for {symbol}: price={current_price}")
                 
             except Exception as e:
                 logger.error(f"Error preloading data for {symbol}: {e}")
@@ -256,10 +278,21 @@ class BinanceFuturesFeed:
             self.last_trades[symbol] = self.last_trades[symbol][-100:]
             
             # Обновляем тикер
+            current_time = datetime.utcnow()
             self.tickers[symbol] = {
                 'price': trade_data['price'],
-                'timestamp': datetime.utcnow()
+                'timestamp': current_time
             }
+            
+            # Сохраняем цену BTC для корреляции если это BTC
+            if symbol == 'BTCUSDT':
+                ts = int(current_time.timestamp() * 1000)
+                self.btc_prices[ts] = trade_data['price']
+                # Очищаем старые записи (храним последние 1000)
+                if len(self.btc_prices) > 1000:
+                    sorted_keys = sorted(self.btc_prices.keys())
+                    for k in sorted_keys[:-1000]:
+                        del self.btc_prices[k]
             
             # Уведомление подписчиков
             for callback in self._trade_callbacks:
@@ -339,6 +372,78 @@ class BinanceFuturesFeed:
         
         return None
 
+    def get_btc_price_for_timestamp(self, timestamp: int) -> Optional[float]:
+        """Получение цены BTC для ближайшего timestamp для корреляции."""
+        if not self.btc_prices:
+            return None
+        
+        # Ищем ближайший timestamp
+        keys = sorted(self.btc_prices.keys())
+        target = timestamp
+        
+        # Бинарный поиск ближайшего
+        closest_key = min(keys, key=lambda k: abs(k - target))
+        
+        # Если разница больше 5 минут, возвращаем None
+        if abs(closest_key - target) > 300000:  # 5 мин в мс
+            return None
+        
+        return self.btc_prices[closest_key]
+
+    def get_latest_btc_price(self) -> Optional[float]:
+        """Получение последней известной цены BTC."""
+        if not self.btc_prices:
+            return self.tickers.get('BTCUSDT', {}).get('price')
+        
+        latest_ts = max(self.btc_prices.keys())
+        return self.btc_prices[latest_ts]
+
+    async def get_24h_volume(self, symbol: str) -> Optional[float]:
+        """Получение объема торгов за 24 часа из API Binance."""
+        if not self.client:
+            logger.error(f"Client not initialized for {symbol}")
+            return None
+        
+        try:
+            # Используем правильный метод для фьючерсов - получаем тикер за 24ч
+            ticker_24h = await self.client.futures_ticker(symbol=symbol)
+            # ticker_24h может быть списком или dict в зависимости от версии библиотеки
+            if isinstance(ticker_24h, list):
+                for t in ticker_24h:
+                    if t.get('symbol') == symbol:
+                        volume = float(t.get('volume', 0))
+                        logger.debug(f"24h volume for {symbol}: {volume}")
+                        return volume
+            elif isinstance(ticker_24h, dict):
+                volume = float(ticker_24h.get('volume', 0))
+                logger.debug(f"24h volume for {symbol}: {volume}")
+                return volume
+            logger.warning(f"Could not parse 24h volume for {symbol}")
+            return 0.0
+        except Exception as e:
+            logger.error(f"Error getting 24h volume for {symbol}: {e}")
+            return 0.0
+
+    def get_volume_24h(self, symbol: str) -> Optional[float]:
+        """Синхронный wrapper для get_24h_volume (для обратной совместимости).
+        Примечание: для корректной работы требует asyncio event loop.
+        """
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # Если цикл запущен, создаем task
+                task = loop.create_task(self.get_24h_volume(symbol))
+                # Возвращаем None, так как результат будет позже
+                return None
+            else:
+                # Если цикла нет, запускаем синхронно
+                return loop.run_until_complete(self.get_24h_volume(symbol))
+        except RuntimeError:
+            # Нет активного цикла, создаем новый
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return loop.run_until_complete(self.get_24h_volume(symbol))
+
 
 # Legacy compatibility class for old code
 class DataFeed:
@@ -381,14 +486,14 @@ class DataFeed:
             elif asks:
                 mid_price = float(asks[0][0])
             
-            # Объем за 24ч берем из кэша или ставим заглушку, т.к. в стакане его нет
+            # Объем за 24ч получаем из API Binance через метод feed
             volume_24h = self.feed.get_volume_24h(symbol) if hasattr(self.feed, 'get_volume_24h') else 0.0
 
             card = DataCard(
                 symbol=symbol,
                 timestamp=orderbook['timestamp'],
                 price=mid_price,
-                volume_24h=volume_24h,
+                volume_24h=volume_24h if volume_24h is not None else 0.0,
                 orderbook_snapshot=orderbook
             )
             self.prob_field.update(card)
@@ -397,12 +502,15 @@ class DataFeed:
         """Отправка сделки в ProbabilityField."""
         if self.prob_field:
             from src.core.models import DataCard
+            # Получаем реальный объем 24ч из API
+            volume_24h = self.feed.get_volume_24h(symbol) if hasattr(self.feed, 'get_volume_24h') else 0.0
+            
             card = DataCard(
                 symbol=symbol,
                 timestamp=datetime.utcnow(),
                 price=trade['price'],
-                volume_24h=trade['qty'], # Используем объем текущей сделки как заглушку
-                recent_trades=[trade] # Передаем текущую сделку как список
+                volume_24h=volume_24h if volume_24h is not None else 0.0,
+                recent_trades=[trade]
             )
             # Используем актуальный метод update_market_data
             asyncio.create_task(self.prob_field.update_market_data(
