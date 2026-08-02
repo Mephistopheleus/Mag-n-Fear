@@ -227,6 +227,10 @@ class TradingBot:
                             'confidence': cluster.get('confidence', 0.5)
                         })
                     
+                    # Обновляем данные в CorrelationEngine для мега-коррелятора
+                    timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+                    self.corr_engine.update_price(symbol, current_price, timestamp_ms)
+                    
                     # Получаем свежие данные от анализаторов
                     # Берем историю свечей и стакан из DataFeed
                     candles_short = await self.feed.get_candles(symbol, '1m', limit=50) or []
@@ -245,6 +249,10 @@ class TradingBot:
                             depth=10
                         )
                     
+                    # Получаем корреляционные сигналы от Мега-коррелятора
+                    corr_signals = self.corr_engine.get_correlation_signals()
+                    symbol_corr = corr_signals.get(symbol, {})
+                    
                     market_data = {
                         'current_price': current_price,
                         'candles_short': candles_short,
@@ -253,7 +261,13 @@ class TradingBot:
                         'history': candles_short + candles_mid,  # Объединяем для расчета уровней
                         'order_book': order_book,  # Передаем стакан в синтезатор
                         'order_flow_imbalance': imbalance,
-                        'news_impact': 0.0
+                        'news_impact': 0.0,
+                        # Данные от Мега-коррелятора
+                        'correlation_signals': symbol_corr,
+                        'btc_integrated_correlation': symbol_corr.get('btc_integrated_correlation', 0),
+                        'eth_integrated_correlation': symbol_corr.get('eth_integrated_correlation', 0),
+                        'beta_btc': symbol_corr.get('beta_btc', 0),
+                        'correlation_agreement': symbol_corr.get('btc_method_agreement', 0)
                     }
                     
                     # Синтезируем единую модель рынка
