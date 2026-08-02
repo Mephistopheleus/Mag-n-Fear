@@ -7,6 +7,7 @@ import logging
 import sys
 import os
 import time
+from datetime import datetime
 from typing import Optional
 
 # Добавляем корень проекта в путь для импортов
@@ -624,7 +625,7 @@ class TradingBot:
                                         "volatility": row["market_volatility"],
                                         "volume": row["market_volume"]
                                     },
-                                    "is_real": row.get("is_real", False)
+                                    "is_real": row["is_real"] if "is_real" in row.keys() else False
                                 }
                                 cards.append(card)
                             
