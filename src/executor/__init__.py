@@ -60,7 +60,7 @@ class Executor:
         self._running = False
         
     async def start(self):
-        """Инициализация клиента Binance."""
+        """Инициализация клиента Binance и синхронизация позиций."""
         # Берем ключи из раздела api_keys в конфиге
         api_keys_cfg = self.config.get('api_keys', {})
         if hasattr(api_keys_cfg, 'dict'):
@@ -86,9 +86,58 @@ class Executor:
         )
         self._running = True
         
+        # Синхронизация с реальными позициями на Binance
+        await self._sync_positions_from_exchange()
+        
         # Запуск обработчика очереди
         asyncio.create_task(self._process_queue())
         print(f"[Executor] Started (testnet={self.testnet})")
+    
+    async def _sync_positions_from_exchange(self):
+        """Синхронизирует внутренние позиции с реальными позициями на бирже."""
+        logger.info("[Executor] Syncing positions from exchange...")
+        try:
+            positions = await self._client.futures_position_information()
+            
+            # Получаем настройки risk - обрабатываем и dict и Pydantic модель
+            risk_cfg = self.config.get('risk', {})
+            if hasattr(risk_cfg, 'dict'):
+                risk_dict = risk_cfg.dict()
+            elif hasattr(risk_cfg, '__dict__'):
+                risk_dict = vars(risk_cfg)
+            else:
+                risk_dict = risk_cfg
+            
+            stop_loss_pct = risk_dict.get('stop_loss_pct', 0.01)
+            
+            for pos in positions:
+                position_amt = float(pos['positionAmt'])
+                if position_amt != 0:
+                    symbol = pos['symbol']
+                    side = 'LONG' if position_amt > 0 else 'SHORT'
+                    entry_price = float(pos['entryPrice'])
+                    quantity = abs(position_amt)
+                    
+                    # Рассчитываем стоп-лосс на основе текущих настроек risk
+                    if side == 'LONG':
+                        stop_loss_price = entry_price * (1 - stop_loss_pct)
+                    else:
+                        stop_loss_price = entry_price * (1 + stop_loss_pct)
+                    
+                    self._active_positions[symbol] = {
+                        'side': side,
+                        'quantity': quantity,
+                        'entry_price': entry_price,
+                        'stop_loss': stop_loss_price,
+                        'take_profit': entry_price * (1 + stop_loss_pct * 2) if side == 'LONG' else entry_price * (1 - stop_loss_pct * 2)
+                    }
+                    logger.info(f"[Executor] Synced position {symbol}: {side} {quantity} @ {entry_price}, SL={stop_loss_price}")
+            
+            if not self._active_positions:
+                logger.info("[Executor] No open positions found on exchange")
+                
+        except Exception as e:
+            logger.error(f"[Executor] Error syncing positions: {e}", exc_info=True)
         
     async def stop(self):
         """Остановка и закрытие клиента с выставлением стоп-лоссов по активным позициям."""

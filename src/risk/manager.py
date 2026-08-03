@@ -515,29 +515,44 @@ class RiskManager:
 
     async def _get_balance_from_executor(self) -> float:
         """
-        Получение баланса из Executor или конфига.
-        Приоритет: Executor (реальный API баланс) > config.risk.trading_balance_usd > 0 (торгуем на весь доступный)
+        Получение баланса для торговли.
+        
+        ВАЖНО: Для расчёта размера позиций используется ТОЛЬКО trading_balance_usd из конфига.
+        Реальный баланс с Binance используется только для валидации (контроль, что не ушли в минус).
+        
+        Приоритет: config.risk.trading_balance_usd > fallback на весь доступный (если = 0)
         """
         try:
-            # В реальной системе здесь будет вызов к Executor для получения реального баланса
-            executor = self.config.get('executor_instance')
-            if executor and hasattr(executor, 'get_balance'):
-                balance = await executor.get_balance()
-                if balance > 0:
-                    logger.debug(f"[RiskManager] Got real balance from Executor: ${balance}")
-                    return balance
-            
-            # Берем из конфига risk.trading_balance_usd
-            # Если указано 0 - торгуем на весь доступный баланс (будет запрос к API)
+            # Берем из конфига risk.trading_balance_usd - это ОСНОВНОЙ баланс для торговли
             risk_cfg = self.config.get('risk', {})
             trading_balance = risk_cfg.get('trading_balance_usd', 0)
             
             if trading_balance > 0:
                 logger.debug(f"[RiskManager] Using configured trading balance: ${trading_balance}")
+                
+                # Валидация: проверяем реальный баланс на Binance, чтобы убедиться что хватает средств
+                executor = self.config.get('executor_instance')
+                if executor and hasattr(executor, 'get_balance'):
+                    real_balance = await executor.get_balance()
+                    if real_balance < trading_balance:
+                        logger.warning(
+                            f"[RiskManager] Configured trading balance (${trading_balance}) "
+                            f"exceeds real balance (${real_balance}). Using real balance."
+                        )
+                        return real_balance
+                
                 return trading_balance
             
-            # Если 0 - получаем реальный баланс через feed
+            # Если trading_balance_usd = 0 - торгуем на весь доступный баланс (режим full balance)
             logger.info("[RiskManager] trading_balance_usd=0, fetching real balance from Binance API")
+            executor = self.config.get('executor_instance')
+            if executor and hasattr(executor, 'get_balance'):
+                balance = await executor.get_balance()
+                if balance > 0:
+                    logger.debug(f"[RiskManager] Using real balance from Executor: ${balance}")
+                    return balance
+            
+            # Fallback через feed
             feed_instance = self.config.get('feed_instance')
             if feed_instance and hasattr(feed_instance, 'get_account_balance'):
                 balance_data = await feed_instance.get_account_balance()
