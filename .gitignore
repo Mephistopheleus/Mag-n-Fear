@@ -1,8 +1,5 @@
 ```
-# Database files
-*.db
-
-# Environment variables
+# Environment
 .env
 .env.local
 *.env.*
@@ -12,38 +9,73 @@ node_modules/
 .venv/
 venv/
 __pycache__/
-*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.julia/
+zig*/
+julia-*/
+
+# Build artifacts
 dist/
 build/
 target/
-.gradle/
 
-# Logs
+# Logs and temporary files
 *.log
+*.tmp
+*.swp
+*.swo
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Python specific
+# Compiled files
 *.pyc
-*.pyo
-*.pyd
-.Python
+*.class
+*.o
+*.exe
+*.dll
 *.so
+*.a
+*.obj
+*.out
 
 # Coverage reports
 coverage/
 htmlcov/
 .coverage
 
-# Temporary files
-*.tmp
-*~
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# Gradle
+.gradle/
+
+# VSCode
+.vscode/
+
+# IntelliJ IDEA
+.idea/
 ```

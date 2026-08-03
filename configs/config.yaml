@@ -14,7 +14,6 @@ data:
   snapshot_interval_sec: 1
   symbols:
   - DOGEUSDT
-  - BTCUSDT
   timeframes:
   - 1m
   - 5m
