@@ -440,7 +440,7 @@ class RiskManager:
             'entry_time': shadow.get('timestamp'),
             'exit_time': time.time(),
             'duration': time.time() - shadow.get('timestamp', 0),
-            'max_adverse_excursion': shadow.get('max_drawdown', 0), # TODO: считать в цикле
+            'max_adverse_excursion': shadow.get('max_adverse_excursion', 0.0),
             'strategy_type': shadow.get('strategy_type', 'unknown')
         }
         

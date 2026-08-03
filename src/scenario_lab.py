@@ -68,12 +68,11 @@ class ScenarioLab:
     def _quick_simulate(self, scenario: Dict, context: Dict) -> float:
         """
         Fast approximation of PnL based on parameter changes.
-        In production, this would call the full Executor simulation.
+        Uses heuristics to estimate outcome without full simulation.
         """
-        # Simplified logic: 
+        # Heuristic simulation logic: 
         # Wider SL -> lower chance of hit but larger loss
         # Wider TP -> lower chance of hit but larger gain
-        # This is a placeholder for the real simulation engine
         
         base_pnl = scenario.get('simulated_pnl', 0)
         volatility = context.get('volatility', 0.01)
@@ -82,7 +81,7 @@ class ScenarioLab:
         tp_pct = scenario['parameters'].get('take_profit_pct', 0.04)
         
         # Heuristic: if volatility is high, wider stops perform better
-        vol_factor = volatility / 0.02 # Normalize around 2% vol
+        vol_factor = volatility / 0.02  # Normalize around 2% vol
         
         if sl_pct > 0.02 * vol_factor:
             # Wider stop avoided premature exit
