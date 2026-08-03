@@ -337,7 +337,7 @@ class Executor:
         # Если ордер отклонен из-за минимального размера, пробуем с минимумом
         if retry_with_min:
             # Получаем текущую цену для расчета минимального количества
-            ticker = await self._client.futures_ticker_price(symbol=symbol)
+            ticker = await self._client.futures_symbol_ticker(symbol=symbol)
             current_price = float(ticker.get('price', 0))
             
             if current_price > 0:

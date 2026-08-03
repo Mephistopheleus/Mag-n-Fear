@@ -1,49 +1,17 @@
 ```
-# Python
-__pycache__/
+# Compiled Python files
 *.pyc
-*.pyo
-*.pyd
-
-# Databases
-*.db
-
-# Dependencies
-.venv/
-venv/
-env/
-ENV/
+__pycache__/
 
 # Logs
 *.log
+run_report.log
 
-# Temporary files
-*.tmp
-*.temp
-*~
+# Database files
+*.db
 
-# Coverage reports
-.coverage
-htmlcov/
-.coverage.*
-
-# Testing
-.pytest_cache/
-.mypy_cache/
-.hypothesis/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Environment variables
+# Environment files
 .env
 .env.local
-.env.*
+*.env.*
 ```
