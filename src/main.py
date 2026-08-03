@@ -154,10 +154,14 @@ class TradingBot:
             await self.stop()
 
     async def stop(self):
-        """Корректная остановка."""
+        """Корректная остановка с закрытием всех позиций и выставлением стоп-лоссов."""
         logger.info("Stopping components...")
-        await self.news.stop()
+        
+        # Сначала останавливаем Executor - он выставит стоп-лоссы по всем активным позициям
         await self.executor.stop()
+        
+        # Затем останавливаем остальные компоненты
+        await self.news.stop()
         await self.notifier.notify_status("Bot Stopped")
 
     async def _data_feed_loop(self):
@@ -484,43 +488,26 @@ class TradingBot:
         ШАГ 4: Сверка балансов.
         Периодически сравнивает расчетный баланс бота с реальным балансом на бирже.
         """
-        import time
         
         check_interval_sec = 60  # Проверка каждую минуту
         
         while True:
             try:
-                # Запрос баланса через API Binance
+                # Запрос реального баланса через API Binance
                 balance_real = await self.executor.get_balance()
-                balance_real_usdt = balance_real.get('available', 0) + balance_real.get('total', 0) / 2
-                
-                # Расчетный баланс бота (упрощенно: начальный баланс + PnL всех закрытых сделок)
-                # Для точного расчета нужно суммировать PnL из карточек
+                balance_real_usdt = balance_real.get('total', 0)  # walletBalance включает нереализованный PnL
+
+                # Получаем PnL всех закрытых теневых сделок для статистики
                 stats = self.shadow_dealer.get_statistics()
                 total_shadow_pnl = stats.get('total_pnl', 0)
-                
-                # Берем начальный баланс из конфига
-                initial_balance = self.config.risk.max_position_size_usd * 10  # Условно 10x от макс позиции
-                
-                balance_bot = initial_balance + total_shadow_pnl
-                
-                diff = balance_bot - balance_real_usdt
-                diff_pct = (diff / balance_real_usdt * 100) if balance_real_usdt > 0 else 0
-                
+
+                # Логгируем только реальный баланс и статистику - никаких выдуманных балансов
                 logger.info(
-                    f"[CHECK] Real: ${balance_real_usdt:.2f} | "
-                    f"Bot: ${balance_bot:.2f} | "
-                    f"Diff: ${diff:.2f} ({diff_pct:.2f}%) | "
-                    f"Shadow PnL: ${total_shadow_pnl:.2f}"
+                    f"[CHECK] Real Balance: ${balance_real_usdt:.2f} | "
+                    f"Shadow PnL (closed trades): ${total_shadow_pnl:.2f}"
                 )
-                
-                # Если расхождение больше 5%, предупреждаем
-                if abs(diff_pct) > 5:
-                    logger.warning(f"[CHECK] Large balance discrepancy detected! {diff_pct:.2f}%")
-                    await self.notifier.notify_error(f"Balance mismatch: {diff_pct:.2f}%")
-                
+
                 await asyncio.sleep(check_interval_sec)
-                
             except Exception as e:
                 logger.error(f"Error in balance check loop: {e}", exc_info=True)
                 await asyncio.sleep(check_interval_sec)

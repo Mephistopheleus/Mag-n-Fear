@@ -4,11 +4,14 @@ Executes trading commands from ScenarioWriter after RiskManager validation.
 Handles order queue, position tracking, and stop-loss updates.
 """
 import asyncio
+import logging
 import time
 from typing import Dict, Any, Optional, List
 from binance import AsyncClient
 from src.core.field import ProbabilityField
 from src.risk.manager import RiskManager
+
+logger = logging.getLogger(__name__)
 
 
 class Executor:
@@ -88,11 +91,39 @@ class Executor:
         print(f"[Executor] Started (testnet={self.testnet})")
         
     async def stop(self):
-        """Остановка и закрытие клиента."""
+        """Остановка и закрытие клиента с выставлением стоп-лоссов по активным позициям."""
+        logger.info("[Executor] Stopping - closing all positions with stop-loss...")
+        
+        # Если есть активные позиции - выставляем для них стоп-лосс ордера
+        if self._active_positions:
+            for symbol, pos in self._active_positions.items():
+                try:
+                    stop_loss_price = pos.get('stop_loss')
+                    if stop_loss_price:
+                        side = pos['side']
+                        quantity = pos['quantity']
+                        
+                        # Для LONG позиция закрывается продажей, для SHORT - покупкой
+                        stop_side = 'SELL' if side == 'LONG' else 'BUY'
+                        
+                        # Выставляем Stop Market ордер
+                        stop_order = await self._client.futures_create_order(
+                            symbol=symbol,
+                            side=stop_side,
+                            type='STOP_MARKET',
+                            quantity=quantity,
+                            stopPrice=stop_loss_price,
+                            reduceOnly=True
+                        )
+                        logger.info(f"[Executor] STOP-LOSS order placed for {symbol}: {stop_side} {quantity} @ {stop_loss_price}, order_id={stop_order['orderId']}")
+                            
+                except Exception as e:
+                    logger.error(f"[Executor] Failed to set stop-loss for {symbol}: {e}")
+        
         self._running = False
         if self._client:
             await self._client.close_connection()
-        print("[Executor] Stopped")
+        logger.info("[Executor] Stopped")
         
     async def submit_command(self, symbol: str, command: Dict[str, Any]):
         """

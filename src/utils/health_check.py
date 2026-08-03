@@ -64,5 +64,7 @@ class HealthCheck:
             status = self.get_status()
             if not status["overall"]:
                 logger.error("System UNHEALTHY! Check components.")
-                # TODO: Trigger alert via Notifier
+                # Trigger alert via Notifier if available
+                if hasattr(self, 'notifier') and self.notifier:
+                    await self.notifier.notify_error(f"System UNHEALTHY: {status}")
             await asyncio.sleep(self.check_interval_sec)

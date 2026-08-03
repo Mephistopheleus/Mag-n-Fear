@@ -24,12 +24,18 @@ class Notifier:
         if not self.enabled:
             return
         
-        # TODO: Реализовать отправку через aiohttp
-        # url = f"https://api.telegram.org/bot{self.token}/sendMessage"
-        # payload = {"chat_id": self.chat_id, "text": message, "parse_mode": parse_mode}
+        # Реализация отправки через aiohttp
+        url = f"https://api.telegram.org/bot{self.telegram_token}/sendMessage"
+        payload = {"chat_id": self.chat_id, "text": message, "parse_mode": parse_mode}
         
-        logger.info(f"[TELEGRAM MOCK] {message}")
-        # await session.post(url, json=payload)
+        try:
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                await session.post(url, json=payload)
+            logger.info(f"[TELEGRAM] Message sent: {message[:50]}...")
+        except Exception as e:
+            logger.error(f"[TELEGRAM] Failed to send message: {e}")
+            logger.info(f"[TELEGRAM MOCK] {message}")
 
     async def notify_trade(self, scenario: dict, action: str):
         """Форматирует и отправляет уведомление о сделке."""
