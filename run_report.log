@@ -1,0 +1,1363 @@
+OpenBLAS WARNING - could not determine the L2 cache size on this system, assuming 256k
+OpenBLAS WARNING - could not determine the L2 cache size on this system, assuming 256k
+2026-08-03 08:10:48,168 - __main__ - INFO - Initializing Trading Bot...
+2026-08-03 08:10:48,187 - __main__ - INFO - Config loaded.
+2026-08-03 08:10:48,188 - __main__ - INFO - Trading Bot initialized. Symbols: ['DOGEUSDT', 'BTCUSDT']
+2026-08-03 08:10:48,188 - asyncio - DEBUG - Using selector: EpollSelector
+2026-08-03 08:10:48,189 - __main__ - INFO - Starting Trading Bot loop...
+2026-08-03 08:10:48,189 - src.data.feed - INFO - Initializing Binance Futures client...
+2026-08-03 08:10:48,359 - src.data.feed - INFO - Binance client initialized (testnet=True)
+2026-08-03 08:10:48,359 - src.data.feed - INFO - Preloading market data...
+2026-08-03 08:10:48,588 - src.data.feed - INFO - Loaded data for DOGEUSDT: price=0.06927
+2026-08-03 08:10:48,819 - src.data.feed - INFO - Loaded data for BTCUSDT: price=62543.94
+2026-08-03 08:10:48,820 - src.data.feed - INFO - Binance Futures feed started
+2026-08-03 08:10:48,820 - src.data.feed - INFO - Starting WebSocket streams (aiohttp)...
+2026-08-03 08:10:48,820 - src.data.feed - INFO - WebSocket tasks created for 2 symbols.
+2026-08-03 08:10:48,986 - src.executor - INFO - [Executor] Syncing positions from exchange...
+2026-08-03 08:10:49,078 - src.executor - INFO - [Executor] Synced position DOGEUSDT: LONG 300824.0 @ 0.07258827546943009, SL=0.07186239271473578
+2026-08-03 08:10:49,107 - src.data.feed - INFO - Connected to orderbook WS for BTCUSDT
+2026-08-03 08:10:49,109 - src.data.feed - INFO - Connected to orderbook WS for DOGEUSDT
+2026-08-03 08:10:49,116 - src.data.feed - INFO - Connected to trades WS for BTCUSDT
+2026-08-03 08:10:49,160 - src.data.feed - INFO - Connected to trades WS for DOGEUSDT
+2026-08-03 08:10:49,165 - src.data.feed - INFO - [DataFeed] Initial price for DOGEUSDT: 0.06921
+2026-08-03 08:10:49,165 - __main__ - INFO - Initialized DOGEUSDT with price 0.06921
+2026-08-03 08:10:49,243 - src.data.feed - INFO - [DataFeed] Initial price for BTCUSDT: 62515.4
+2026-08-03 08:10:49,243 - __main__ - INFO - Initialized BTCUSDT with price 62515.4
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:10:49,250 - __main__ - INFO - AutoTuner: Starting learning cycle (58939 new cards, 58939 total)
+2026-08-03 08:10:53,764 - __main__ - INFO - AutoTuner updated weights: trend -> win_rate=0.13, impact_score=-25.334
+2026-08-03 08:10:53,764 - __main__ - INFO - AutoTuner updated weights: mean_reversion -> win_rate=0.13, impact_score=-25.334
+2026-08-03 08:10:53,764 - __main__ - INFO - AutoTuner updated weights: order_flow -> win_rate=0.13, impact_score=-25.334
+2026-08-03 08:10:53,764 - __main__ - INFO - AutoTuner updated weights: volatility -> win_rate=0.13, impact_score=-25.334
+2026-08-03 08:10:53,764 - __main__ - INFO - AutoTuner updated weights: matrix -> win_rate=0.13, impact_score=-25.334
+2026-08-03 08:10:53,764 - __main__ - INFO - AutoTuner updated weights based on 58940 trades
+2026-08-03 08:10:53,767 - __main__ - INFO - Laboratory: Starting analysis cycle (0 new cards, 58939 total)
+2026-08-03 08:10:53,804 - __main__ - INFO - Laboratory: Best adjustment found - param=stop_loss_pct, direction=INCREASE, value=0.0050, expected_gain=6255.60
+2026-08-03 08:10:53,804 - __main__ - INFO - Laboratory: Sending 800 snapshots to AutoTuner
+2026-08-03 08:10:53,809 - __main__ - INFO - Laboratory: Saved 800 snapshots to database
+2026-08-03 08:10:53,868 - __main__ - INFO - [CHECK] Real Balance: $4266.33 | Shadow PnL (closed trades): $0.00
+2026-08-03 08:10:54,024 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,024 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,025 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,025 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,025 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,025 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,026 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,026 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533310.0
+2026-08-03 08:10:54,026 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,027 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,027 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533548.0
+2026-08-03 08:10:54,027 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,047 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:10:54,064 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:10:54,064 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:10:54,065 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:10:54,065 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744654 (trap) RR=5.67, confidence=0.75
+2026-08-03 08:10:54,065 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744654 (trap) RR=4.19, confidence=0.75
+2026-08-03 08:10:54,065 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744654 (trap) RR=5.12, confidence=0.75
+2026-08-03 08:10:54,065 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:54,065 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:54,065 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=5.67, Vol=0.0000
+2026-08-03 08:10:54,066 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:10:54,162 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533548.0
+2026-08-03 08:10:54,163 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533310.0
+2026-08-03 08:10:54,163 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533310.0
+2026-08-03 08:10:54,163 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533310.0
+2026-08-03 08:10:54,163 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533548.0
+2026-08-03 08:10:54,170 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:54,170 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:54,170 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:54,170 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.19, Vol=0.0000
+2026-08-03 08:10:54,170 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:10:54,301 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,322 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:54,322 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:54,322 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:54,322 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=5.12, Vol=0.0000
+2026-08-03 08:10:54,322 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:10:54,323 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533310.0
+2026-08-03 08:10:54,418 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:10:54,605 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,661 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:10:54,667 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.74, trend=BEARISH
+2026-08-03 08:10:54,667 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0004
+2026-08-03 08:10:54,667 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:10:54,667 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744654 (scalp) RR=5.50, confidence=0.73
+2026-08-03 08:10:54,668 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744654 (trap) RR=4.21, confidence=0.75
+2026-08-03 08:10:54,668 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744654 (trap) RR=5.93, confidence=0.75
+2026-08-03 08:10:54,668 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:54,668 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:54,668 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.50, Vol=0.0000
+2026-08-03 08:10:54,668 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:10:54,669 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,669 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,695 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,756 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:54,756 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:54,756 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:54,756 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.21, Vol=0.0000
+2026-08-03 08:10:54,757 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:10:54,773 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533310.0
+2026-08-03 08:10:54,841 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,847 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:54,847 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:54,847 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:54,847 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=5.93, Vol=0.0000
+2026-08-03 08:10:54,847 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap LONG - OK
+2026-08-03 08:10:54,935 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:54,951 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:54,951 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:55,100 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:55,191 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:55,339 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:55,717 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534180.0
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:10:55,946 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321533548.0
+2026-08-03 08:10:56,134 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534180.0
+2026-08-03 08:10:56,177 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:10:56,185 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:10:56,186 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:10:56,186 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:10:56,186 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744656 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:10:56,186 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744656 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:10:56,186 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:56,186 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:56,186 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:10:56,186 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:10:56,273 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:56,273 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:56,273 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:56,273 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:10:56,273 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:10:56,285 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:56,366 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:10:56,598 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605463.6976
+2026-08-03 08:10:56,610 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:10:56,615 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.74, trend=BEARISH
+2026-08-03 08:10:56,615 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0004
+2026-08-03 08:10:56,616 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:10:56,621 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744656 (scalp) RR=5.39, confidence=0.73
+2026-08-03 08:10:56,621 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744656 (trap) RR=4.18, confidence=0.75
+2026-08-03 08:10:56,621 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744656 (trap) RR=5.98, confidence=0.75
+2026-08-03 08:10:56,622 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:56,622 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:56,622 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.39, Vol=0.0000
+2026-08-03 08:10:56,622 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:10:56,710 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:56,710 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:56,710 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:56,710 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.18, Vol=0.0000
+2026-08-03 08:10:56,710 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:10:56,804 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:56,804 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:56,805 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:56,805 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=5.98, Vol=0.0000
+2026-08-03 08:10:56,805 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap LONG - OK
+2026-08-03 08:10:56,842 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605466.9041
+2026-08-03 08:10:56,860 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534180.0
+2026-08-03 08:10:56,895 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:56,997 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605466.9041
+2026-08-03 08:10:57,147 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605466.9041
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:10:58,045 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534180.0
+2026-08-03 08:10:58,086 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0049
+2026-08-03 08:10:58,145 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:10:58,151 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:10:58,151 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:10:58,152 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:10:58,152 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744658 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:10:58,152 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744658 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:10:58,152 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:58,152 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:58,152 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:10:58,152 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:10:58,245 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:58,245 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:58,246 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:58,246 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:10:58,246 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:10:58,290 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0049
+2026-08-03 08:10:58,338 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:10:58,502 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605466.9041
+2026-08-03 08:10:58,585 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:10:58,602 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.76, trend=BEARISH
+2026-08-03 08:10:58,602 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0004
+2026-08-03 08:10:58,602 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:10:58,603 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744658 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:10:58,603 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744658 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:10:58,603 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:58,603 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:58,603 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:10:58,603 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:10:58,681 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0049
+2026-08-03 08:10:58,693 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:10:58,693 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:10:58,693 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:10:58,693 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:10:58,693 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:10:58,788 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+[Executor] Started (testnet=True)
+[AutoTuner] Loaded 58940 cards from SQLite database
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.1813 ($5.00), SL=0.06963645, TP=0.0671919, conf=0.75
+[NewsAggregator] News for BTCUSDT: Crypto treasury firm ZeroStack warns of survival r... (dir=1.00, str=0.20, target=0.069477, time=300s)
+[NewsAggregator] News for BTCUSDT: Bitcoin hits $62K while Coinbase premium hits 77-d... (dir=1.00, str=0.40, target=0.069754, time=240s)
+[NewsAggregator] News for BTCUSDT: Coldcard’s 5-year flaw reveals hardware wallet tes... (dir=-1.00, str=0.20, target=0.068923, time=300s)
+[NewsAggregator] News for BTCUSDT: South Korean stablecoin outflows top $367M in June... (dir=-1.00, str=0.40, target=0.068646, time=240s)
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.1813 ($5.00), SL=0.0687744, TP=0.0713481, conf=0.75
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.18131947452 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.1813 ($5.00), SL=0.06886395, TP=0.0713481, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58940)
+[Executor] Trade card saved to SQLite database (total cards: 58941)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.18131947452 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61788.129166666666, conf=0.7333333333333334
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60641.975, conf=0.75
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.18131947452 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: LONG DOGEUSDT, qty=0.0001 ($5.00), SL=62201.43, TP=64393.025, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58942)
+[Executor] Trade card saved to SQLite database (total cards: 58943)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.997760627024433e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.997760627024433e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.997760627024433e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58944)
+[Executor] Trade card saved to SQLite database (total cards: 58945)
+[Executor] Trade card saved to SQLite database (total cards: 58946)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61785.460666666666, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60639.356, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=0.0001 ($5.00), SL=62201.43, TP=64390.244000000006, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58947)
+[Executor] Trade card saved to SQLite database (total cards: 58948)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998106048487718e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998106048487718e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998106048487718e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58949)
+[Executor] Trade card saved to SQLite database (total cards: 58950)
+[Executor] Trade card saved to SQLite database (total cards: 58951)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58952)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...2026-08-03 08:10:59,294 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534180.0
+2026-08-03 08:10:59,739 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0049
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:10:59,872 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534180.0
+2026-08-03 08:10:59,889 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0049
+2026-08-03 08:11:00,047 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:00,063 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:00,064 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:00,064 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:00,064 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744660 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:00,064 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744660 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:00,064 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:00,064 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:00,064 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:00,064 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:00,155 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:00,155 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:00,155 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:00,155 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:00,155 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:00,258 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:00,472 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534180.0
+2026-08-03 08:11:00,477 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0049
+2026-08-03 08:11:00,505 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:00,510 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.76, trend=BEARISH
+2026-08-03 08:11:00,511 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0004
+2026-08-03 08:11:00,511 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:00,511 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744660 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:00,511 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744660 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:00,511 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:00,511 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:00,511 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:00,511 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:00,606 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:00,607 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:00,607 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:00,607 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:00,607 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:00,659 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0049
+2026-08-03 08:11:00,695 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:00,733 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534642.0
+2026-08-03 08:11:00,891 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.01
+2026-08-03 08:11:01,213 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534180.0
+2026-08-03 08:11:01,365 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534642.0
+2026-08-03 08:11:01,597 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534642.0
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:01,900 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0173
+2026-08-03 08:11:01,936 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:01,947 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:01,947 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:01,947 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:01,947 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744661 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:01,947 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744661 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:01,948 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:01,948 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:01,948 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:01,948 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:02,039 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:02,039 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:02,039 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:02,039 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:02,039 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:02,160 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:02,167 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.01
+2026-08-03 08:11:02,371 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0173
+2026-08-03 08:11:02,411 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:02,426 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.76, trend=BEARISH
+2026-08-03 08:11:02,426 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0004
+2026-08-03 08:11:02,426 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:02,426 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744662 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:02,426 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744662 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:02,426 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:02,426 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:02,426 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:02,426 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:02,527 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:02,527 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:02,527 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:02,528 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:02,528 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:02,618 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:03,038 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534642.0
+2026-08-03 08:11:03,208 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0173
+2026-08-03 08:11:03,507 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534642.0
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:03,816 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0173
+2026-08-03 08:11:03,882 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:03,887 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:03,888 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:03,888 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:03,888 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744663 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:03,888 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744663 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:03,888 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:03,888 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:03,888 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:03,888 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:03,980 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:03,980 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:03,980 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:03,980 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:03,981 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:04,054 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.01
+2026-08-03 08:11:04,071 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:04,352 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:04,363 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:04,364 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:04,364 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:04,364 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744664 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:04,364 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744664 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:04,364 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:04,364 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:04,364 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:04,364 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:04,365 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321253523.0
+2026-08-03 08:11:04,455 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:04,455 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:04,455 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:04,455 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:04,455 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:04,547 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:04,676 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321534642.0
+2026-08-03 08:11:04,906 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.01
+2026-08-03 08:11:04,981 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321253523.0
+2026-08-03 08:11:05,303 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605496.0173
+2026-08-03 08:11:05,343 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321253523.0
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:05,595 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7284
+2026-08-03 08:11:05,802 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:05,822 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:05,822 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:05,822 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:05,823 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744665 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:05,823 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744665 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:05,823 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:05,823 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:05,823 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:05,823 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:05,913 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:05,913 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:05,913 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:05,913 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:05,913 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:06,006 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:06,163 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+2026-08-03 08:11:06,265 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:06,271 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:06,271 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:06,271 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:06,271 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744666 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:06,271 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744666 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:06,281 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:06,281 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:06,281 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:06,281 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:06,320 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+2026-08-03 08:11:06,389 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:06,389 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:06,389 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:06,389 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:06,389 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:06,392 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7284
+2026-08-03 08:11:06,487 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58953)
+[Executor] Trade card saved to SQLite database (total cards: 58954)
+[Executor] Trade card saved to SQLite database (total cards: 58955)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58956)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58957)
+[Executor] Trade card saved to SQLite database (total cards: 58958)
+[Executor] Trade card saved to SQLite database (total cards: 58959)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58960)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58961)
+[Executor] Trade card saved to SQLite database (total cards: 58962)
+[Executor] Trade card saved to SQLite database (total cards: 58963)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58964)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58965)
+[Executor] Trade card saved to SQLite database (total cards: 58966)
+[Executor] Trade card saved to SQLite database (total cards: 58967)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58968)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)2026-08-03 08:11:06,547 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7284
+2026-08-03 08:11:06,597 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321253523.0
+2026-08-03 08:11:06,900 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7354
+2026-08-03 08:11:07,140 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7354
+2026-08-03 08:11:07,227 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:07,560 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7284
+2026-08-03 08:11:07,731 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:07,747 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:07,748 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:07,748 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:07,748 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744667 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:07,748 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744667 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:07,748 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:07,748 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:07,748 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:07,748 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:07,762 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+2026-08-03 08:11:07,837 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:07,838 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:07,838 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:07,838 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:07,838 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:07,896 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+2026-08-03 08:11:07,927 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:08,164 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+2026-08-03 08:11:08,203 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:08,209 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:08,209 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:08,209 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:08,210 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744668 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:08,210 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744668 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:08,210 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:08,210 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:08,210 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:08,210 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:08,302 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:08,302 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:08,302 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:08,302 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:08,302 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:08,350 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7354
+2026-08-03 08:11:08,394 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:08,632 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7284
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:09,472 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+2026-08-03 08:11:09,620 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+2026-08-03 08:11:09,637 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:09,648 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:09,648 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:09,648 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:09,648 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744669 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:09,648 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744669 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:09,648 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:09,648 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:09,649 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:09,649 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:09,742 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:09,743 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:09,743 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:09,743 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:09,743 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:09,830 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:09,862 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321254307.0
+2026-08-03 08:11:09,994 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7354
+2026-08-03 08:11:10,082 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:10,087 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:10,087 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:10,088 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:10,088 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744670 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:10,088 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744670 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:10,088 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:10,088 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:10,088 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:10,088 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:10,182 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:10,182 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:10,182 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:10,182 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:10,182 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:10,222 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7284
+2026-08-03 08:11:10,408 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:10,487 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7354
+2026-08-03 08:11:10,878 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+2026-08-03 08:11:11,030 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+2026-08-03 08:11:11,164 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7405
+2026-08-03 08:11:11,274 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+2026-08-03 08:11:11,401 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7405
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:11,650 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:11,656 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:11,656 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:11,656 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:11,656 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744671 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:11,656 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744671 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:11,657 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:11,657 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:11,661 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:11,661 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:11,702 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+2026-08-03 08:11:11,762 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:11,763 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:11,763 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:11,763 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:11,763 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:11,853 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:12,004 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7405
+2026-08-03 08:11:12,102 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:12,108 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:12,108 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:12,108 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:12,108 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744672 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:12,108 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744672 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:12,108 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:12,108 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:12,108 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:12,109 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:12,189 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7446
+2026-08-03 08:11:12,200 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:12,200 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:12,200 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:12,200 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:12,200 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:12,230 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+2026-08-03 08:11:12,295 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:12,598 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7446
+2026-08-03 08:11:12,649 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255479.0
+2026-08-03 08:11:12,819 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+2026-08-03 08:11:12,959 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+2026-08-03 08:11:13,112 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:13,403 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7405
+2026-08-03 08:11:13,538 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:13,546 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:13,547 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:13,547 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:13,547 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744673 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:13,547 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744673 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:13,547 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:13,547 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:13,547 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:13,547 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:13,555 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7405
+2026-08-03 08:11:13,638 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:13,638 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:13,638 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:13,638 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:13,638 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:13,724 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:13,964 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:13,969 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:13,969 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:13,970 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:13,970 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744673 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:13,970 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744673 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:13,970 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:13,970 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:13,970 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:13,970 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:14,058 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:14,058 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:14,058 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:14,058 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:14,058 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:14,144 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7446
+
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58969)
+[Executor] Trade card saved to SQLite database (total cards: 58970)
+[Executor] Trade card saved to SQLite database (total cards: 58971)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58972)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58973)
+[Executor] Trade card saved to SQLite database (total cards: 58974)
+[Executor] Trade card saved to SQLite database (total cards: 58975)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58976)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58977)
+[Executor] Trade card saved to SQLite database (total cards: 58978)
+[Executor] Trade card saved to SQLite database (total cards: 58979)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58980)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58981)
+[Executor] Trade card saved to SQLite database (total cards: 58982)
+[Executor] Trade card saved to SQLite database (total cards: 58983)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.752026-08-03 08:11:14,306 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:14,468 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255009.0
+2026-08-03 08:11:14,607 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255479.0
+2026-08-03 08:11:15,302 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255479.0
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:15,329 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.759
+2026-08-03 08:11:15,490 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.759
+2026-08-03 08:11:15,562 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:15,568 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:15,568 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:15,568 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:15,568 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744675 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:15,568 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744675 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:15,568 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:15,568 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:15,568 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:15,568 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:15,653 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.759
+2026-08-03 08:11:15,660 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:15,660 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:15,660 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:15,660 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:15,660 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:15,749 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:16,023 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:16,029 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:16,029 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:16,029 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:16,029 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744676 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:16,029 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744676 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:16,029 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:16,029 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:16,029 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:16,029 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:16,117 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:16,118 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:16,118 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:16,118 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:16,118 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:16,206 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:16,221 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255970.0
+2026-08-03 08:11:16,353 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255479.0
+2026-08-03 08:11:16,500 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255479.0
+2026-08-03 08:11:16,807 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7653
+2026-08-03 08:11:16,808 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7653
+2026-08-03 08:11:16,832 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7653
+2026-08-03 08:11:16,985 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.759
+2026-08-03 08:11:17,163 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.759
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+/workspace/src/correlation_engine.py:123: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = pearsonr(ret_i, ret_j)
+/workspace/src/correlation_engine.py:125: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = spearmanr(ret_i, ret_j)
+2026-08-03 08:11:17,454 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:17,465 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:17,466 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:17,466 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:17,466 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744677 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:17,466 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744677 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:17,466 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:17,466 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:17,466 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:17,466 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:17,558 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:17,558 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:17,558 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:17,558 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:17,558 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:17,648 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:17,928 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:17,943 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:17,943 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:17,943 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:17,944 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744677 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:17,944 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744677 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:17,944 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:17,944 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:17,944 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:17,944 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:18,033 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:18,033 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:18,033 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:18,033 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:18,033 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:18,101 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321256284.0
+2026-08-03 08:11:18,127 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:18,251 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321256284.0
+2026-08-03 08:11:18,582 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255970.0
+2026-08-03 08:11:18,909 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7653
+2026-08-03 08:11:18,972 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.759
+2026-08-03 08:11:19,123 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7653
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+/workspace/src/correlation_engine.py:123: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = pearsonr(ret_i, ret_j)
+/workspace/src/correlation_engine.py:125: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = spearmanr(ret_i, ret_j)
+2026-08-03 08:11:19,387 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:19,403 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:19,404 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:19,404 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:19,404 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744679 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:19,404 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744679 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:19,404 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:19,404 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:19,404 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:19,405 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:19,494 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:19,494 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:19,494 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:19,494 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:19,494 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:19,586 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:19,846 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:19,862 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:19,863 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:19,863 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:19,863 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744679 (scalp) RR=5.50, confidence=0.73
+2026-08-03 08:11:19,863 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744679 (trap) RR=4.21, confidence=0.75
+2026-08-03 08:11:19,864 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744679 (trap) RR=5.93, confidence=0.75
+2026-08-03 08:11:19,864 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:19,864 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:19,864 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.50, Vol=0.0000
+2026-08-03 08:11:19,864 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:19,963 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:19,964 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:19,981 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:19,981 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.21, Vol=0.0000
+2026-08-03 08:11:19,981 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:19,983 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7653
+2026-08-03 08:11:20,070 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:20,070 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:20,070 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:20,070 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=5.93, Vol=0.0000
+2026-08-03 08:11:20,070 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap LONG - OK
+2026-08-03 08:11:20,071 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7653
+2026-08-03 08:11:20,147 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321255970.0
+2026-08-03 08:11:20,158 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:20,273 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321256284.0
+2026-08-03 08:11:20,427 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321256284.0
+2026-08-03 08:11:20,658 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8503
+2026-08-03 08:11:20,807 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.7653
+2026-08-03 08:11:21,080 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8503
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+/workspace/src/correlation_engine.py:123: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = pearsonr(ret_i, ret_j)
+/workspace/src/correlation_engine.py:125: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = spearmanr(ret_i, ret_j)
+2026-08-03 08:11:21,412 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:21,426 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:21,426 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:21,426 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:21,426 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744681 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:21,426 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744681 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:21,426 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:21,426 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:21,426 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:21,426 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:21,527 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:21,527 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:21,527 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:21,527 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:21,527 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:21,618 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:21,687 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257175.0
+
+[Executor] Trade card saved to SQLite database (total cards: 58984)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58985)
+[Executor] Trade card saved to SQLite database (total cards: 58986)
+[Executor] Trade card saved to SQLite database (total cards: 58987)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58988)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58989)
+[Executor] Trade card saved to SQLite database (total cards: 58990)
+[Executor] Trade card saved to SQLite database (total cards: 58991)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58992)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58993)
+[Executor] Trade card saved to SQLite database (total cards: 58994)
+[Executor] Trade card saved to SQLite database (total cards: 58995)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61788.129166666666, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60641.975, conf=0.75
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.997760627024433e-05 to 1.0 (step_size=1.0)
+[Executor] Scenario queued: LONG DOGEUSDT, qty=0.0001 ($5.00), SL=62201.43, TP=64393.025, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58996)
+[Executor] Trade card saved to SQLite database (total cards: 58997)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.997760627024433e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.997760627024433e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 58998)
+[Executor] Trade card saved to SQLite database (total cards: 58999)
+[Executor] Trade card saved to SQLite database (total cards: 59000)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...2026-08-03 08:11:21,840 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257175.0
+2026-08-03 08:11:21,875 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:21,885 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:21,885 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:21,885 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:21,886 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744681 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:21,886 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744681 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:21,886 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:21,886 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:21,886 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:21,886 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:21,975 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:21,975 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:21,975 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:21,975 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:21,975 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:22,063 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:22,287 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8503
+2026-08-03 08:11:22,299 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257486.0
+2026-08-03 08:11:22,439 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8503
+2026-08-03 08:11:22,647 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8503
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:23,190 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257175.0
+/workspace/src/correlation_engine.py:123: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = pearsonr(ret_i, ret_j)
+/workspace/src/correlation_engine.py:125: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = spearmanr(ret_i, ret_j)
+2026-08-03 08:11:23,310 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:23,326 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:23,326 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:23,326 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:23,327 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744683 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:23,327 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744683 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:23,327 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:23,327 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:23,327 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:23,327 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:23,339 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257486.0
+2026-08-03 08:11:23,413 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:23,413 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:23,413 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:23,413 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:23,413 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:23,499 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:23,535 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257175.0
+2026-08-03 08:11:23,782 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:23,788 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.78, trend=BEARISH
+2026-08-03 08:11:23,788 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:23,788 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:23,788 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744683 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:23,788 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744683 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:23,788 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:23,788 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:23,788 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:23,788 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:23,880 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:23,881 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:23,881 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:23,881 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:23,881 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:23,905 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8503
+2026-08-03 08:11:23,970 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:24,009 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257486.0
+2026-08-03 08:11:24,213 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8554
+2026-08-03 08:11:24,332 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8503
+2026-08-03 08:11:24,482 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8554
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:25,151 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257175.0
+/workspace/src/correlation_engine.py:123: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = pearsonr(ret_i, ret_j)
+/workspace/src/correlation_engine.py:125: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = spearmanr(ret_i, ret_j)
+2026-08-03 08:11:25,226 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:25,243 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:25,243 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:25,243 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:25,243 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744685 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:25,243 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744685 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:25,244 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:25,244 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:25,244 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:25,244 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:25,339 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:25,339 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:25,339 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:25,339 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:25,339 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:25,340 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321257486.0
+2026-08-03 08:11:25,427 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:25,708 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:25,723 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.74, trend=BEARISH
+2026-08-03 08:11:25,723 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:25,724 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:25,724 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744685 (scalp) RR=5.35, confidence=0.73
+2026-08-03 08:11:25,724 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744685 (trap) RR=4.17, confidence=0.75
+2026-08-03 08:11:25,724 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:25,724 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:25,724 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.35, Vol=0.0000
+2026-08-03 08:11:25,724 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:25,725 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8771
+2026-08-03 08:11:25,813 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:25,813 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:25,813 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:25,813 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.17, Vol=0.0000
+2026-08-03 08:11:25,813 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:25,845 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8554
+2026-08-03 08:11:25,906 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:25,995 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8771
+2026-08-03 08:11:26,220 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8554
+2026-08-03 08:11:26,550 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8554
+2026-08-03 08:11:26,797 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8771
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:27,093 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321272560.0
+/workspace/src/correlation_engine.py:123: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = pearsonr(ret_i, ret_j)
+/workspace/src/correlation_engine.py:125: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  corr, _ = spearmanr(ret_i, ret_j)
+2026-08-03 08:11:27,155 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:27,165 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.12, trend=BEARISH
+2026-08-03 08:11:27,165 - __main__ - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-03 08:11:27,166 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.33
+2026-08-03 08:11:27,166 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744687 (trap) RR=4.76, confidence=0.75
+2026-08-03 08:11:27,166 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744687 (trap) RR=4.88, confidence=0.75
+2026-08-03 08:11:27,166 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:27,166 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:27,166 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.76, Vol=0.0000
+2026-08-03 08:11:27,166 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap SHORT - OK
+2026-08-03 08:11:27,247 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 353321272253.0
+2026-08-03 08:11:27,254 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:27,254 - src.risk.manager - DEBUG - [RiskManager] DOGEUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:27,254 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:27,254 - src.risk.manager - INFO - [RiskManager] DOGEUSDT: ACCEPTED - Profit 3.00%, RR=4.88, Vol=0.0000
+2026-08-03 08:11:27,254 - __main__ - INFO - Scenario ACCEPTED for DOGEUSDT: trap LONG - OK
+2026-08-03 08:11:27,345 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: DOGEUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+/workspace/src/main.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+2026-08-03 08:11:27,426 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8771
+2026-08-03 08:11:27,607 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-03 08:11:27,622 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=-0.74, trend=BEARISH
+2026-08-03 08:11:27,622 - __main__ - DEBUG - Market Model for BTCUSDT: Trend=BEARISH, Strength=0.67, Vol=0.0003
+2026-08-03 08:11:27,622 - src.logic.scenario_writer - INFO - Генерация сценариев для DOGEUSDT. Тренд: BEARISH, Сила: 0.67
+2026-08-03 08:11:27,622 - src.logic.scenario_writer - INFO - Сценарий принят: scalp_SHORT_1785744687 (scalp) RR=5.50, confidence=0.73
+2026-08-03 08:11:27,622 - src.logic.scenario_writer - INFO - Сценарий принят: trap_SHORT_1785744687 (trap) RR=4.21, confidence=0.75
+2026-08-03 08:11:27,622 - src.logic.scenario_writer - INFO - Сценарий принят: trap_LONG_1785744687 (trap) RR=5.93, confidence=0.75
+2026-08-03 08:11:27,623 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:27,623 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:27,623 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 1.17%, RR=5.50, Vol=0.0000
+2026-08-03 08:11:27,623 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: scalp SHORT - OK
+2026-08-03 08:11:27,710 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - scalp SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:27,710 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:27,710 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:27,710 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=4.21, Vol=0.0000
+2026-08-03 08:11:27,710 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap SHORT - OK
+2026-08-03 08:11:27,802 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap SHORT (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:27,802 - src.risk.manager - DEBUG - [RiskManager] BTCUSDT: Flat market detected, reduced profit threshold by factor 0.7 to 0.035%
+2026-08-03 08:11:27,802 - src.risk.manager - DEBUG - [RiskManager] Using configured trading balance: $50.0
+2026-08-03 08:11:27,802 - src.risk.manager - INFO - [RiskManager] BTCUSDT: ACCEPTED - Profit 3.00%, RR=5.93, Vol=0.0000
+2026-08-03 08:11:27,802 - __main__ - INFO - Scenario ACCEPTED for BTCUSDT: trap LONG - OK
+2026-08-03 08:11:27,894 - src.risk.manager - DEBUG - [RiskManager] Added to shadow learning: BTCUSDT - trap LONG (reason: accepted_real_trade, learning=False)
+2026-08-03 08:11:28,132 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8853
+
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 59001)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 59002)
+[Executor] Trade card saved to SQLite database (total cards: 59003)
+[Executor] Trade card saved to SQLite database (total cards: 59004)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 59005)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 59006)
+[Executor] Trade card saved to SQLite database (total cards: 59007)
+[Executor] Trade card saved to SQLite database (total cards: 59008)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61784.67, conf=0.7333333333333334
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60638.58, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 59009)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.998208401318105e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=72.2543 ($5.00), SL=0.06963645, TP=0.06712399999999999, conf=0.75
+[Executor] Scenario queued: LONG DOGEUSDT, qty=72.2543 ($5.00), SL=0.0687744, TP=0.071276, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 59010)
+[Executor] Trade card saved to SQLite database (total cards: 59011)
+[Executor] Trade card saved to SQLite database (total cards: 59012)
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 72.25433526011561 to 72.0 (step_size=1.0)
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62650.2, TP=61788.129166666666, conf=0.7333333333333334
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Scenario queued: SHORT DOGEUSDT, qty=0.0001 ($5.00), SL=62963.450999999994, TP=60641.975, conf=0.75
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.997760627024433e-05 to 1.0 (step_size=1.0)
+[Executor] Scenario queued: LONG DOGEUSDT, qty=0.0001 ($5.00), SL=62201.43, TP=64393.025, conf=0.75
+[Executor] Trade card saved to SQLite database (total cards: 59013)
+[Executor] Trade card saved to SQLite database (total cards: 59014)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'
+[Executor] Order rejected due to quantity precision. Adjusting to symbol precision...
+[Executor] Adjusted quantity from 7.997760627024433e-05 to 1.0 (step_size=1.0)
+[Executor] Adjusted quantity still too small. Retrying with minimum allowed ($5)...
+[Executor] Failed to execute OPEN on DOGEUSDT: 'AsyncClient' object has no attribute 'futures_ticker_price'2026-08-03 08:11:28,178 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 605488.8771
