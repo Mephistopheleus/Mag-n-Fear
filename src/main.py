@@ -9,6 +9,7 @@ import os
 import time
 from datetime import datetime
 from typing import Optional
+from pathlib import Path
 
 # Добавляем корень проекта в путь для импортов
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,6 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.core.config_loader import load_config, get_config
 from src.utils.health_check import HealthCheck
 from src.utils.notifier import Notifier
+from src.utils.data_rotator import DataRotator, setup_rotating_logger
 
 # Импорт модулей данных
 from src.data.feed import DataFeed
@@ -41,15 +43,24 @@ from src.correlation_engine import CorrelationEngine
 from src.harmonic_analyzer import HarmonicAnalyzer
 from src.scenario_lab import ScenarioLab
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Пути к данным
+LOG_FILE = "data_storage/bot.log"
+DB_PATH = "data_storage/trading_history.db"
+
+# Настраиваем логгер с ротацией
+os.makedirs("data_storage", exist_ok=True)
+logger = setup_rotating_logger(LOG_FILE, level=logging.DEBUG)
 
 class TradingBot:
     def __init__(self, config_path: str = "configs/config.yaml"):
         logger.info("Initializing Trading Bot...")
+        
+        # Инициализация ротатора данных
+        self.data_rotator = DataRotator(
+            log_file=LOG_FILE,
+            db_path=DB_PATH
+        )
+        logger.info("DataRotator initialized with limits: logs=2MB, DB=5MB")
         
         # 1. Загрузка конфига
         self.config = load_config(config_path)
@@ -403,12 +414,25 @@ class TradingBot:
                 await asyncio.sleep(delay)
 
     async def _health_monitor_loop(self):
-        """Мониторинг здоровья системы."""
+        """Мониторинг здоровья системы и ротация данных."""
         delay = 10
+        rotation_check_interval = 300  # Проверка ротации каждые 5 минут
+        last_rotation_check = 0
+        
         while True:
             try:
                 self.health.heartbeat("health_monitor")
-                # check_connectivity не существует, используем start_monitoring или просто heartbeat
+                
+                # Проверка и ротация данных
+                current_time = time.time()
+                if current_time - last_rotation_check >= rotation_check_interval:
+                    rotation_results = self.data_rotator.check_and_rotate()
+                    if rotation_results["log_rotated"]:
+                        logger.info(f"Log rotation performed. Current log size: {rotation_results['log_size_mb']:.2f} MB")
+                    if rotation_results["db_rotated"]:
+                        logger.info(f"Database rotation performed. Current DB size: {rotation_results['db_size_mb']:.2f} MB")
+                    last_rotation_check = current_time
+                
                 await asyncio.sleep(delay)
             except Exception as e:
                 logger.error(f"Error in health monitor: {e}", exc_info=True)
