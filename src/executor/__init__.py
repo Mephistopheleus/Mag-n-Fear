@@ -382,22 +382,39 @@ class Executor:
         executed_qty = float(order.get('executedQty', quantity))
         avg_price = float(order.get('avgEntryPrice', price or 0))
         
+        # Получаем SL и TP из команды
+        stop_loss = command.get('stop_loss')
+        take_profit = command.get('take_profit')
+        
         self._active_positions[symbol] = {
             'side': side,
             'quantity': executed_qty,
             'entry_price': avg_price,
             'leverage': leverage,
-            'stop_loss': command.get('stop_loss'),
-            'take_profit': command.get('take_profit'),
+            'stop_loss': stop_loss,
+            'take_profit': take_profit,
             'order_id': order['orderId'],
-            'stop_order_id': None,  # Пока стопа нет, будет заполнен при установке
+            'stop_order_id': None,  # Будет заполнен после выставления стопа
             'opened_at': time.time()
         }
+        
+        # АТОМАРНОЕ ВЫСТАВЛЕНИЕ СТОП-ЛОССА СРАЗУ ПОСЛЕ ОТКРЫТИЯ
+        if stop_loss:
+            sl_success = await self._place_stop_loss_order(symbol, stop_loss, executed_qty, side)
+            if not sl_success:
+                # КРИТИЧЕСКАЯ ОШИБКА: не удалось выставить стоп-лосс
+                # НЕМЕДЛЕННО ЗАКРЫВАЕМ ПОЗИЦИЮ, ЧТОБЫ НЕ ОСТАВИТЬ ЕЁ БЕЗ ЗАЩИТЫ
+                print(f"[Executor] CRITICAL: Failed to place stop-loss for {symbol}. Closing position immediately to avoid unprotected trade.")
+                try:
+                    await self._close_position(symbol, {})
+                except Exception as close_err:
+                    print(f"[Executor] EMERGENCY: Failed to close position after SL failure: {close_err}")
+                return False
         
         # Регистрация в RiskManager для теневого отслеживания
         self.risk_manager.register_scenario(symbol, {
             'entry_price': self._active_positions[symbol]['entry_price'],
-            'stop_loss': command.get('stop_loss'),
+            'stop_loss': stop_loss,
             'side': side
         })
         
@@ -405,6 +422,29 @@ class Executor:
         self.risk_manager.update_position(symbol, self._active_positions[symbol])
         
         return True
+    
+    async def _place_stop_loss_order(self, symbol: str, stop_price: float, quantity: float, side: str) -> bool:
+        """Выставляет Stop Market ордер на бирже. Возвращает True если успешно."""
+        try:
+            stop_side = 'SELL' if side == 'LONG' else 'BUY'
+            
+            order = await self._client.futures_create_order(
+                symbol=symbol,
+                side=stop_side,
+                type='STOP_MARKET',
+                quantity=quantity,
+                stopPrice=stop_price,
+                closePosition=True
+            )
+            
+            # Сохраняем ID стопа в позицию
+            self._active_positions[symbol]['stop_order_id'] = order['orderId']
+            print(f"[Executor] Stop-loss placed for {symbol}: price={stop_price}, order_id={order['orderId']}")
+            return True
+            
+        except Exception as e:
+            print(f"[Executor] Failed to place stop-loss order: {e}")
+            return False
     
     def _get_step_size(self, symbol: str) -> float:
         """Получение шага количества для символа через API Binance."""
