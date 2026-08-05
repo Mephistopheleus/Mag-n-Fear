@@ -113,7 +113,7 @@ class DataRotator:
                         DELETE FROM trades 
                         WHERE id NOT IN (
                             SELECT id FROM trades 
-                            ORDER BY timestamp DESC 
+                            ORDER BY timestamp_close DESC 
                             LIMIT ?
                         )
                     """, (self.MAX_TRADES_ROWS,))
@@ -188,11 +188,12 @@ def setup_rotating_logger(log_file: str, level: int = logging.INFO) -> logging.L
     Returns:
         Настроенный logger
     """
-    logger = logging.getLogger("TradingBot")
-    logger.setLevel(level)
+    # Настраиваем корневой логгер, чтобы все модули писали в файл
+    root_logger = logging.getLogger()
+    root_logger.setLevel(level)
     
     # Очищаем существующие handlers
-    logger.handlers.clear()
+    root_logger.handlers.clear()
     
     # File handler без ротации (ротацию делаем вручную через DataRotator)
     file_handler = logging.FileHandler(log_file)
@@ -204,12 +205,12 @@ def setup_rotating_logger(log_file: str, level: int = logging.INFO) -> logging.L
     )
     file_handler.setFormatter(formatter)
     
-    logger.addHandler(file_handler)
+    root_logger.addHandler(file_handler)
     
     # Console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    root_logger.addHandler(console_handler)
     
-    return logger
+    return root_logger
