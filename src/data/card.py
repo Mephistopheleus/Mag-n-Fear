@@ -508,6 +508,9 @@ class CardCreator:
         """
         is_profitable = snapshot.net_pnl_usd > 0
         
+        # Базовый скор влияния (1.0 для прибыли, -1.0 для убытка)
+        base_impact_score = 1.0 if is_profitable else -1.0
+        
         # Влияние анализов
         analyzer_impact = {}
         for analysis in snapshot.analysis_cards:
@@ -516,9 +519,9 @@ class CardCreator:
             trust_score = analysis.get('trust_score', 0.5)
             combined = analysis.get('combined_probability', 0.5)
             
-            # Простая эвристика: если сделка прибыльна, анализ с высокой вероятностью полезен
+            # Эвристика: если сделка прибыльна, анализ с высокой вероятностью полезен
             # В реальном автотюнере будет более сложный статистический анализ
-            impact_score = combined if is_profitable else -combined
+            impact_score = combined * base_impact_score
             
             analyzer_impact[analyzer_id] = {
                 "confidence": confidence,
@@ -528,27 +531,28 @@ class CardCreator:
                 "was_useful": is_profitable
             }
         
-        # Влияние настроек
+        # Влияние настроек (используем base_impact_score, который всегда определён)
         config_impact = {}
         config = snapshot.config_snapshot
         if 'risk' in config:
             config_impact['leverage'] = {
                 "value": config['risk'].get('max_leverage', 1.0),
-                "impact": impact_score if is_profitable else -impact_score
+                "impact": base_impact_score
             }
             config_impact['position_size_pct'] = {
                 "value": config['risk'].get('max_position_size_pct', 0.66),
-                "impact": impact_score if is_profitable else -impact_score
+                "impact": base_impact_score
             }
         
-        # Определение рыночных условий
+        # Определение рыночных условий (исправленная логика)
         market_condition = "unknown"
-        if 'market_context' in snapshot.market_context:
-            ctx = snapshot.market_context['market_context']
+        ctx = snapshot.market_context
+        if ctx:
             vol = ctx.get('volatility', 0.01)
+            trend = ctx.get('trend', '')
             if vol > 0.03:
                 market_condition = "volatile"
-            elif ctx.get('trend', '') == 'SIDEWAYS':
+            elif trend == 'SIDEWAYS':
                 market_condition = "ranging"
             else:
                 market_condition = "trending"
