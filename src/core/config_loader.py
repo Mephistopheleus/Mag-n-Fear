@@ -100,6 +100,21 @@ class ApiKeysConfig(BaseModel):
     binance_testnet_api_secret: str = ""
 
 
+class NewsConfig(BaseModel):
+    """Конфигурация новостного агрегатора."""
+    finnhub_api_key: str = ""
+    newsapi_key: str = ""
+    fred_api_key: str = ""
+    
+    # Веса источников
+    news_weight_finnhub: float = 1.0
+    news_weight_newsapi: float = 0.8
+    news_weight_fred: float = 0.9
+    
+    # Период полураспада (секунды)
+    news_half_life_sec: int = 900
+
+
 class Config(BaseModel):
     bot: BotConfig
     data: DataConfig
@@ -111,6 +126,7 @@ class Config(BaseModel):
     logging: LoggingConfig
     storage: StorageConfig
     api_keys: ApiKeysConfig = Field(default_factory=ApiKeysConfig)
+    news: NewsConfig = Field(default_factory=NewsConfig)
     
     def get(self, key: str, default=None):
         """Метод для совместимости со старым кодом, ожидающим dict."""
