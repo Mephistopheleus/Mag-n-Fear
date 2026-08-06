@@ -319,8 +319,9 @@ class NewsAggregator:
             for card in cards:
                 # Конвертируем импульс (-1..1) в вероятность (0..1) и цену
                 # Для новости мы не даем конкретную цену, а влияем на общую вероятность тренда
-                # Используем текущую цену как базу, а влияние как сдвиг вероятности
-                current_price = prob_field.current_price if hasattr(prob_field, 'current_price') else 0.0
+                # Используем текущую цену КОНКРЕТНОГО актива как базу
+                symbol = card.get('symbol', 'BTCUSDT')
+                current_price = prob_field.get_current_price(symbol) if hasattr(prob_field, 'get_current_price') else 0.0
                 
                 # Простая конвертация: импульс +0.5 -> вероятность 0.75, импульс -0.5 -> вероятность 0.25
                 base_prob = 0.5
@@ -332,7 +333,7 @@ class NewsAggregator:
                 horizon_sec = int(card.get('horizon_sec', 900))
                 
                 prob_field.add_point(
-                    symbol=card['symbol'],
+                    symbol=symbol,
                     price=current_price, # Цена не меняется, меняется вероятность
                     time_sec=horizon_sec,
                     probability=adjusted_prob,
