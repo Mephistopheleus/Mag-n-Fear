@@ -49,7 +49,7 @@ risk:
   min_reward_ratio: 1.5
   risk_per_trade_pct: 0.5
   slippage_buffer: 0.0005
-  trading_balance_usd: 50.0
+  trading_balance_usd: 100.0
 scenario:
   entry_delay_sec: 2
   max_slippage_bps: 10
