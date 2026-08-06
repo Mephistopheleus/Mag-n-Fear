@@ -39,7 +39,7 @@ class TunerConfig(BaseModel):
 class RiskConfig(BaseModel):
     trading_balance_usd: float = 50.0      # Выделенный баланс для торговли (USDT)
     max_daily_loss_pct: float = 2.0      # Максимальная просадка за день (%)
-    max_position_size_usd: float = 33    # Максимальный размер позиции ($), не более 2/3 от баланса
+    max_position_size_pct: float = 0.66  # Максимальный размер позиции (% от баланса), 2/3 = 0.66
     risk_per_trade_pct: float = 0.5      # Риск на сделку (%)
     min_reward_ratio: float = 1.5        # Минимальное соотношение Профит/Риск
 
