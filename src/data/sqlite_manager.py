@@ -22,15 +22,17 @@ class SQLiteManager:
     2. AnalysisCard - карточки анализов
     3. TunerLog - логи изменений настроек автотюнером
     
-    Автоматическая ротация:
-    - Снимки сделок: макс. 5MB (старые записи удаляются)
-    - Логи тюнера: макс. 2MB
+    Автоматическая ротация по объёму (в байтах):
+    - Снимки сделок: макс. 10MB (старые записи удаляются)
+    - Логи тюнера: макс. 1.5MB
+    - История изменений тюнера: макс. 5MB
     """
     
-    def __init__(self, db_path: str, max_snapshots_size_mb: float = 5.0, max_logs_size_mb: float = 2.0):
+    def __init__(self, db_path: str, max_snapshots_size_mb: float = 10.0, max_logs_size_mb: float = 1.5, max_tuner_history_size_mb: float = 5.0):
         self.db_path = Path(db_path)
         self.max_snapshots_size_bytes = int(max_snapshots_size_mb * 1024 * 1024)
         self.max_logs_size_bytes = int(max_logs_size_mb * 1024 * 1024)
+        self.max_tuner_history_size_bytes = int(max_tuner_history_size_mb * 1024 * 1024)
         
         # Блокировка для потокобезопасности
         self._lock = threading.Lock()
@@ -39,7 +41,7 @@ class SQLiteManager:
         self._create_tables()
         
         logger.info(f"[SQLiteManager] Database initialized: {self.db_path}")
-        logger.info(f"[SQLiteManager] Max snapshots size: {max_snapshots_size_mb}MB, Max logs size: {max_logs_size_mb}MB")
+        logger.info(f"[SQLiteManager] Limits - Snapshots: {max_snapshots_size_mb}MB, Logs: {max_logs_size_mb}MB, TunerHistory: {max_tuner_history_size_mb}MB")
     
     def _get_connection(self) -> sqlite3.Connection:
         """Получает соединение с БД."""
@@ -352,7 +354,7 @@ class SQLiteManager:
                 logger.debug(f"[SQLiteManager] Tuner log saved: {event_type}")
                 
                 # Проверка размера и ротация
-                self._rotate_logs_if_needed(conn)
+                self._rotate_tuner_history_if_needed(conn)
                 
                 return True
                 
@@ -486,11 +488,17 @@ class SQLiteManager:
                 conn.close()
     
     def _get_table_size(self, conn: sqlite3.Connection, table_name: str) -> int:
-        """Получает размер таблицы в байтах."""
+        """Получает размер конкретной таблицы в байтах через sum(page_count * page_size) для её индексов."""
         cursor = conn.cursor()
-        cursor.execute(f"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()")
+        # Размер таблицы = сумма размеров всех страниц, занятых таблицей и её индексами
+        # Используем dbstat для точного подсчета размера конкретной таблицы
+        cursor.execute(f"""
+            SELECT SUM(pgsize) as size 
+            FROM dbstat 
+            WHERE name = '{table_name}' OR name LIKE '{table_name}_%'
+        """)
         result = cursor.fetchone()
-        return result[0] if result else 0
+        return result[0] if result and result[0] else 0
     
     def _rotate_snapshots_if_needed(self, conn: sqlite3.Connection):
         """Удаляет старые снимки если размер превышает лимит."""
@@ -513,11 +521,11 @@ class SQLiteManager:
             logger.info("[SQLiteManager] Snapshots rotation completed")
     
     def _rotate_logs_if_needed(self, conn: sqlite3.Connection):
-        """Удаляет старые логи если размер превышает лимит."""
+        """Удаляет старые логи (события) если размер превышает лимит 1.5MB."""
         current_size = self._get_table_size(conn, 'tuner_logs')
         
         if current_size > self.max_logs_size_bytes:
-            logger.warning(f"[SQLiteManager] Logs size ({current_size / 1024 / 1024:.2f}MB) exceeds limit. Rotating...")
+            logger.warning(f"[SQLiteManager] Logs size ({current_size / 1024 / 1024:.2f}MB) exceeds limit ({self.max_logs_size_bytes / 1024 / 1024:.2f}MB). Rotating...")
             
             cursor = conn.cursor()
             # Удаляем oldest 10% записей
@@ -531,6 +539,29 @@ class SQLiteManager:
             """)
             conn.commit()
             logger.info("[SQLiteManager] Logs rotation completed")
+    
+    def _rotate_tuner_history_if_needed(self, conn: sqlite3.Connection):
+        """Удаляет старую историю изменений тюнера если размер превышает лимит 5MB."""
+        # В текущей реализации tuner_logs хранит и события, и историю
+        # Для разделения можно создать отдельную таблицу tuner_history
+        # Пока используем ту же логику ротации что и для логов
+        current_size = self._get_table_size(conn, 'tuner_logs')
+        
+        if current_size > self.max_tuner_history_size_bytes:
+            logger.warning(f"[SQLiteManager] Tuner history size ({current_size / 1024 / 1024:.2f}MB) exceeds limit ({self.max_tuner_history_size_bytes / 1024 / 1024:.2f}MB). Rotating...")
+            
+            cursor = conn.cursor()
+            # Удаляем oldest 10% записей
+            cursor.execute("""
+                DELETE FROM tuner_logs 
+                WHERE log_id IN (
+                    SELECT log_id FROM tuner_logs 
+                    ORDER BY timestamp ASC 
+                    LIMIT MAX(1, (SELECT COUNT(*) FROM tuner_logs) / 10)
+                )
+            """)
+            conn.commit()
+            logger.info("[SQLiteManager] Tuner history rotation completed")
     
     def get_statistics(self) -> Dict[str, Any]:
         """Возвращает статистику по базе данных."""

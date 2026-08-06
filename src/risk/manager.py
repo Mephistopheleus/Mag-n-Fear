@@ -87,9 +87,9 @@ class RiskManager:
         # Чем выше волатильность/риск ликвидности, тем ниже допустимое плечо
         dynamic_max_leverage = self._calc_dynamic_leverage(volatility, liq_risk)
         
-        # 5. Лимит экспозиции: max_position_size_pct от trading_balance_usd
-        # Снижаем лимит при плохой ликвидности для защиты капитала
-        exposure_limit = self.max_position_size_pct * (1.0 - liq_risk)
+        # 5. Лимит экспозиции: max_position_size_pct ОТ trading_balance_usd (выделенного баланса)
+        # Не от полного баланса биржи! Снижаем лимит при плохой ликвидности для защиты капитала
+        exposure_limit = self.trading_balance_usd * self.max_position_size_pct * (1.0 - liq_risk)
         
         metrics = RiskMetrics(
             max_leverage=dynamic_max_leverage,
@@ -264,12 +264,11 @@ class RiskManager:
         price = scenario.get('price', card.price)
         notional = qty * price
         
-        # Получение баланса через Executor (реальный вызов)
-        balance = await self._get_balance_from_executor()
-        # Если баланс 0 - значит торгуем на весь доступный, проверка экспозиции не нужна
-        if balance > 0 and notional > balance * metrics.exposure_limit:
-            logger.debug(f"[RiskManager] {symbol}: REJECTED - Exposure {notional:.2f} exceeds limit {balance * metrics.exposure_limit:.2f}")
-            return False, f"Exposure {notional:.2f} exceeds limit {balance * metrics.exposure_limit:.2f}"
+        # metrics.exposure_limit уже рассчитан как trading_balance_usd * max_position_size_pct * (1 - liq_risk)
+        # Сравниваем напрямую с лимитом в долларах
+        if notional > metrics.exposure_limit:
+            logger.debug(f"[RiskManager] {symbol}: REJECTED - Exposure {notional:.2f} exceeds limit {metrics.exposure_limit:.2f}")
+            return False, f"Exposure {notional:.2f} exceeds limit {metrics.exposure_limit:.2f}"
         
         # Проверка аварийных флагов (всегда строго, кроме режима обучения для тени)
         if metrics.is_emergency:
