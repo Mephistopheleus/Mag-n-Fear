@@ -8,9 +8,12 @@ import asyncio
 import aiohttp
 import math
 import time
+import logging
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
+
+logger = logging.getLogger(__name__)
 
 # Импорты внутренних модулей (предполагаемая структура)
 try:
@@ -317,7 +320,7 @@ class NewsAggregator:
                 # Конвертируем импульс (-1..1) в вероятность (0..1) и цену
                 # Для новости мы не даем конкретную цену, а влияем на общую вероятность тренда
                 # Используем текущую цену как базу, а влияние как сдвиг вероятности
-                current_price = prob_field.current_price(card['symbol']) if hasattr(prob_field, 'current_price') else 0.0
+                current_price = prob_field.current_price if hasattr(prob_field, 'current_price') else 0.0
                 
                 # Простая конвертация: импульс +0.5 -> вероятность 0.75, импульс -0.5 -> вероятность 0.25
                 base_prob = 0.5
