@@ -44,7 +44,7 @@ risk:
   learning_mode: false
   max_correlation_exposure: 0.8
   max_daily_loss_pct: 2.0
-  max_position_size_usd: 33
+  max_position_size_pct: 0.66
   min_profit_threshold: 0.05
   min_reward_ratio: 1.5
   risk_per_trade_pct: 0.5

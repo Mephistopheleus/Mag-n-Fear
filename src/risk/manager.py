@@ -48,7 +48,12 @@ class RiskManager:
         
         self.min_leverage = risk_cfg.get('min_leverage', 1.0)
         self.max_leverage_default = risk_cfg.get('max_leverage', 5.0)
-        self.max_exposure_pct = risk_cfg.get('max_exposure_pct', 0.05)  # 5% баланса
+        
+        # Динамический лимит экспозиции: max_position_size_pct от trading_balance_usd
+        # По умолчанию 66% (2/3) от выделенного баланса
+        self.max_position_size_pct = risk_cfg.get('max_position_size_pct', 0.66)
+        self.trading_balance_usd = risk_cfg.get('trading_balance_usd', 50.0)
+        
         self.volatility_threshold = risk_cfg.get('volatility_threshold', 0.05)  # 5% движение
         
         # Режим обучения (Learning Mode) - чтение из конфига
@@ -82,8 +87,9 @@ class RiskManager:
         # Чем выше волатильность/риск ликвидности, тем ниже допустимое плечо
         dynamic_max_leverage = self._calc_dynamic_leverage(volatility, liq_risk)
         
-        # 5. Лимит экспозиции
-        exposure_limit = self.max_exposure_pct * (1.0 - liq_risk)  # Снижаем лимит при плохой ликвидности
+        # 5. Лимит экспозиции: max_position_size_pct от trading_balance_usd
+        # Снижаем лимит при плохой ликвидности для защиты капитала
+        exposure_limit = self.max_position_size_pct * (1.0 - liq_risk)
         
         metrics = RiskMetrics(
             max_leverage=dynamic_max_leverage,
