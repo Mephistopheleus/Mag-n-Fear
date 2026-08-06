@@ -125,7 +125,7 @@ class NewsAggregator:
                             source='finnhub',
                             headline=item.get('headline', ''),
                             sentiment_raw=sentiment,
-                            timestamp=item.get('datetime', time.time()) / 1000.0,
+                            timestamp=item.get('datetime', time.time()), # Finnhub отдает секунды
                             relevance=1.0, # Крипто-новости релевантны по умолчанию
                             raw_data=item
                         ))
@@ -305,3 +305,37 @@ class NewsAggregator:
         news = await self.fetch_all_news()
         impacts = self.process_news_to_impacts(news)
         return self.generate_analysis_cards(impacts, symbols)
+
+    async def run_cycle(self, symbols: List[str], prob_field: 'ProbabilityField'):
+        """
+        Метод для вызова из главного цикла бота.
+        Собирает новости и добавляет карточки анализа в ProbabilityField.
+        """
+        try:
+            cards = await self.get_current_analysis(symbols)
+            for card in cards:
+                # Конвертируем импульс (-1..1) в вероятность (0..1) и цену
+                # Для новости мы не даем конкретную цену, а влияем на общую вероятность тренда
+                # Используем текущую цену как базу, а влияние как сдвиг вероятности
+                current_price = prob_field.current_price(card['symbol']) if hasattr(prob_field, 'current_price') else 0.0
+                
+                # Простая конвертация: импульс +0.5 -> вероятность 0.75, импульс -0.5 -> вероятность 0.25
+                base_prob = 0.5
+                adjusted_prob = base_prob + (card['value'] * 0.5) # value is -1..1
+                adjusted_prob = max(0.1, min(0.9, adjusted_prob))
+                
+                # Добавляем точку в поле с источником "news"
+                # Горизонт берем из карточки
+                horizon_sec = int(card.get('horizon_sec', 900))
+                
+                prob_field.add_point(
+                    symbol=card['symbol'],
+                    price=current_price, # Цена не меняется, меняется вероятность
+                    time_sec=horizon_sec,
+                    probability=adjusted_prob,
+                    source='news_aggregator'
+                )
+                
+            logger.debug(f"[NewsAggregator] Cycle complete. Generated {len(cards)} cards, added to field.")
+        except Exception as e:
+            logger.error(f"[NewsAggregator] Cycle failed: {e}", exc_info=True)
