@@ -195,7 +195,7 @@ class TradingBot:
         delay = 60  # Обновление каждые 60 секунд
         while True:
             try:
-                await self.news.run_cycle(self.symbols)
+                await self.news.run_cycle(self.symbols, self.prob_field)
                 await asyncio.sleep(delay)
             except Exception as e:
                 logger.error(f"Error in news loop: {e}", exc_info=True)
