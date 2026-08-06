@@ -22,7 +22,7 @@ from src.utils.data_rotator import DataRotator, setup_rotating_logger
 
 # Импорт модулей данных
 from src.data.feed import DataFeed
-from src.data.news_aggregator import NewsAggregator
+from src.analyzers.news_aggregator import NewsAggregator
 
 # Импорт математического ядра
 from src.math_core.time_continuum import TimeContinuum
@@ -75,7 +75,9 @@ class TradingBot:
         
         # 4. Инициализация модулей данных
         self.feed = DataFeed(self.config, self.prob_field)
-        self.news = NewsAggregator(self.config, self.prob_field)
+        # Передаем конфиг секции news в NewsAggregator
+        news_config = self.config.news if hasattr(self.config, 'news') else {}
+        self.news = NewsAggregator(news_config)
         
         # 5. Инициализация математики
         self.continuum = TimeContinuum(self.config)

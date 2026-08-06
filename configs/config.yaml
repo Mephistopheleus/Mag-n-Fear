@@ -62,8 +62,24 @@ tuner:
   confidence_factors:
     matrix: 0.1
     mean_reversion: 0.1
+    news_aggregator: 0.1
     order_flow: 0.1
     trend: 0.1
     volatility: 0.1
   impact_threshold: 0.05
   min_trades_for_update: 50
+
+# Новостной агрегатор
+news:
+  # API ключи
+  finnhub_api_key: d9q5s1pr01qo4q2sbe7gd9q5s1pr01qo4q2sbe80
+  newsapi_key: 000d211d9d3c4a4c82076219a9b03f73
+  fred_api_key: ce7a846c7aa30bb2f8b829ebf5c489c5
+  
+  # Веса источников (настраиваются автотюнером)
+  news_weight_finnhub: 1.0
+  news_weight_newsapi: 0.8
+  news_weight_fred: 0.9
+  
+  # Период полураспада влияния новости (секунды, 900 = 15 минут)
+  news_half_life_sec: 900

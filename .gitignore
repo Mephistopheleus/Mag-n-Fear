@@ -5,21 +5,23 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Dependencies
-.venv/
-venv/
-env/
+# Logs
+*.log
+
+# Environment
 .env
 .env.local
 .env.*
 
+# Dependencies
+venv/
+.venv/
+.env/
+
 # Build artifacts
 dist/
 build/
-*.egg-info/
-
-# Logs
-*.log
+target/
 
 # Coverage
 .coverage
