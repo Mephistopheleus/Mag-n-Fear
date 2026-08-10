@@ -63,6 +63,7 @@ class SQLiteManager:
                         timestamp_open TEXT NOT NULL,
                         timestamp_close TEXT,
                         scenario_id TEXT,
+                        scenario_type TEXT,
                         risk_id TEXT,
                         order_id TEXT,
                         symbol TEXT,
@@ -72,6 +73,7 @@ class SQLiteManager:
                         highest_price REAL,
                         lowest_price REAL,
                         leverage REAL,
+                        leverage_dynamic REAL,
                         position_size_usd REAL,
                         quantity REAL,
                         pnl_usd REAL,
@@ -85,9 +87,11 @@ class SQLiteManager:
                         mae_price REAL,
                         mfe_pct REAL,
                         mfe_price REAL,
+                        atr_value REAL,
                         trailing_stop_activated INTEGER,
                         trailing_stop_distance_pct REAL,
                         trailing_stop_activation_pct REAL,
+                        trail_levels TEXT,  -- JSON
                         analysis_cards TEXT,  -- JSON
                         scenario_card TEXT,   -- JSON
                         risk_card TEXT,       -- JSON
@@ -96,6 +100,7 @@ class SQLiteManager:
                         expected_profit_usd REAL,
                         profit_deviation_usd REAL,
                         profit_deviation_pct REAL,
+                        lab_recommendation TEXT,  -- JSON
                         tuner_analysis TEXT,  -- JSON
                         created_at TEXT DEFAULT CURRENT_TIMESTAMP
                     )
@@ -106,6 +111,8 @@ class SQLiteManager:
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_snapshots_open ON trade_snapshots(timestamp_open)")
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_snapshots_pnl ON trade_snapshots(pnl_usd)")
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_snapshots_scenario ON trade_snapshots(scenario_id)")
+                cursor.execute("CREATE INDEX IF NOT EXISTS idx_snapshots_scenario_type ON trade_snapshots(scenario_type)")
+                cursor.execute("CREATE INDEX IF NOT EXISTS idx_snapshots_atr ON trade_snapshots(atr_value)")
                 
                 # Таблица карточек анализов
                 cursor.execute("""
@@ -178,24 +185,29 @@ class SQLiteManager:
                 market_context_json = json.dumps(snapshot_dict.get('market_context') or {})
                 config_snapshot_json = json.dumps(snapshot_dict.get('config_snapshot') or {})
                 tuner_analysis_json = json.dumps(snapshot_dict.get('tuner_analysis') or {})
+                lab_recommendation_json = json.dumps(snapshot_dict.get('lab_recommendation') or {})
+                trail_levels_json = json.dumps(snapshot_dict.get('trail_levels') or [])
+
                 
                 cursor.execute("""
                     INSERT OR REPLACE INTO trade_snapshots (
-                        snapshot_id, timestamp_open, timestamp_close, scenario_id, risk_id, order_id,
+                        snapshot_id, timestamp_open, timestamp_close, scenario_id, scenario_type, risk_id, order_id,
                         symbol, direction, entry_price, exit_price, highest_price, lowest_price,
-                        leverage, position_size_usd, quantity,
+                        leverage, leverage_dynamic, position_size_usd, quantity,
                         pnl_usd, pnl_pct, commission_usd, slippage_usd, net_pnl_usd,
                         duration_seconds, exit_reason,
-                        mae_pct, mae_price, mfe_pct, mfe_price,
+                        mae_pct, mae_price, mfe_pct, mfe_price, atr_value,
                         trailing_stop_activated, trailing_stop_distance_pct, trailing_stop_activation_pct,
+                        trail_levels,
                         analysis_cards, scenario_card, risk_card, market_context, config_snapshot,
-                        expected_profit_usd, profit_deviation_usd, profit_deviation_pct, tuner_analysis
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        expected_profit_usd, profit_deviation_usd, profit_deviation_pct, lab_recommendation, tuner_analysis
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     snapshot_dict.get('snapshot_id'),
                     snapshot_dict.get('timestamp_open'),
                     snapshot_dict.get('timestamp_close'),
                     snapshot_dict.get('scenario_id'),
+                    snapshot_dict.get('scenario_type'),
                     snapshot_dict.get('risk_id'),
                     snapshot_dict.get('order_id'),
                     snapshot_dict.get('symbol'),
@@ -205,6 +217,7 @@ class SQLiteManager:
                     snapshot_dict.get('highest_price'),
                     snapshot_dict.get('lowest_price'),
                     snapshot_dict.get('leverage'),
+                    snapshot_dict.get('leverage_dynamic'),
                     snapshot_dict.get('position_size_usd'),
                     snapshot_dict.get('quantity'),
                     snapshot_dict.get('pnl_usd'),
@@ -218,9 +231,11 @@ class SQLiteManager:
                     snapshot_dict.get('mae_price'),
                     snapshot_dict.get('mfe_pct'),
                     snapshot_dict.get('mfe_price'),
+                    snapshot_dict.get('atr_value'),
                     1 if snapshot_dict.get('trailing_stop_activated') else 0,
                     snapshot_dict.get('trailing_stop_distance_pct'),
                     snapshot_dict.get('trailing_stop_activation_pct'),
+                    trail_levels_json,
                     analysis_cards_json,
                     scenario_card_json,
                     risk_card_json,
@@ -229,6 +244,7 @@ class SQLiteManager:
                     snapshot_dict.get('expected_profit_usd'),
                     snapshot_dict.get('profit_deviation_usd'),
                     snapshot_dict.get('profit_deviation_pct'),
+                    lab_recommendation_json,
                     tuner_analysis_json
                 ))
                 
