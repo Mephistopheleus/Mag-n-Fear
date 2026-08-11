@@ -102,6 +102,11 @@ class LiquidityDensityAnalyzer(BaseIndicator):
         # Зоны низкой ликвидности (вакуумы) - ниже 20-го процентиля
         low_liq_threshold = np.percentile(avg_density_per_bin, 20)
         
+        # Для нормировки strength используем диапазон между 20-м и 80-м процентилями
+        p20 = np.percentile(avg_density_per_bin, 20)
+        p80 = np.percentile(avg_density_per_bin, 80)
+        density_range = p80 - p20 if p80 > p20 else 1.0
+        
         min_price = df_slice['low'].min()
         max_price = df_slice['high'].max()
         price_range = max_price - min_price
@@ -111,22 +116,32 @@ class LiquidityDensityAnalyzer(BaseIndicator):
             price_level = min_price + (i / self.price_bins) * price_range
             
             if density > high_liq_threshold:
+                # Нормировка для стен: (density - p80) / (max_density - p80)
+                max_density = np.max(avg_density_per_bin)
+                wall_strength = (density - p80) / (max_density - p80 + 1e-6)
+                wall_strength = max(0.0, min(1.0, wall_strength))  # Clamp to [0, 1]
+                
                 zones.append({
                     'type': 'wall',
                     'price_level': float(price_level),
                     'bin_index': i,
                     'density': float(density),
                     'significance': 'support_resistance',
-                    'strength': min(1.0, density / high_liq_threshold)
+                    'strength': float(wall_strength)
                 })
             elif density < low_liq_threshold:
+                # Нормировка для вакуумов: (p20 - density) / (p20 - min_density)
+                min_density = np.min(avg_density_per_bin)
+                void_strength = (p20 - density) / (p20 - min_density + 1e-6)
+                void_strength = max(0.0, min(1.0, void_strength))  # Clamp to [0, 1]
+                
                 zones.append({
                     'type': 'void',
                     'price_level': float(price_level),
                     'bin_index': i,
                     'density': float(density),
                     'significance': 'breakout_zone',
-                    'strength': min(1.0, low_liq_threshold / (density + 1e-6))
+                    'strength': float(void_strength)
                 })
         
         return zones
