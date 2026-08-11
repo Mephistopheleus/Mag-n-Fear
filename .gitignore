@@ -11,40 +11,36 @@ __pycache__/
 *.pyd
 *.so
 *.egg-info/
-dist/
-build/
-*.egg
 
-# Environment files
+# Dependencies
+venv/
+.venv/
 .env
 .env.local
 .env.*
-.venv/
-venv/
-ENV/
-
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
 
 # Logs
 *.log
 
-# Coverage reports
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage
 .coverage
+coverage/
 htmlcov/
-.coverage.*
-coverage.xml
 
-# Testing
+# Distribution / packaging
+dist/
+build/
+*.egg
+*.whl
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Pytest
 .pytest_cache/
-.mypy_cache/
-.hypothesis/
-
-# OS generated files
-.DS_Store
-Thumbs.db
 ```
