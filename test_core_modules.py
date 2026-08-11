@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from src.core.models import DataCard, RiskMetrics, NewsVector
 from src.core.field import ProbabilityField
 from src.risk.manager import RiskManager
-from src.data.news_aggregator import NewsAggregator
+from src.analyzers.news_aggregator import NewsAggregator
 
 
 async def test_data_models():
@@ -101,7 +101,7 @@ async def test_probability_field():
         source_id="test_feed",
         headline="Dogecoin partnership announced"
     )
-    await field.update_news_vector("DOGEUSDT", news)
+    field.update_news_vector("DOGEUSDT", news)
     card = await field.get_card("DOGEUSDT")
     print(f"✓ Новость записана: {len(card.news_vectors)} векторов, сентимент={card.get_aggregated_sentiment():.2f}")
     
@@ -167,28 +167,21 @@ async def test_news_aggregator():
     """Тест NewsAggregator (без реального парсинга, проверка структуры)."""
     print("\n=== ТЕСТ 4: NewsAggregator (структура) ===")
     
-    field = ProbabilityField()
-    await field.initialize_symbol("DOGEUSDT", 0.08234)
-    
     config = {}
-    na = NewsAggregator(config, field)
+    na = NewsAggregator(config)
     
-    # Проверка ключевых слов
+    # Проверка метода простого сентимента
     text_bullish = "Dogecoin surges on major partnership announcement and adoption"
     text_bearish = "SEC investigation into crypto exchanges causes market crash"
     
-    dir_bull, str_bull = na._analyze_sentiment(text_bullish)
-    dir_bear, str_bear = na._analyze_sentiment(text_bearish)
+    sentiment_bull = na._calculate_simple_sentiment(text_bullish)
+    sentiment_bear = na._calculate_simple_sentiment(text_bearish)
     
-    print(f"✓ Бычья новость: direction={dir_bull:.2f}, strength={str_bull:.2f}")
-    print(f"✓ Медвежья новость: direction={dir_bear:.2f}, strength={str_bear:.2f}")
+    print(f"✓ Бычья новость: sentiment={sentiment_bull:.2f}")
+    print(f"✓ Медвежья новость: sentiment={sentiment_bear:.2f}")
     
-    # Определение актива
-    asset1 = na._detect_asset("DOGE moon soon!")
-    asset2 = na._detect_asset("Bitcoin futures trading")
-    asset3 = na._detect_asset("Random stock market news")
-    
-    print(f"✓ Детекция активов: DOGE={asset1}, BTC={asset2}, Other={asset3}")
+    # Проверка что объект создан
+    print(f"✓ NewsAggregator инициализирован: {type(na).__name__}")
     
     return True
 
