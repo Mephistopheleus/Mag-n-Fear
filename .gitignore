@@ -1,3 +1,43 @@
-The current .gitignore content appears to be empty based on your input. Since there are no file changes provided that would require adding ignore rules (no compiled files, dependencies, editor files, etc.), and the current .gitignore is empty, the optimized result remains empty.
+```
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-(empty — output nothing)
+# Database
+*.db
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Dependencies
+.venv/
+venv/
+env/
+pip-log.txt
+pipenv.lock
+
+# Testing
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+.hypothesis/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+```

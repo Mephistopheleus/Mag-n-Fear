@@ -1,85 +1,358 @@
+# =============================================================================
+# КОНФИГУРАЦИЯ ТОРГОВОЙ СИСТЕМЫ HYBRID MATH SCALPER (v3.0)
+# =============================================================================
+# Принцип: Строгое разделение на CONSTANTS (не меняются автотюнером) 
+# и TUNABLE_PARAMS (настраиваются автотюнером в процессе обучения).
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# API КЛЮЧИ И ДОСТУП
+# -----------------------------------------------------------------------------
 api_keys:
   binance_testnet_api_key: mYVqkHL4mSwEiHrHC6PaurPUHOV7auYwXXpkSmMX7hSSY8KT7teRmbQV6BY9YD3i
   binance_testnet_api_secret: ym3B6HkI6ervEsc4We0jr47O51tueW8CRTqpU6TxbpwzKsxAtLWtGKtbeUQ86aBf
-bot:
-  exchanges:
-  - binance_futures
-  mode: live
-  name: HybridMathScalper
-  version: 0.1.0
-data:
-  correlation_symbol: BTCUSDT
-  order_book_depth: 20
-  primary_symbol: DOGEUSDT
-  snapshot_interval_sec: 1
-  symbols:
-  - DOGEUSDT
-  timeframes:
-  - 1m
-  - 5m
-executor:
-  default_order_type: limit
-  limit_order_timeout_sec: 30
-  trailing_stop:
-    activation_pct: 0.5
-    enabled: true
-    trail_distance_pct: 0.3
-  use_ioc: false
-logging:
-  cards_path: data_storage/cards
-  level: INFO
-  log_path: logs/bot.log
-  rotation: 1 day
-  save_cards: true
-matrix:
-  decay_factor: 0.95
-  price_bins_count: 50
-  time_bins_count: 60
-  time_horizon_sec: 300
-risk:
-  commission_buffer: 0.0003
-  commission_rate: 0.0002
-  flat_market_discount: 0.7
-  kelly_fraction: 0.25
-  learning_mode: false
-  max_correlation_exposure: 0.8
-  max_daily_loss_pct: 2.0
-  max_position_size_pct: 0.66
-  min_profit_threshold: 0.05
-  min_reward_ratio: 1.5
-  risk_per_trade_pct: 0.5
-  slippage_buffer: 0.0005
-  trading_balance_usd: 100.0
-scenario:
-  entry_delay_sec: 2
-  max_slippage_bps: 10
-  min_confidence_threshold: 0.65
-storage:
-  db_path: data_storage/history.db
-  matrix_cache_path: data_storage/matrix_cache.parquet
-  type: sqlite
-tuner:
-  confidence_factors:
-    matrix: 0.1
-    mean_reversion: 0.1
-    news_aggregator: 0.1
-    order_flow: 0.1
-    trend: 0.1
-    volatility: 0.1
-  impact_threshold: 0.05
-  min_trades_for_update: 50
-
-# Новостной агрегатор
-news:
-  # API ключи
+  
+  # Новостные API
   finnhub_api_key: d9q5s1pr01qo4q2sbe7gd9q5s1pr01qo4q2sbe80
   newsapi_key: 000d211d9d3c4a4c82076219a9b03f73
   fred_api_key: ce7a846c7aa30bb2f8b829ebf5c489c5
+
+# -----------------------------------------------------------------------------
+# CONSTANTS - Математические константы и неизменяемые параметры
+# Автотюнер НЕ имеет права менять эти значения.
+# -----------------------------------------------------------------------------
+CONSTANTS:
+  # Периоды индикаторов и математические основы
+  indiator_periods:
+    atr_period: 14
+    rsi_period: 14
+    macd_fast: 12
+    macd_slow: 26
+    macd_signal: 9
+    bollinger_period: 20
+    bollinger_std: 2.0
+    fibonacci_levels: [0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0, 1.618, 2.618]
+    
+  # Параметры синтеза таймфреймов ("полотно")
+  timeframes:
+    base_tf_sec: 300  # 5 минут база
+    synthetic_tfs: [60, 300, 900, 1800, 3600, 14400, 86400]  # 1m, 5m, 15m, 30m, 1h, 4h, 1d
+    
+  # Пороги сходимости и стабильности
+  convergence_threshold: 0.85
+  stability_window_sec: 600
   
-  # Веса источников (настраиваются автотюнером)
-  news_weight_finnhub: 1.0
-  news_weight_newsapi: 0.8
-  news_weight_fred: 0.9
+  # Формулы расчета
+  kelly_formula_cap: 0.25  # Максимальная доля по Келли
+  max_leverage_cap: 20     # Жесткое ограничение плеча
   
-  # Период полураспада влияния новости (секунды, 900 = 15 минут)
-  news_half_life_sec: 900
+  # Системные константы
+  heartbeat_interval_sec: 5
+  data_snapshot_interval_sec: 1
+
+# -----------------------------------------------------------------------------
+# TUNABLE_PARAMS - Параметры, изменяемые Автотюнером
+# -----------------------------------------------------------------------------
+TUNABLE_PARAMS:
+  # ---------------------------------------------------------------------------
+  # Глобальные настройки риска и баланса
+  # ---------------------------------------------------------------------------
+  risk:
+    trading_balance_usd: 50.0          # Стартовый лимит (консервативно)
+    risk_per_trade_pct: 0.5            # Риск на сделку % от баланса
+    max_position_size_pct: 0.66        # Макс размер позиции % от лимита
+    max_daily_loss_pct: 2.0            # Макс дневной убыток %
+    max_correlation_exposure: 0.8      # Макс корреляционная экспозиция
+    min_reward_ratio: 1.5              # Мин R:R для входа
+    min_profit_threshold: 0.05         # Мин порог прибыли (%)
+    commission_buffer: 0.0003          # Буфер на комиссии
+    slippage_buffer: 0.0005            # Буфер на проскальзывание
+    flat_market_discount: 0.7          # Скидка на флэт рынок
+    
+  # ---------------------------------------------------------------------------
+  # Настройки кредитного плеча (Умное плечо)
+  # ---------------------------------------------------------------------------
+  leverage:
+    base_leverage: 1
+    max_dynamic_leverage: 10
+    volatility_adjustment_factor: 0.5
+    confidence_leverage_multiplier: 0.2
+    
+  # ---------------------------------------------------------------------------
+  # Трейлинг-стоп (Трехуровневый адаптивный)
+  # ---------------------------------------------------------------------------
+  trailing_stop:
+    enabled: true
+    # База: ATR множитель
+    atr_multiplier_base: 2.0
+    # Уровень 1: Активация (безубыток)
+    activation_pct: 0.5
+    breakeven_trigger_pct: 0.3
+    # Уровень 2: Подтягивание (Trailing Step)
+    trail_step_pct: 0.2
+    trail_distance_atr_mult: 1.5
+    # Уровень 3: Защита прибыли
+    profit_lock_trigger_pct: 2.0
+    tight_stop_atr_mult: 1.0
+    
+  # ---------------------------------------------------------------------------
+  # Настройки анализаторов (веса, пороги, доверие)
+  # ---------------------------------------------------------------------------
+  analyzers:
+    # Базовые технические анализаторы
+    trend:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      timeframe_primary: "5m"
+      g_trend_channel_sensitivity: 0.7
+      
+    volatility:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      atr_period: 14
+      volatility_threshold: 0.02
+      
+    order_flow:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      order_book_depth: 20
+      imbalance_threshold: 0.3
+      
+    mean_reversion:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      bollinger_deviation: 2.0
+      reversion_threshold: 0.01
+      
+    # Новые анализаторы
+    atr_analyzer:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      period: 14
+      
+    trend_line_detector:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      min_touches: 3
+      regression_threshold: 0.85
+      
+    fibonacci_levels:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      swing_lookback: 50
+      
+    graph_pattern_recognizer:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      patterns: ["head_shoulders", "triangle", "flag", "double_top", "double_bottom"]
+      min_pattern_confidence: 0.6
+      
+    support_resistance:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      extremum_lookback: 20
+      volume_confirmation: true
+      
+    fractal_analyzer:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      fractal_dimension_threshold: 1.5
+      
+    # Корреляционный анализатор
+    correlation:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      methods: ["pearson", "spearman", "kendall", "dcor"]
+      symbols: ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "DOGEUSDT", "PEPEUSDT", "LINKUSDT", "RNDRUSDT", "LTCUSDT", "XRPUSDT"]
+      threshold: 0.7
+      
+    # Новостной агрегатор
+    news_aggregator:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      finnhub_weight: 1.0
+      newsapi_weight: 0.8
+      fred_weight: 0.9
+      half_life_sec: 900
+      sentiment_threshold: 0.5
+      
+    # Анализатор свечей (детальный разбор)
+    candle_analyzer:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      pattern_strength_threshold: 0.7
+      
+    # Прогнозист цены (Market Predictor)
+    market_predictor:
+      enabled: true
+      confidence_factor: 0.1
+      weight: 1.0
+      horizon_sec: 300
+      matrix_weight: 0.4
+      news_weight: 0.3
+      technical_weight: 0.3
+      
+  # ---------------------------------------------------------------------------
+  # Настройки сценариев (Scenario Writer)
+  # ---------------------------------------------------------------------------
+  scenarios:
+    # Общие настройки
+    min_confidence_threshold: 0.65
+    entry_delay_sec: 2
+    max_slippage_bps: 10
+    
+    # Типы сценариев
+    scalp_impulse:
+      enabled: true
+      horizon_sec: 60
+      min_rr: 1.2
+      entry_confirmation: "order_flow_spike"
+      exit_condition: "trailing_only"
+      
+    breakout_level:
+      enabled: true
+      horizon_sec: 300
+      min_rr: 2.0
+      entry_confirmation: "volume_sr_break"
+      exit_condition: "trailing_with_lock"
+      
+    micro_trend_follow:
+      enabled: true
+      horizon_sec: 180
+      min_rr: 1.5
+      entry_confirmation: "trend_continuation"
+      exit_condition: "trend_reversal_signal"
+      
+    liquidity_trap:
+      enabled: true
+      horizon_sec: 240
+      min_rr: 2.5
+      entry_confirmation: "false_breakout"
+      exit_condition: "mean_reversion"
+      
+    mean_reversion:
+      enabled: true
+      horizon_sec: 420
+      min_rr: 1.8
+      entry_confirmation: "bollinger_extreme"
+      exit_condition: "center_channel"
+      
+    liquidity_spikes:
+      enabled: true
+      horizon_sec: 30
+      min_rr: 1.1
+      entry_confirmation: "volume_spike"
+      exit_condition: "quick_exit"
+      
+    straddle:
+      enabled: true
+      horizon_sec: 600
+      min_rr: 3.0
+      entry_confirmation: "news_volatility"
+      exit_condition: "dual_trailing"
+      dual_order: true
+      
+    arbitrage:
+      enabled: true
+      horizon_sec: 120
+      min_rr: 1.5
+      entry_confirmation: "correlation_anomaly"
+      exit_condition: "normalization"
+      pairs: ["BTCUSDT-ETHUSDT", "BTCUSDT-SOLUSDT", "ETHUSDT-SOLUSDT"]
+      
+    impulse_enhanced:
+      enabled: true
+      horizon_sec: 480
+      min_rr: 2.2
+      entry_confirmation: "momentum_volume"
+      exit_condition: "wide_trailing"
+      
+    counter_trend:
+      enabled: true
+      horizon_sec: 360
+      min_rr: 2.5
+      entry_confirmation: "extremum_reversal"
+      exit_condition: "strict_stop"
+      
+    adaptive_market:
+      enabled: true
+      horizon_sec: 300
+      min_rr: 1.8
+      entry_confirmation: "regime_detection"
+      exit_condition: "flexible"
+      
+  # ---------------------------------------------------------------------------
+  # Настройки Матрицы вероятностей
+  # ---------------------------------------------------------------------------
+  matrix:
+    decay_factor: 0.95
+    price_bins_count: 50
+    time_bins_count: 60
+    time_horizon_sec: 300
+    confidence_decay_rate: 0.1
+    
+  # ---------------------------------------------------------------------------
+  # Настройки Автотюнера
+  # ---------------------------------------------------------------------------
+  tuner:
+    enabled: true
+    learning_mode: false  # false = LIVE, true = только симуляция
+    min_trades_for_update: 50
+    impact_threshold: 0.05
+    target_metrics:
+      pnl_day_target: 1.0    # 100% PnL в день (идеал для градиента)
+      wr_target: 1.0         # 100% Win Rate (идеал)
+      dd_target: 0.0         # 0% Drawdown (идеал)
+    update_frequency_sec: 3600  # Частота обновления конфига
+    
+  # ---------------------------------------------------------------------------
+  # Лаборатория (Scenario Lab)
+  # ---------------------------------------------------------------------------
+  lab:
+    enabled: true
+    simulation_runs: 100
+    param_variation_pct: 0.2
+    save_best_configs: true
+    
+# -----------------------------------------------------------------------------
+# СИСТЕМНЫЕ НАСТРОЙКИ (не меняются автотюнером)
+# -----------------------------------------------------------------------------
+system:
+  bot_name: "HybridMathScalper"
+  version: "3.0.0"
+  mode: "live"  # live, test, shadow
+  exchange: "binance_futures"
+  
+  logging:
+    level: "INFO"
+    log_path: "logs/bot.log"
+    rotation: "1 day"
+    save_cards: true
+    cards_path: "data_storage/cards"
+    
+  storage:
+    type: "sqlite"
+    db_path: "data_storage/history.db"
+    matrix_cache_path: "data_storage/matrix_cache.parquet"
+    max_snapshots_db_mb: 10
+    max_tuner_logs_mb: 1.5
+    max_history_mb: 5
+    
+  data:
+    primary_symbol: "DOGEUSDT"
+    correlation_symbol: "BTCUSDT"
+    symbols: ["DOGEUSDT", "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]
+    order_book_depth: 20
