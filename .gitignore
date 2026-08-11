@@ -1,46 +1,44 @@
 ```gitignore
-# Python cache
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Compiled Python files
-*.pyc
-*.pyo
-*.pyd
-*.so
-*.egg-info/
+# Logs
+*.log
 
-# Dependencies
-venv/
-.venv/
+# Environment
 .env
 .env.local
 .env.*
 
-# Logs
-*.log
+# Dependencies
+.venv/
+venv/
+.env/
 
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
+
+# Build artifacts
+dist/
+build/
+target/
+*.egg-info/
 
 # Coverage
 .coverage
-coverage/
 htmlcov/
+coverage/
 
-# Distribution / packaging
-dist/
-build/
-*.egg
-*.whl
-pip-log.txt
-pip-delete-this-directory.txt
+# Temporary files
+*.tmp
+*.swp
+*.swo
 
-# Pytest
-.pytest_cache/
+# OS
+.DS_Store
+Thumbs.db
 ```

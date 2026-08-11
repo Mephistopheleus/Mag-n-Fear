@@ -1,380 +1,245 @@
 """
-ScenarioWriter v2.0 - Генератор сценариев на основе единой модели рынка.
+ScenarioWriter v3.0 - Конвейер генерации торговых идей.
 
 Принципы работы:
-1. Получает от MarketSynthesizer полную модель рынка (тренд, уровни, настроение).
-2. Генерирует сценарии для разных горизонтов (Scalp, Trap, Swing), согласованные с моделью.
-3. Не принимает решений о входе, только формирует гипотезы "Что если?".
-4. Каждый сценарий содержит: тип, направление, цену входа, цели, стоп, обоснование.
+1. Получает данные от ВСЕХ анализаторов (не через MarketSynthesizer, а напрямую из MatrixProbabilityField).
+2. Генерирует ТОРГОВЫЕ ИДЕИ (TradeIdea) для всех возможных сценариев без фильтрации.
+3. Не принимает решений о входе, только формирует гипотезы "Что если?" с полной геометрией.
+4. Каждый сценарий содержит: тип (ScenarioType), направление, цену входа, цели, стоп, обоснование, рекомендуемое плечо.
+5. Помечает каждый сценарий тегом scenario_type для обучения AutoTuner.
+6. Передает ВСЕ идеи в RiskManager для фильтрации и выбора лучших.
 """
 
 import logging
 from typing import List, Dict, Any, Optional
-from dataclasses import dataclass, asdict
 from datetime import datetime
+
+from src.core.trade_idea import TradeIdea, ScenarioType
+from src.matrix.probability_field import MatrixProbabilityField
 
 logger = logging.getLogger(__name__)
 
-@dataclass
-class TradeScenario:
-    """Структура торгового сценария."""
-    scenario_id: str
-    timestamp: float
-    symbol: str
-    strategy_type: str  # 'scalp', 'trap', 'swing'
-    direction: str      # 'LONG', 'SHORT'
-    entry_price: float
-    target_price: float
-    stop_loss: float
-    confidence: float   # 0.0 - 1.0 (насколько сценарий соответствует модели рынка)
-    time_horizon_sec: int
-    reasoning: str      # Текстовое обоснование
-    risk_reward_ratio: float
-    
-    # Данные анализаторов для обучения AutoTuner
-    analyzer_trend_useful: bool = False
-    analyzer_mean_reversion_useful: bool = False
-    analyzer_order_flow_useful: bool = False
-    analyzer_volatility_useful: bool = False
-    analyzer_matrix_useful: bool = False
-    
-    analyzer_trend_confidence: float = 0.0
-    analyzer_mean_reversion_confidence: float = 0.0
-    analyzer_order_flow_confidence: float = 0.0
-    analyzer_volatility_confidence: float = 0.0
-    analyzer_matrix_confidence: float = 0.0
-    
-    # Данные о рыночных условиях
-    market_trend: str = "NEUTRAL"
-    market_volatility: float = 0.0
-    market_volume: float = 0.0
-    
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
 
 class ScenarioWriter:
-    def __init__(self, config: Dict[str, Any], prob_field, risk_manager, matrix_analyzer):
+    """
+    Конвейер генерации торговых идей.
+    Работает напрямую с MatrixProbabilityField и данными анализаторов.
+    """
+    def __init__(self, config: Dict[str, Any], prob_field: MatrixProbabilityField):
         self.config = config
         self.prob_field = prob_field
-        self.risk_manager = risk_manager
-        self.matrix_analyzer = matrix_analyzer
-        self.symbol = config.get('symbol', 'DOGEUSDT')
-        self.min_confidence = config.get('min_scenario_confidence', 0.6)
+        self.symbol = config.get('symbol', 'BTCUSDT')
         
-        # Параметры для разных стратегий
-        self.strategies = {
-            'scalp': {
-                'min_rr': 1.5,
-                'time_horizon': (60, 300),  # 1-5 минут
-                'target_mult': (0.005, 0.015) # 0.5% - 1.5% движения
-            },
-            'trap': {
-                'min_rr': 2.0,
-                'time_horizon': (300, 900), # 5-15 минут
-                'target_mult': (0.01, 0.03) # 1% - 3% движения (отскок)
-            },
-            'swing': {
-                'min_rr': 2.5,
-                'time_horizon': (900, 3600), # 15 мин - 1 час
-                'target_mult': (0.02, 0.05) # 2% - 5% движения
-            }
+        # Параметры для разных типов сценариев (настраиваемые через TUNABLE_PARAMS)
+        self.scenario_params = {
+            ScenarioType.SCALPING_LONG: {'min_rr': 1.5, 'time_horizon': (60, 300), 'target_move_pct': (0.005, 0.015)},
+            ScenarioType.SCALPING_SHORT: {'min_rr': 1.5, 'time_horizon': (60, 300), 'target_move_pct': (0.005, 0.015)},
+            ScenarioType.BREAKOUT_LONG: {'min_rr': 2.0, 'time_horizon': (300, 900), 'target_move_pct': (0.01, 0.03)},
+            ScenarioType.BREAKOUT_SHORT: {'min_rr': 2.0, 'time_horizon': (300, 900), 'target_move_pct': (0.01, 0.03)},
+            ScenarioType.PULLBACK_LONG: {'min_rr': 2.0, 'time_horizon': (180, 600), 'target_move_pct': (0.008, 0.02)},
+            ScenarioType.PULLBACK_SHORT: {'min_rr': 2.0, 'time_horizon': (180, 600), 'target_move_pct': (0.008, 0.02)},
+            ScenarioType.REVERSAL_LONG: {'min_rr': 2.5, 'time_horizon': (600, 1800), 'target_move_pct': (0.02, 0.05)},
+            ScenarioType.REVERSAL_SHORT: {'min_rr': 2.5, 'time_horizon': (600, 1800), 'target_move_pct': (0.02, 0.05)},
+            ScenarioType.LIQUIDITY_RUN: {'min_rr': 3.0, 'time_horizon': (900, 2700), 'target_move_pct': (0.03, 0.08)},
+            ScenarioType.MEAN_REVERSION: {'min_rr': 2.0, 'time_horizon': (300, 1200), 'target_move_pct': (0.01, 0.025)},
+            ScenarioType.ARBITRAGE_CORRELATION: {'min_rr': 1.8, 'time_horizon': (120, 600), 'target_move_pct': (0.005, 0.012)},
         }
-
-    def generate_scenarios(self, market_model: Dict[str, Any], current_price: float) -> List[TradeScenario]:
-        """
-        Генерирует список сценариев на основе модели рынка от Synthesizer.
         
-        Args:
-            market_model: Словарь с данными от MarketSynthesizer:
-                - trend: 'BULLISH', 'BEARISH', 'SIDEWAYS'
-                - strength: 0.0 - 1.0
-                - key_levels: {'support': [...], 'resistance': [...]}
-                - sentiment: 0.0 - 1.0 (общее настроение)
-                - volatility: текущая волатильность
-            current_price: Текущая цена актива.
-            
-        Returns:
-            Список объектов TradeScenario.
+        logger.info("ScenarioWriter v3.0 инициализирован. Режим: КОНВЕЙЕР ИДЕЙ")
+
+    def generate_all_ideas(self, current_price: float, market_context: Dict[str, Any]) -> List[TradeIdea]:
         """
-        scenarios = []
+        Генерирует ВСЕ возможные торговые идеи на основе данных из MatrixProbabilityField.
+        Не фильтрует идеи - это задача RiskManager.
+        """
+        ideas = []
         timestamp = datetime.now().timestamp()
         
-        trend = market_model.get('trend', 'SIDEWAYS')
-        strength = market_model.get('strength', 0.5)
-        key_levels = market_model.get('key_levels', {'support': [], 'resistance': []})
-        sentiment = market_model.get('sentiment', 0.5)
-        volatility = market_model.get('volatility', 0.01)
+        logger.info(f"Генерация идей для {self.symbol}. Цена: {current_price:.4f}")
         
-        logger.info(f"Генерация сценариев для {self.symbol}. Тренд: {trend}, Сила: {strength:.2f}")
-
-        # 1. Сценарии по тренду (Scalp и Swing)
-        if trend != 'SIDEWAYS' and strength > 0.4:
-            direction = 'LONG' if trend == 'BULLISH' else 'SHORT'
-            
-            # Скальпинг по тренду
-            scalp_scen = self._create_trend_scenario(
-                'scalp', direction, current_price, key_levels, volatility, strength, timestamp
-            )
-            if scalp_scen:
-                scenarios.append(scalp_scen)
-            
-            # Свинг по тренду (если сила тренда высокая)
-            if strength > 0.7:
-                swing_scen = self._create_trend_scenario(
-                    'swing', direction, current_price, key_levels, volatility, strength, timestamp
-                )
-                if swing_scen:
-                    scenarios.append(swing_scen)
-
-        # 2. Сценарии "Ловушка" (против текущего движения у уровней)
-        trap_scenarios = self._create_trap_scenarios(current_price, key_levels, trend, strength, timestamp)
-        scenarios.extend(trap_scenarios)
-
-        # 3. Сценарии для боковика (если тренд слабый)
-        if trend == 'SIDEWAYS' or strength < 0.3:
-            range_scenarios = self._create_range_scenarios(current_price, key_levels, volatility, timestamp)
-            scenarios.extend(range_scenarios)
-
-        # ВАЖНО: Возвращаем ВСЕ сценарии, фильтрация будет в RiskManager
-        # Это нужно для обучения AutoTuner на полных данных
-        for scen in scenarios:
-            min_rr_req = self.strategies[scen.strategy_type]['min_rr']
-            if scen.confidence >= self.min_confidence and scen.risk_reward_ratio >= min_rr_req:
-                logger.info(f"Сценарий принят: {scen.scenario_id} ({scen.strategy_type}) RR={scen.risk_reward_ratio:.2f}, confidence={scen.confidence:.2f}")
-            else:
-                logger.debug(f"Сценарий отклонен на уровне Writer: {scen.scenario_id} (низкая уверенность или плохой RR). confidence={scen.confidence:.2f}, RR={scen.risk_reward_ratio:.2f}, required_RR={min_rr_req:.2f}")
-
-        return scenarios  # Возвращаем все сценарии для дальнейшей проверки в RiskManager
-
-    def _create_trend_scenario(self, strat_type: str, direction: str, price: float, 
-                               levels: Dict, vol: float, strength: float, ts: float) -> Optional[TradeScenario]:
-        """Создает сценарий движения по тренду."""
-        params = self.strategies[strat_type]
+        # Получаем данные из MatrixProbabilityField напрямую
+        field_data = self.prob_field.get_latest_snapshot()
         
-        if direction == 'LONG':
-            nearest_res = self._find_nearest_level(levels.get('resistance', []), price, above=True)
-            target_pct = self._calc_target_pct(params['target_mult'], strength)
-            target = max(nearest_res, price * (1 + target_pct)) if nearest_res else price * (1 + target_pct)
-            
-            nearest_sup = self._find_nearest_level(levels.get('support', []), price, above=False)
-            stop_pct = vol * 1.5
-            stop = min(nearest_sup, price * (1 - stop_pct)) if nearest_sup else price * (1 - stop_pct)
-            
-            reasoning = f"Тренд {direction}. Сила {strength:.2f}. Цель на уровне {nearest_res or 'процентном'}."
-        else:
-            nearest_sup = self._find_nearest_level(levels.get('support', []), price, above=False)
-            target_pct = self._calc_target_pct(params['target_mult'], strength)
-            target = min(nearest_sup, price * (1 - target_pct)) if nearest_sup else price * (1 - target_pct)
-            
-            nearest_res = self._find_nearest_level(levels.get('resistance', []), price, above=True)
-            stop_pct = vol * 1.5
-            stop = max(nearest_res, price * (1 + stop_pct)) if nearest_res else price * (1 + stop_pct)
-            
-            reasoning = f"Тренд {direction}. Сила {strength:.2f}. Цель на уровне {nearest_sup or 'процентном'}."
+        # 1. Генерируем идеи на основе паттернов
+        pattern_ideas = self._generate_pattern_ideas(field_data, current_price, timestamp)
+        ideas.extend(pattern_ideas)
+        
+        # 2. Генерируем идеи на основе ликвидности
+        liquidity_ideas = self._generate_liquidity_ideas(field_data, current_price, timestamp)
+        ideas.extend(liquidity_ideas)
+        
+        # 3. Генерируем идеи на основе тренда
+        trend_ideas = self._generate_trend_ideas(field_data, current_price, timestamp)
+        ideas.extend(trend_ideas)
+        
+        # 4. Генерируем идеи на основе возврата к среднему
+        mean_rev_ideas = self._generate_mean_reversion_ideas(field_data, current_price, timestamp)
+        ideas.extend(mean_rev_ideas)
+        
+        # 5. Генерируем идеи на основе корреляций
+        arb_ideas = self._generate_arbitrage_ideas(field_data, current_price, timestamp)
+        ideas.extend(arb_ideas)
+        
+        logger.info(f"Сгенерировано {len(ideas)} торговых идей. Передача в RiskManager.")
+        return ideas
 
-        if stop == 0 or target == 0 or stop == price or target == price:
+    def _generate_pattern_ideas(self, field_data: Dict, price: float, ts: float) -> List[TradeIdea]:
+        """Генерирует идеи на основе графических паттернов."""
+        ideas = []
+        patterns = field_data.get('graph_patterns', [])
+        
+        for pattern in patterns:
+            pattern_type = pattern.get('type', '')
+            confidence = pattern.get('confidence', 0.5)
+            breakout_direction = pattern.get('breakout_direction', 0)
+            target_price = pattern.get('target_price', price)
+            neckline = pattern.get('neckline', price)
+            
+            if breakout_direction > 0:
+                scenario_type = ScenarioType.BREAKOUT_LONG if confidence > 0.7 else ScenarioType.PULLBACK_LONG
+                idea = self._create_idea(scenario_type, 1, price, neckline * 0.995, target_price, 
+                                        target_price, 600, confidence, f"Паттерн {pattern_type}: пробой вверх", 
+                                        [f"pattern_{pattern_type}", "breakout"], ts)
+                if idea: ideas.append(idea)
+            elif breakout_direction < 0:
+                scenario_type = ScenarioType.BREAKOUT_SHORT if confidence > 0.7 else ScenarioType.PULLBACK_SHORT
+                idea = self._create_idea(scenario_type, -1, price, neckline * 1.005, target_price,
+                                        target_price, 600, confidence, f"Паттерн {pattern_type}: пробой вниз",
+                                        [f"pattern_{pattern_type}", "breakdown"], ts)
+                if idea: ideas.append(idea)
+        return ideas
+
+    def _generate_liquidity_ideas(self, field_data: Dict, price: float, ts: float) -> List[TradeIdea]:
+        """Генерирует идеи на основе карты ликвидности."""
+        ideas = []
+        liq_data = field_data.get('liquidity_map', {})
+        poc_price = liq_data.get('poc_price')
+        zones = liq_data.get('zones', [])
+        
+        if not poc_price:
+            return ideas
+        
+        dist_to_poc = abs(price - poc_price) / price
+        if dist_to_poc > 0.002:
+            direction = 1 if price < poc_price else -1
+            scenario_type = ScenarioType.LIQUIDITY_RUN
+            stop_mult = 0.99 if direction == 1 else 1.01
+            idea = self._create_idea(scenario_type, direction, price, price * stop_mult, poc_price,
+                                    poc_price, 900, 0.65, f"Движение к POC ({poc_price:.4f})",
+                                    ["liquidity_run", "poc_magnet"], ts)
+            if idea: ideas.append(idea)
+        
+        for zone in zones:
+            if zone.get('type') == 'void' and zone.get('strength', 0) > 0.5:
+                void_low, void_high = zone.get('low', price), zone.get('high', price)
+                if price > void_high:
+                    idea = self._create_idea(ScenarioType.BREAKOUT_SHORT, -1, price, void_high * 1.01, void_low,
+                                            void_low, 300, 0.6, f"Пробой вакуума вниз до {void_low:.4f}",
+                                            ["void_breakdown"], ts)
+                    if idea: ideas.append(idea)
+                elif price < void_low:
+                    idea = self._create_idea(ScenarioType.BREAKOUT_LONG, 1, price, void_low * 0.99, void_high,
+                                            void_high, 300, 0.6, f"Пробой вакуума вверх до {void_high:.4f}",
+                                            ["void_breakout"], ts)
+                    if idea: ideas.append(idea)
+        return ideas
+
+    def _generate_trend_ideas(self, field_data: Dict, price: float, ts: float) -> List[TradeIdea]:
+        """Генерирует идеи на основе трендовых анализаторов."""
+        ideas = []
+        trend_data = field_data.get('g_trend', {})
+        trend_direction = trend_data.get('direction', 'NEUTRAL')
+        trend_strength = trend_data.get('strength', 0.5)
+        channel_lower = trend_data.get('lower_bound', price * 0.99)
+        channel_upper = trend_data.get('upper_bound', price * 1.01)
+        
+        if trend_direction == 'UP' and trend_strength > 0.6:
+            scenario_type = ScenarioType.PULLBACK_LONG if price > channel_lower * 1.005 else ScenarioType.SCALPING_LONG
+            idea = self._create_idea(scenario_type, 1, price, channel_lower * 0.995, channel_upper,
+                                    channel_upper, 400, trend_strength, f"Тренд вверх (сила {trend_strength:.2f})",
+                                    ["trend_following", "channel_bounce"], ts)
+            if idea: ideas.append(idea)
+        elif trend_direction == 'DOWN' and trend_strength > 0.6:
+            scenario_type = ScenarioType.PULLBACK_SHORT if price < channel_upper * 0.995 else ScenarioType.SCALPING_SHORT
+            idea = self._create_idea(scenario_type, -1, price, channel_upper * 1.005, channel_lower,
+                                    channel_lower, 400, trend_strength, f"Тренд вниз (сила {trend_strength:.2f})",
+                                    ["trend_following", "channel_rejection"], ts)
+            if idea: ideas.append(idea)
+        return ideas
+
+    def _generate_mean_reversion_ideas(self, field_data: Dict, price: float, ts: float) -> List[TradeIdea]:
+        """Генерирует идеи на основе возврата к среднему."""
+        ideas = []
+        mr_data = field_data.get('mean_reversion', {})
+        rsi = mr_data.get('rsi', 50)
+        bb_upper = mr_data.get('bb_upper', price * 1.02)
+        bb_lower = mr_data.get('bb_lower', price * 0.98)
+        bb_middle = mr_data.get('bb_middle', price)
+        
+        if rsi < 30:
+            idea = self._create_idea(ScenarioType.MEAN_REVERSION, 1, price, bb_lower * 0.99, bb_middle,
+                                    bb_middle, 600, 0.7, f"Перепроданность (RSI={rsi:.1f})",
+                                    ["mean_reversion", "oversold"], ts)
+            if idea: ideas.append(idea)
+        elif rsi > 70:
+            idea = self._create_idea(ScenarioType.MEAN_REVERSION, -1, price, bb_upper * 1.01, bb_middle,
+                                    bb_middle, 600, 0.7, f"Перекупленность (RSI={rsi:.1f})",
+                                    ["mean_reversion", "overbought"], ts)
+            if idea: ideas.append(idea)
+        return ideas
+
+    def _generate_arbitrage_ideas(self, field_data: Dict, price: float, ts: float) -> List[TradeIdea]:
+        """Генерирует идеи на основе корреляций."""
+        ideas = []
+        corr_data = field_data.get('correlations', {})
+        btc_corr = corr_data.get('BTCUSDT', {})
+        coeff = btc_corr.get('coefficient', 0.8)
+        divergence = btc_corr.get('divergence_pct', 0.0)
+        
+        if abs(divergence) > 0.01 and coeff > 0.7:
+            direction = 1 if divergence > 0 else -1
+            tp_mult = 1.015 if direction > 0 else 0.985
+            stop_mult = 0.99 if direction > 0 else 1.01
+            idea = self._create_idea(ScenarioType.ARBITRAGE_CORRELATION, direction, price, price * stop_mult,
+                                    price * tp_mult, price * tp_mult, 300, 0.65,
+                                    f"Корреляционный арбитраж с BTC ({divergence*100:.2f}%)",
+                                    ["correlation_arb", "btc_pair"], ts)
+            if idea: ideas.append(idea)
+        return ideas
+
+    def _create_idea(self, scenario_type: ScenarioType, direction: int, entry: float,
+                     stop: float, tp: float, target_price: float, target_time_sec: int,
+                     confidence: float, reason: str, logic_tags: List[str], timestamp: float) -> Optional[TradeIdea]:
+        """Создает объект TradeIdea с расчетом рекомендуемого плеча."""
+        params = self.scenario_params.get(scenario_type, {'min_rr': 1.5})
+        min_rr = params['min_rr']
+        
+        risk = (entry - stop) if direction == 1 else (stop - entry)
+        reward = (tp - entry) if direction == 1 else (entry - tp)
+        
+        if risk <= 0 or reward <= 0:
             return None
-
-        rr = abs(target - price) / abs(price - stop)
-        confidence = strength * 0.8 + 0.2
         
-        # Заполняем данные анализаторов для обучения AutoTuner
-        # Trend analyzer активен когда есть явный тренд
-        trend_useful = strength > 0.6
-        trend_confidence = strength
+        rr = reward / risk
+        if rr < min_rr:
+            return None
         
-        # Mean reversion полезен в боковике или против сильного тренда
-        mean_rev_useful = strength < 0.4 or (direction == 'SHORT' and strength > 0.8) or (direction == 'LONG' and strength > 0.8)
-        mean_rev_confidence = 1.0 - strength if strength < 0.4 else 0.3
+        dist_to_sl_pct = abs(risk / entry * 100)
+        recommended_leverage = min(10.0, 2.0 / dist_to_sl_pct) if dist_to_sl_pct > 0 else 1.0
         
-        # Order flow важен при пробоях уровней
-        order_flow_useful = strength > 0.5
-        order_flow_confidence = strength * 0.7
-        
-        # Volatility analyzer всегда полезен для расчета стопов
-        vol_useful = True
-        vol_confidence = 0.8
-        
-        # Matrix analyzer полезен при наличии кластеров
-        matrix_useful = True
-        matrix_confidence = 0.6
-        
-        return TradeScenario(
-            scenario_id=f"{strat_type}_{direction}_{int(ts)}",
-            timestamp=ts,
+        return TradeIdea(
             symbol=self.symbol,
-            strategy_type=strat_type,
+            scenario_type=scenario_type,
             direction=direction,
-            entry_price=price,
-            target_price=target,
-            stop_loss=stop,
+            entry_price=entry,
+            stop_loss_price=stop,
+            take_profit_price=tp,
+            target_price=target_price,
+            target_time_sec=target_time_sec,
+            expected_volatility=0.02,
             confidence=confidence,
-            time_horizon_sec=int((params['time_horizon'][0] + params['time_horizon'][1]) / 2),
-            reasoning=reasoning,
-            risk_reward_ratio=rr,
-            # Данные анализаторов
-            analyzer_trend_useful=trend_useful,
-            analyzer_mean_reversion_useful=mean_rev_useful,
-            analyzer_order_flow_useful=order_flow_useful,
-            analyzer_volatility_useful=vol_useful,
-            analyzer_matrix_useful=matrix_useful,
-            analyzer_trend_confidence=trend_confidence,
-            analyzer_mean_reversion_confidence=mean_rev_confidence,
-            analyzer_order_flow_confidence=order_flow_confidence,
-            analyzer_volatility_confidence=vol_confidence,
-            analyzer_matrix_confidence=matrix_confidence,
-            # Рыночные условия
-            market_trend=self._get_trend_from_direction(direction),
-            market_volatility=vol,
-            market_volume=1.0  # Заглушка, будет заменено на реальные данные
+            logic_tags=logic_tags,
+            reason=reason,
+            recommended_leverage=recommended_leverage,
+            matrix_snapshot={}
         )
-    
-    def _get_trend_from_direction(self, direction: str) -> str:
-        """Преобразует направление сделки в тренд."""
-        return "BULLISH" if direction == "LONG" else "BEARISH"
-
-    def _create_trap_scenarios(self, price: float, levels: Dict, trend: str, strength: float, ts: float) -> List[TradeScenario]:
-        """Создает сценарии ловушек у уровней."""
-        scenarios = []
-        params = self.strategies['trap']
-        
-        for level in levels.get('resistance', []):
-            if 0 < (level - price) / price < 0.01:
-                target = price * (1 - params['target_mult'][1])
-                stop = level * 1.005
-                rr = abs(target - price) / abs(stop - price)
-                if rr >= params['min_rr']:
-                    scenarios.append(TradeScenario(
-                        scenario_id=f"trap_SHORT_{int(ts)}",
-                        timestamp=ts, symbol=self.symbol, strategy_type='trap',
-                        direction='SHORT', entry_price=price, target_price=target,
-                        stop_loss=stop, confidence=0.75,
-                        time_horizon_sec=600,
-                        reasoning=f"Ловушка у сопротивления {level:.4f}.",
-                        risk_reward_ratio=rr,
-                        # Данные анализаторов для trap-сценариев
-                        analyzer_trend_useful=False,  # Trap играет против тренда
-                        analyzer_mean_reversion_useful=True,  # Mean reversion ключевой для trap
-                        analyzer_order_flow_useful=True,  # Важен поток для подтверждения ложного пробоя
-                        analyzer_volatility_useful=True,
-                        analyzer_matrix_useful=True,
-                        analyzer_trend_confidence=0.2,
-                        analyzer_mean_reversion_confidence=0.85,
-                        analyzer_order_flow_confidence=0.75,
-                        analyzer_volatility_confidence=0.8,
-                        analyzer_matrix_confidence=0.65,
-                        market_trend="BEARISH" if trend == "BULLISH" else "BULLISH",  # Контр-тренд
-                        market_volatility=params['target_mult'][1],
-                        market_volume=1.2  # Повышенный объем у уровней
-                    ))
-
-        for level in levels.get('support', []):
-            if 0 < (price - level) / price < 0.01:
-                target = price * (1 + params['target_mult'][1])
-                stop = level * 0.995
-                rr = abs(target - price) / abs(price - stop)
-                if rr >= params['min_rr']:
-                    scenarios.append(TradeScenario(
-                        scenario_id=f"trap_LONG_{int(ts)}",
-                        timestamp=ts, symbol=self.symbol, strategy_type='trap',
-                        direction='LONG', entry_price=price, target_price=target,
-                        stop_loss=stop, confidence=0.75,
-                        time_horizon_sec=600,
-                        reasoning=f"Ловушка у поддержки {level:.4f}.",
-                        risk_reward_ratio=rr,
-                        # Данные анализаторов для trap-сценариев
-                        analyzer_trend_useful=False,  # Trap играет против тренда
-                        analyzer_mean_reversion_useful=True,  # Mean reversion ключевой для trap
-                        analyzer_order_flow_useful=True,  # Важен поток для подтверждения ложного пробоя
-                        analyzer_volatility_useful=True,
-                        analyzer_matrix_useful=True,
-                        analyzer_trend_confidence=0.2,
-                        analyzer_mean_reversion_confidence=0.85,
-                        analyzer_order_flow_confidence=0.75,
-                        analyzer_volatility_confidence=0.8,
-                        analyzer_matrix_confidence=0.65,
-                        market_trend="BULLISH" if trend == "BEARISH" else "BEARISH",  # Контр-тренд
-                        market_volatility=params['target_mult'][1],
-                        market_volume=1.2  # Повышенный объем у уровней
-                    ))
-        return scenarios
-
-    def _create_range_scenarios(self, price: float, levels: Dict, vol: float, ts: float) -> List[TradeScenario]:
-        """Сценарии для бокового движения."""
-        scenarios = []
-        
-        sup = self._find_nearest_level(levels.get('support', []), price, above=False)
-        res = self._find_nearest_level(levels.get('resistance', []), price, above=True)
-        
-        if sup and (price - sup) / price < 0.02:
-            target = (sup + res) / 2 if res else price * 1.01
-            stop = sup * 0.995
-            rr = abs(target - price) / abs(price - stop)
-            if rr >= 1.5:
-                scenarios.append(TradeScenario(
-                    scenario_id=f"range_LONG_{int(ts)}",
-                    timestamp=ts, symbol=self.symbol, strategy_type='scalp',
-                    direction='LONG', entry_price=price, target_price=target,
-                    stop_loss=stop, confidence=0.65,
-                    time_horizon_sec=180,
-                    reasoning=f"Боковик. Покупка у поддержки {sup:.4f}.",
-                    risk_reward_ratio=rr,
-                    # Данные анализаторов для range-сценариев
-                    analyzer_trend_useful=False,  # Тренд не важен в боковике
-                    analyzer_mean_reversion_useful=True,  # Mean reversion ключевой
-                    analyzer_order_flow_useful=False,
-                    analyzer_volatility_useful=True,
-                    analyzer_matrix_useful=True,
-                    analyzer_trend_confidence=0.1,
-                    analyzer_mean_reversion_confidence=0.8,
-                    analyzer_order_flow_confidence=0.3,
-                    analyzer_volatility_confidence=0.7,
-                    analyzer_matrix_confidence=0.6,
-                    market_trend="SIDEWAYS",
-                    market_volatility=vol * 0.8,  # В боковике волатильность ниже
-                    market_volume=0.8  # Объем ниже в боковике
-                ))
-                
-        if res and (res - price) / price < 0.02:
-            target = (sup + res) / 2 if sup else price * 0.99
-            stop = res * 1.005
-            rr = abs(target - price) / abs(stop - price)
-            if rr >= 1.5:
-                scenarios.append(TradeScenario(
-                    scenario_id=f"range_SHORT_{int(ts)}",
-                    timestamp=ts, symbol=self.symbol, strategy_type='scalp',
-                    direction='SHORT', entry_price=price, target_price=target,
-                    stop_loss=stop, confidence=0.65,
-                    time_horizon_sec=180,
-                    reasoning=f"Боковик. Продажа у сопротивления {res:.4f}.",
-                    risk_reward_ratio=rr,
-                    # Данные анализаторов для range-сценариев
-                    analyzer_trend_useful=False,  # Тренд не важен в боковике
-                    analyzer_mean_reversion_useful=True,  # Mean reversion ключевой
-                    analyzer_order_flow_useful=False,
-                    analyzer_volatility_useful=True,
-                    analyzer_matrix_useful=True,
-                    analyzer_trend_confidence=0.1,
-                    analyzer_mean_reversion_confidence=0.8,
-                    analyzer_order_flow_confidence=0.3,
-                    analyzer_volatility_confidence=0.7,
-                    analyzer_matrix_confidence=0.6,
-                    market_trend="SIDEWAYS",
-                    market_volatility=vol * 0.8,  # В боковике волатильность ниже
-                    market_volume=0.8  # Объем ниже в боковике
-                ))
-        return scenarios
-
-    def _find_nearest_level(self, levels_list: List[float], price: float, above: bool) -> Optional[float]:
-        """Находит ближайший уровень выше или ниже цены."""
-        if not levels_list:
-            return None
-        filtered = [l for l in levels_list if (l > price if above else l < price)]
-        if not filtered:
-            return None
-        return min(filtered) if above else max(filtered)
-
-    def _calc_target_pct(self, mult_range: tuple, strength: float) -> float:
-        """Расчет процента движения цели."""
-        min_p, max_p = mult_range
-        return min_p + (max_p - min_p) * strength
