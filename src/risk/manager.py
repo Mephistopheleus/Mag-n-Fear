@@ -379,44 +379,119 @@ class RiskManager:
 
     def _update_trailing_stop(self, shadow: Dict, current_price: float, volatility: float) -> float:
         """
-        Логика адаптивного трейлинг-стопа.
-        Двигает стоп только в направлении прибыли.
-        Расстояние до стопа зависит от волатильности (ATR аналог).
+        Трёхуровневый адаптивный трейлинг-стоп.
+        
+        УРОВЕНЬ 1: Активация (Безубыток) - при достижении activation_pct
+        УРОВЕНЬ 2: Подтягивание (Trailing Step) - динамическое расстояние на основе волатильности
+        УРОВЕНЬ 3: Замок прибыли (Profit Lock) - уплотнение стопа при сильном движении
+        
+        :param shadow: Данные теневой позиции
+        :param current_price: Текущая цена
+        :param volatility: Индекс волатильности
+        :return: Новый уровень стоп-лосса
         """
         side = shadow.get('side', 'LONG')
         current_stop = shadow.get('current_stop_loss', 0)
         entry_price = shadow.get('entry_price', current_price)
         
-        # Динамическое расстояние стопа: база + волатильность * коэффициент
-        # Коэффициент можно крутить через AutoTuner (пока хардкод 2.0 для примера)
-        trail_multiplier = self.config.get('risk', {}).get('trail_multiplier', 2.0)
-        base_distance = entry_price * 0.005 # Базовый отступ 0.5%
-        vol_distance = current_price * volatility * trail_multiplier
+        # Расчет текущего PnL в процентах
+        if side == 'LONG':
+            pnl_pct = (current_price - entry_price) / entry_price * 100 if entry_price > 0 else 0
+        else:
+            pnl_pct = (entry_price - current_price) / entry_price * 100 if entry_price > 0 else 0
         
-        dynamic_distance = max(base_distance, vol_distance)
+        # Получаем настройки из конфига (с дефолтами)
+        trailing_cfg = self.config.get('TUNABLE_PARAMS', {}).get('trailing_stop', {})
+        if not trailing_cfg:
+            # Fallback на старый формат конфига
+            trailing_cfg = self.config.get('risk', {}).get('trailing_stop', {})
+        
+        # === НАСТРОЙКИ УРОВНЯ 1: АКТИВАЦИЯ ===
+        activation_pct = trailing_cfg.get('activation_pct', 0.5)  # % движения для активации
+        breakeven_trigger_pct = trailing_cfg.get('breakeven_trigger_pct', 0.3)  # % от входа для безубытка
+        
+        # === НАСТРОЙКИ УРОВНЯ 2: ПОДТЯГИВАНИЕ ===
+        trail_step_pct = trailing_cfg.get('trail_step_pct', 0.2)  # Шаг подтягивания в %
+        trail_distance_atr_mult = trailing_cfg.get('trail_distance_atr_mult', 1.5)  # Множитель волатильности
+        
+        # === НАСТРОЙКИ УРОВНЯ 3: ЗАМОК ПРИБЫЛИ ===
+        profit_lock_trigger_pct = trailing_cfg.get('profit_lock_trigger_pct', 2.0)  # % для замка прибыли
+        tight_stop_atr_mult = trailing_cfg.get('tight_stop_atr_mult', 1.0)  # Уплотненный множитель
         
         new_stop = current_stop
         
+        # =========================================================================
+        # === УРОВЕНЬ 1: АКТИВАЦИЯ (Безубыток) ===
+        # =========================================================================
+        if pnl_pct >= activation_pct:
+            # Активируем трейлинг - двигаем стоп в безубыток
+            if side == 'LONG':
+                breakeven_stop = entry_price * (1 + breakeven_trigger_pct / 100)
+                if current_stop < breakeven_stop:
+                    new_stop = breakeven_stop
+                    logger.debug(f"[Trail L1] {shadow.get('symbol', 'UNK')}: Activated breakeven at {breakeven_stop:.5f} (PnL={pnl_pct:.2f}%)")
+            else:  # SHORT
+                breakeven_stop = entry_price * (1 - breakeven_trigger_pct / 100)
+                if current_stop == 0 or current_stop > breakeven_stop:
+                    new_stop = breakeven_stop
+                    logger.debug(f"[Trail L1] {shadow.get('symbol', 'UNK')}: Activated breakeven at {breakeven_stop:.5f} (PnL={pnl_pct:.2f}%)")
+        
+        # =========================================================================
+        # === УРОВЕНЬ 3: ЗАМОК ПРИБЫЛИ (Проверяем ДО уровня 2) ===
+        # =========================================================================
+        if pnl_pct >= profit_lock_trigger_pct:
+            # Сильное движение в нашу пользу - уплотняем стоп для защиты прибыли
+            tight_distance = current_price * volatility * tight_stop_atr_mult
+            
+            if side == 'LONG':
+                potential_stop = current_price - tight_distance
+                # Двигаем только вверх
+                if potential_stop > new_stop:
+                    new_stop = potential_stop
+                    logger.debug(f"[Trail L3] {shadow.get('symbol', 'UNK')}: Profit lock activated at {new_stop:.5f} (PnL={pnl_pct:.2f}%, tight_dist={tight_distance:.5f})")
+            else:  # SHORT
+                potential_stop = current_price + tight_distance
+                if new_stop == 0 or potential_stop < new_stop:
+                    new_stop = potential_stop
+                    logger.debug(f"[Trail L3] {shadow.get('symbol', 'UNK')}: Profit lock activated at {new_stop:.5f} (PnL={pnl_pct:.2f}%)")
+            
+            return new_stop  # Возвращаем сразу, не применяя уровень 2
+        
+        # =========================================================================
+        # === УРОВЕНЬ 2: ПОДТЯГИВАНИЕ (Trailing Step) ===
+        # =========================================================================
+        # Динамическое расстояние на основе волатильности
+        base_distance = entry_price * 0.005  # Базовый отступ 0.5%
+        vol_distance = current_price * volatility * trail_distance_atr_mult
+        dynamic_distance = max(base_distance, vol_distance)
+        
         if side == 'LONG':
-            # Для лонга стоп двигается только вверх
             potential_stop = current_price - dynamic_distance
-            if potential_stop > current_stop:
-                new_stop = potential_stop
-            # Не ниже цены входа (безубыток), если настроено
-            if self.config.get('risk', {}).get('break_even', False):
-                if potential_stop > entry_price and current_stop < entry_price:
-                    new_stop = entry_price
+            # Двигаем стоп только вверх
+            if potential_stop > new_stop:
+                # Округляем до шага трейлинга
+                step_size = entry_price * trail_step_pct / 100
+                if step_size > 0:
+                    stepped_stop = round(potential_stop / step_size) * step_size
+                    new_stop = max(stepped_stop, new_stop)
+                else:
+                    new_stop = potential_stop
                     
+                logger.debug(f"[Trail L2] {shadow.get('symbol', 'UNK')}: Trailing up to {new_stop:.5f} (dist={dynamic_distance:.5f}, step={step_size:.5f})")
+                
         elif side == 'SHORT':
-            # Для шорта стоп двигается только вниз
             potential_stop = current_price + dynamic_distance
-            if potential_stop < current_stop:
-                new_stop = potential_stop
-            # Безубыток
-            if self.config.get('risk', {}).get('break_even', False):
-                if potential_stop < entry_price and current_stop > entry_price:
-                    new_stop = entry_price
+            # Двигаем стоп только вниз
+            if new_stop == 0 or potential_stop < new_stop:
+                step_size = entry_price * trail_step_pct / 100
+                if step_size > 0:
+                    stepped_stop = round(potential_stop / step_size) * step_size
+                    new_stop = min(stepped_stop, new_stop) if new_stop > 0 else stepped_stop
+                else:
+                    new_stop = potential_stop
                     
+                logger.debug(f"[Trail L2] {shadow.get('symbol', 'UNK')}: Trailing down to {new_stop:.5f}")
+        
         return new_stop
 
     def _check_stop_hit(self, shadow: Dict, current_price: float) -> bool:
