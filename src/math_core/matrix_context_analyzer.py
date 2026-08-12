@@ -20,6 +20,7 @@ try:
     from .fibonacci_levels import FibonacciLevels
     from .fractal_patterns import FractalPatternAnalyzer
     from .market_regime import MarketRegimeDetector
+    from .multi_correlation_analyzer import MultiCorrelationAnalyzer
     ANALYZERS_AVAILABLE = True
 except ImportError as e:
     ANALYZERS_AVAILABLE = False
@@ -71,6 +72,7 @@ class MatrixContextAnalyzer:
             self.fib_analyzer = FibonacciLevels(config)
             self.pattern_analyzer = FractalPatternAnalyzer(config)
             self.slice_analyzer = MarketRegimeDetector(config)
+            self.corr_analyzer = MultiCorrelationAnalyzer(config)
         else:
             self.liquidity_analyzer = None
             self.atr_analyzer = None
@@ -78,6 +80,7 @@ class MatrixContextAnalyzer:
             self.fib_analyzer = None
             self.pattern_analyzer = None
             self.slice_analyzer = None
+            self.corr_analyzer = None
             
         self.last_regime: Optional[MarketRegime] = None
 

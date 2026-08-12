@@ -116,7 +116,7 @@ class TradingBot:
         self.lab = ScenarioLab(self.config)
         
         # Символы для торговли
-        self.symbols = self.config.data.symbols
+        self.symbols = self.config.system.data.get('symbols', ['DOGEUSDT', 'BTCUSDT'])
         
         # Для отслеживания карточек сделок (ШАГ 3: AutoTuner Loop)
         self.last_card_count = 0
@@ -230,7 +230,44 @@ class TradingBot:
                         continue
                     
                     # Собираем данные для синтезатора
-                    matrix_snapshot = self.prob_field.get_matrix_snapshot(symbol)
+                    # Получаем список PredictionPoint из поля вероятностей
+                    prediction_points = self.prob_field.get_matrix_snapshot(symbol)
+                    
+                    # Преобразуем список точек в словарь формата для MatrixContextAnalyzer
+                    matrix_snapshot = {
+                        'current_price': current_price,
+                        'atr': {'current_atr': 0.0},  # Заполнится ниже если есть данные
+                        'g_trend': {'direction': 0, 'strength': 0.5},
+                        'liquidity': {'poc_price': current_price, 'balance': 0.0, 'zones': []},
+                        'fibonacci': {'levels': []},
+                        'patterns': [],
+                        'prediction_points': prediction_points  # Сохраняем оригинальные точки
+                    }
+                    
+                    # Извлекаем данные из кластеров/точек прогноза
+                    for point in prediction_points:
+                        source = point.source.lower()
+                        if 'atr' in source or 'volatility' in source:
+                            matrix_snapshot['atr']['current_atr'] = point.probability * 2.0  # Конвертируем вероятность в ATR
+                        elif 'trend' in source or 'g_trend' in source:
+                            matrix_snapshot['g_trend']['direction'] = 1 if point.price > current_price else -1
+                            matrix_snapshot['g_trend']['strength'] = point.probability
+                        elif 'liquidity' in source or 'poc' in source:
+                            matrix_snapshot['liquidity']['poc_price'] = point.price
+                            matrix_snapshot['liquidity']['balance'] = point.probability * 2 - 1
+                        elif 'fibonacci' in source or 'fib' in source:
+                            matrix_snapshot['fibonacci']['levels'].append({
+                                'price': point.price,
+                                'type': f'F{int(point.probability * 100)}',
+                                'probability': point.probability
+                            })
+                        elif 'pattern' in source or 'fractal' in source:
+                            matrix_snapshot['patterns'].append({
+                                'target_price': point.price,
+                                'timeframe_seconds': point.time_sec,
+                                'confidence': point.probability,
+                                'type': source
+                            })
                     
                     # Запускаем MatrixContextAnalyzer для получения инсайтов
                     insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
@@ -342,14 +379,72 @@ class TradingBot:
                     
                     logger.debug(f"Market Model for {symbol}: Trend={market_model['trend']}, Strength={strength:.2f}, Vol={market_model_obj.volatility:.4f}")
                     
+                    # Собираем matrix_snapshot в формате, ожидаемом ScenarioWriter
+                    # Извлекаем данные из market_model, clusters и correlation_signals
+                    matrix_snapshot = {
+                        'graph_patterns': [],  # Заполняем из clusters с паттернами
+                        'liquidity_map': {
+                            'poc_price': current_price,  # Пока текущая цена, можно улучшить
+                            'zones': []
+                        },
+                        'g_trend': {
+                            'direction': trend_map.get(dominant_trend, 'NEUTRAL'),
+                            'strength': strength,
+                            'lower_bound': min(levels['support']) if levels['support'] else current_price * 0.99,
+                            'upper_bound': max(levels['resistance']) if levels['resistance'] else current_price * 1.01
+                        },
+                        'mean_reversion': {
+                            'rsi': 50,  # Пока дефолт, можно добавить расчет
+                            'bb_upper': current_price * 1.02,
+                            'bb_lower': current_price * 0.98,
+                            'bb_middle': current_price
+                        },
+                        'correlations': {
+                            'BTCUSDT': {
+                                'coefficient': symbol_corr.get('btc_integrated_correlation', 0.8),
+                                'divergence_pct': 0.0  # Можно рассчитать позже
+                            }
+                        }
+                    }
+                    
+                    # Заполняем graph_patterns из clusters
+                    for cluster in clusters:
+                        pattern_type = cluster.get('pattern_type', 'unknown')
+                        if pattern_type != 'unknown':
+                            matrix_snapshot['graph_patterns'].append({
+                                'type': pattern_type,
+                                'confidence': cluster.get('confidence', 0.5),
+                                'breakout_direction': 1 if cluster.get('probability', 0.5) > 0.5 else -1,
+                                'target_price': cluster.get('target_price', current_price),
+                                'neckline': current_price
+                            })
+                    
+                    # Заполняем liquidity zones из key_levels
+                    for supp in levels['support']:
+                        matrix_snapshot['liquidity_map']['zones'].append({
+                            'type': 'support',
+                            'price': supp,
+                            'strength': 0.7,
+                            'low': supp * 0.99,
+                            'high': supp * 1.01
+                        })
+                    for res in levels['resistance']:
+                        matrix_snapshot['liquidity_map']['zones'].append({
+                            'type': 'resistance',
+                            'price': res,
+                            'strength': 0.7,
+                            'low': res * 0.99,
+                            'high': res * 1.01
+                        })
+                    
                     # 2. Генерация торговых идей через ScenarioWriter
-                    # Передаем symbol, current_price и market_context в формате, ожидаемом ScenarioWriter
+                    # Передаем symbol, current_price и market_context с правильным matrix_snapshot
                     market_context = {
                         'market_model': market_model,
                         'clusters': clusters,
                         'analysis_points': analysis_points,
                         'regime_summary': self.matrix_context_analyzer.get_regime_summary(),
-                        'matrix_snapshot': {}  # Пустой словарь для совместимости (данные берутся из market_model)
+                        'matrix_snapshot': matrix_snapshot  # Теперь содержит реальные данные
                     }
                     
                     ideas = self.scenario_writer.generate_all_ideas(symbol, current_price, market_context)

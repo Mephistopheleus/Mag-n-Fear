@@ -96,9 +96,12 @@ class TradeIdea:
             "timestamp": self.timestamp,
             "symbol": self.symbol,
             "scenario_type": self.scenario_type.value,
+            "strategy_type": self.scenario_type.value,  # Алиас для совместимости с Executor/ShadowDealer
             "direction": "LONG" if self.direction == 1 else "SHORT",
             "entry_price": self.entry_price,
+            "stop_loss": self.stop_loss_price,  # Алиас для совместимости
             "stop_loss_price": self.stop_loss_price,
+            "take_profit": self.take_profit_price,  # Алиас для совместимости
             "take_profit_price": self.take_profit_price,
             "target_price": self.target_price,
             "target_time_sec": self.target_time_sec,

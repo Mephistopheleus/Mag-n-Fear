@@ -5,8 +5,8 @@ Core Module: Configuration Loader
 """
 import yaml
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
+from pydantic import BaseModel, Field, ConfigDict
+from typing import List, Dict, Optional, Any
 
 
 class BotConfig(BaseModel):
@@ -102,6 +102,8 @@ class ApiKeysConfig(BaseModel):
 
 class NewsConfig(BaseModel):
     """Конфигурация новостного агрегатора."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     finnhub_api_key: str = ""
     newsapi_key: str = ""
     fred_api_key: str = ""
@@ -113,20 +115,59 @@ class NewsConfig(BaseModel):
     
     # Период полураспада (секунды)
     news_half_life_sec: int = 900
+    
+    def get(self, key: str, default=None):
+        """Метод для совместимости со старым кодом, ожидающим dict."""
+        return getattr(self, key, default)
+
+
+class ConstantsConfig(BaseModel):
+    """Константы - неизменяемые параметры."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
+    indiator_periods: Dict[str, Any] = Field(default_factory=dict)
+    timeframes: Dict[str, Any] = Field(default_factory=dict)
+    convergence_threshold: float = 0.85
+    stability_window_sec: int = 600
+    kelly_formula_cap: float = 0.25
+    max_leverage_cap: int = 20
+    heartbeat_interval_sec: int = 5
+    data_snapshot_interval_sec: int = 1
+
+
+class TunableParamsConfig(BaseModel):
+    """Настраиваемые параметры для автотюнера."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
+    risk: RiskConfig = Field(default_factory=RiskConfig)
+    leverage: Dict[str, float] = Field(default_factory=dict)
+    trailing_stop: Dict[str, Any] = Field(default_factory=dict)
+    analyzers: Dict[str, Any] = Field(default_factory=dict)
+    scenarios: ScenarioConfig = Field(default_factory=ScenarioConfig)
+    matrix: MatrixConfig = Field(default_factory=MatrixConfig)
+    tuner: TunerConfig = Field(default_factory=TunerConfig)
+    lab: Dict[str, Any] = Field(default_factory=dict)
+
+
+class SystemConfig(BaseModel):
+    """Системные настройки."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
+    bot_name: str = "HybridMathScalper"
+    version: str = "3.0.0"
+    mode: str = "shadow"
+    exchange: str = "binance_futures"
+    logging: LoggingConfig = Field(default_factory=LoggingConfig)
+    storage: StorageConfig = Field(default_factory=StorageConfig)
+    data: Dict[str, Any] = Field(default_factory=dict)
 
 
 class Config(BaseModel):
-    bot: BotConfig
-    data: DataConfig
-    matrix: MatrixConfig
-    tuner: TunerConfig
-    risk: RiskConfig
-    scenario: ScenarioConfig
-    executor: ExecutorConfig
-    logging: LoggingConfig
-    storage: StorageConfig
     api_keys: ApiKeysConfig = Field(default_factory=ApiKeysConfig)
     news: NewsConfig = Field(default_factory=NewsConfig)
+    CONSTANTS: ConstantsConfig = Field(default_factory=ConstantsConfig)
+    TUNABLE_PARAMS: TunableParamsConfig = Field(default_factory=TunableParamsConfig)
+    system: SystemConfig = Field(default_factory=SystemConfig)
     
     def get(self, key: str, default=None):
         """Метод для совместимости со старым кодом, ожидающим dict."""

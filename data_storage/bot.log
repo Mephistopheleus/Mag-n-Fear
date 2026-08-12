@@ -1,0 +1,1641 @@
+2026-08-12 05:55:07 - root - INFO - Initializing Trading Bot...
+2026-08-12 05:55:07 - root - INFO - DataRotator initialized with limits: logs=2MB, DB=5MB
+2026-08-12 06:02:01 - root - INFO - Initializing Trading Bot...
+2026-08-12 06:02:01 - root - INFO - DataRotator initialized with limits: logs=2MB, DB=5MB
+2026-08-12 06:02:57 - root - INFO - Initializing Trading Bot...
+2026-08-12 06:02:57 - root - INFO - DataRotator initialized with limits: logs=2MB, DB=5MB
+2026-08-12 06:03:17 - root - INFO - Initializing Trading Bot...
+2026-08-12 06:03:17 - root - INFO - DataRotator initialized with limits: logs=2MB, DB=5MB
+2026-08-12 06:03:17 - root - INFO - Config loaded.
+2026-08-12 06:03:29 - root - INFO - Initializing Trading Bot...
+2026-08-12 06:03:29 - root - INFO - DataRotator initialized with limits: logs=2MB, DB=5MB
+2026-08-12 06:03:29 - root - INFO - Config loaded.
+2026-08-12 06:03:29 - src.math_core.fibonacci_levels - INFO - FibonacciLevels initialized for BTCUSDT
+2026-08-12 06:03:29 - src.logic.scenario_writer - INFO - ScenarioWriter v3.0 инициализирован. Режим: КОНВЕЙЕР ИДЕЙ
+2026-08-12 06:03:58 - root - INFO - Initializing Trading Bot...
+2026-08-12 06:03:58 - root - INFO - DataRotator initialized with limits: logs=2MB, DB=5MB
+2026-08-12 06:03:58 - root - INFO - Config loaded.
+2026-08-12 06:03:58 - src.math_core.fibonacci_levels - INFO - FibonacciLevels initialized for BTCUSDT
+2026-08-12 06:03:58 - src.logic.scenario_writer - INFO - ScenarioWriter v3.0 инициализирован. Режим: КОНВЕЙЕР ИДЕЙ
+2026-08-12 06:03:58 - root - INFO - Trading Bot initialized. Symbols: ['DOGEUSDT', 'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']
+2026-08-12 06:03:58 - asyncio - DEBUG - Using selector: EpollSelector
+2026-08-12 06:03:58 - root - INFO - Starting Trading Bot loop...
+2026-08-12 06:03:58 - src.data.feed - INFO - Initializing Binance Futures client...
+2026-08-12 06:03:59 - src.data.feed - INFO - Binance client initialized (testnet=True)
+2026-08-12 06:03:59 - src.data.feed - INFO - Preloading market data...
+2026-08-12 06:03:59 - src.data.feed - INFO - Loaded data for DOGEUSDT: price=0.07198
+2026-08-12 06:03:59 - src.data.feed - INFO - Loaded data for BTCUSDT: price=63787.62
+2026-08-12 06:03:59 - src.data.feed - INFO - Binance Futures feed started
+2026-08-12 06:03:59 - src.data.feed - INFO - Starting WebSocket streams (aiohttp)...
+2026-08-12 06:03:59 - src.data.feed - INFO - WebSocket tasks created for 2 symbols.
+2026-08-12 06:03:59 - src.executor - INFO - [Executor] Syncing positions from exchange...
+2026-08-12 06:03:59 - src.executor - ERROR - [Executor] Error syncing positions: APIError(code=-1003): Way too many requests; IP(130.176.187.76) banned until 1786517812744. Please use the websocket for live updates to avoid bans.
+Traceback (most recent call last):
+  File "/workspace/src/executor/__init__.py", line 100, in _sync_positions_from_exchange
+    positions = await self._client.futures_position_information()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/binance/async_client.py", line 2475, in futures_position_information
+    return await self._request_futures_api(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/binance/async_client.py", line 237, in _request_futures_api
+    return await self._request(method, uri, signed, force_params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/binance/async_client.py", line 199, in _request
+    return await self._handle_response(response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/binance/async_client.py", line 207, in _handle_response
+    raise BinanceAPIException(response, response.status, await response.text())
+binance.exceptions.BinanceAPIException: APIError(code=-1003): Way too many requests; IP(130.176.187.76) banned until 1786517812744. Please use the websocket for live updates to avoid bans.
+2026-08-12 06:04:00 - src.data.feed - INFO - Connected to trades WS for DOGEUSDT
+2026-08-12 06:04:00 - src.data.feed - INFO - Connected to orderbook WS for DOGEUSDT
+2026-08-12 06:04:00 - src.data.feed - INFO - Connected to orderbook WS for BTCUSDT
+2026-08-12 06:04:00 - src.data.feed - INFO - Connected to trades WS for BTCUSDT
+2026-08-12 06:04:00 - src.data.feed - INFO - [DataFeed] Initial price for DOGEUSDT: 0.07197
+2026-08-12 06:04:00 - root - INFO - Initialized DOGEUSDT with price 0.07197
+2026-08-12 06:04:00 - src.data.feed - INFO - [DataFeed] Initial price for BTCUSDT: 63766.2
+2026-08-12 06:04:00 - root - INFO - Initialized BTCUSDT with price 63766.2
+2026-08-12 06:04:00 - src.data.feed - INFO - [DataFeed] Initial price for ETHUSDT: 1889.26
+2026-08-12 06:04:00 - root - INFO - Initialized ETHUSDT with price 1889.26
+2026-08-12 06:04:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193729.6308
+2026-08-12 06:04:00 - src.data.feed - INFO - [DataFeed] Initial price for SOLUSDT: 76.29
+2026-08-12 06:04:00 - root - INFO - Initialized SOLUSDT with price 76.29
+2026-08-12 06:04:00 - src.data.feed - INFO - [DataFeed] Initial price for BNBUSDT: 613.64
+2026-08-12 06:04:00 - root - INFO - Initialized BNBUSDT with price 613.64
+2026-08-12 06:04:00 - src.analyzers.news_aggregator - DEBUG - [NewsAggregator] Cycle complete. Generated 0 cards, added to field.
+2026-08-12 06:04:00 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:00 - root - INFO - [CHECK] Real Balance: $3349.07 | Shadow PnL (closed trades): $0.00
+2026-08-12 06:04:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193729.6347
+2026-08-12 06:04:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193729.6347
+2026-08-12 06:04:01 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:01 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:01 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082888189623.0
+2026-08-12 06:04:02 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:02 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:02 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:02 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:03 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:03 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:04 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082888189623.0
+2026-08-12 06:04:04 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082888189623.0
+2026-08-12 06:04:04 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:04 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:04 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:05 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:05 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:05 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:05 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:06 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1301
+2026-08-12 06:04:06 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:06 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082888189623.0
+2026-08-12 06:04:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2282
+2026-08-12 06:04:07 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2282
+2026-08-12 06:04:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2282
+2026-08-12 06:04:08 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:08 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:08 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650567175.0
+2026-08-12 06:04:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:09 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650567175.0
+2026-08-12 06:04:09 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:10 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2282
+2026-08-12 06:04:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2282
+2026-08-12 06:04:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.1414
+2026-08-12 06:04:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2282
+2026-08-12 06:04:11 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:11 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650567175.0
+2026-08-12 06:04:11 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:11 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650567175.0
+2026-08-12 06:04:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:12 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:12 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650567474.0
+2026-08-12 06:04:13 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650567474.0
+2026-08-12 06:04:13 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:13 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:14 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650567696.0
+2026-08-12 06:04:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:14 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:15 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:15 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:15 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650567696.0
+2026-08-12 06:04:15 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:16 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568069.0
+2026-08-12 06:04:16 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:16 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:16 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.254
+2026-08-12 06:04:16 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2395
+2026-08-12 06:04:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.254
+2026-08-12 06:04:17 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:17 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568283.0
+2026-08-12 06:04:18 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568283.0
+2026-08-12 06:04:18 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.254
+2026-08-12 06:04:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.254
+2026-08-12 06:04:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:19 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:20 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:20 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:20 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568283.0
+2026-08-12 06:04:20 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:20 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2699
+2026-08-12 06:04:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2574
+2026-08-12 06:04:21 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2699
+2026-08-12 06:04:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.5542
+2026-08-12 06:04:22 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2699
+2026-08-12 06:04:22 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:22 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568584.0
+2026-08-12 06:04:22 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568584.0
+2026-08-12 06:04:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.5542
+2026-08-12 06:04:23 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568584.0
+2026-08-12 06:04:23 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.5542
+2026-08-12 06:04:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.5542
+2026-08-12 06:04:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.5542
+2026-08-12 06:04:24 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:24 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2699
+2026-08-12 06:04:25 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568584.0
+2026-08-12 06:04:25 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650568584.0
+2026-08-12 06:04:25 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.5542
+2026-08-12 06:04:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.2699
+2026-08-12 06:04:26 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.569
+2026-08-12 06:04:26 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.569
+2026-08-12 06:04:26 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:26 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.5542
+2026-08-12 06:04:27 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650570482.0
+2026-08-12 06:04:27 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.569
+2026-08-12 06:04:27 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650570482.0
+2026-08-12 06:04:27 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:28 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:29 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:29 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:29 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650570482.0
+2026-08-12 06:04:29 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.569
+2026-08-12 06:04:30 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.569
+2026-08-12 06:04:30 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:30 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650570482.0
+2026-08-12 06:04:31 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7219
+2026-08-12 06:04:31 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:31 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:31 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.57
+2026-08-12 06:04:32 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571065.0
+2026-08-12 06:04:32 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571065.0
+2026-08-12 06:04:32 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7219
+2026-08-12 06:04:32 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:32 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7227
+2026-08-12 06:04:33 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7227
+2026-08-12 06:04:33 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:33 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7219
+2026-08-12 06:04:33 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7227
+2026-08-12 06:04:33 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7227
+2026-08-12 06:04:34 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7219
+2026-08-12 06:04:34 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:34 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7227
+2026-08-12 06:04:34 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571065.0
+2026-08-12 06:04:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571065.0
+2026-08-12 06:04:35 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7219
+2026-08-12 06:04:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571065.0
+2026-08-12 06:04:35 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:35 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7227
+2026-08-12 06:04:35 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7219
+2026-08-12 06:04:36 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7321
+2026-08-12 06:04:36 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:36 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7321
+2026-08-12 06:04:36 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571362.0
+2026-08-12 06:04:37 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571362.0
+2026-08-12 06:04:37 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7321
+2026-08-12 06:04:37 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:37 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7321
+2026-08-12 06:04:37 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7321
+2026-08-12 06:04:37 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7321
+2026-08-12 06:04:38 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:38 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1825
+2026-08-12 06:04:39 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7321
+2026-08-12 06:04:39 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571362.0
+2026-08-12 06:04:39 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:39 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082650571362.0
+2026-08-12 06:04:39 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1825
+2026-08-12 06:04:40 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:40 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1825
+2026-08-12 06:04:40 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193577.7321
+2026-08-12 06:04:41 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1825
+2026-08-12 06:04:41 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1825
+2026-08-12 06:04:41 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:41 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:41 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:42 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:42 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:42 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:42 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:42 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:42 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:43 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:43 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:43 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:43 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:44 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:44 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:44 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:44 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:44 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:45 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:45 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:45 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:45 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:46 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.1951
+2026-08-12 06:04:46 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:46 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:46 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:46 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659875329.0
+2026-08-12 06:04:46 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:46 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:46 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.205
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.2112
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:47 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.205
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.205
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:47 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.2112
+2026-08-12 06:04:48 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:48 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.2112
+2026-08-12 06:04:48 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:48 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.205
+2026-08-12 06:04:49 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.2112
+2026-08-12 06:04:49 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:49 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:49 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:49 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.2112
+2026-08-12 06:04:49 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.205
+2026-08-12 06:04:50 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.205
+2026-08-12 06:04:50 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:50 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.205
+2026-08-12 06:04:50 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082659876227.0
+2026-08-12 06:04:50 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.2112
+2026-08-12 06:04:51 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:51 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.2112
+2026-08-12 06:04:51 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876448.0
+2026-08-12 06:04:51 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.2112
+2026-08-12 06:04:52 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5113
+2026-08-12 06:04:52 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876448.0
+2026-08-12 06:04:52 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5064
+2026-08-12 06:04:52 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:52 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876448.0
+2026-08-12 06:04:52 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:53 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5064
+2026-08-12 06:04:53 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5064
+2026-08-12 06:04:53 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:53 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5113
+2026-08-12 06:04:53 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:54 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:54 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5113
+2026-08-12 06:04:54 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5064
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876448.0
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876448.0
+2026-08-12 06:04:55 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876448.0
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5064
+2026-08-12 06:04:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:56 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082939876751.0
+2026-08-12 06:04:56 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:57 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:57 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:57 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:04:57 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:57 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:04:57 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:04:57 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:57 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:57 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:58 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:04:58 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:58 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:04:58 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:58 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:59 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:04:59 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:05:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:05:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:05:00 - src.analyzers.news_aggregator - DEBUG - [NewsAggregator] Cycle complete. Generated 0 cards, added to field.
+2026-08-12 06:05:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:05:00 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:05:00 - root - INFO - [CHECK] Real Balance: $3349.07 | Shadow PnL (closed trades): $0.00
+2026-08-12 06:05:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:05:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5208
+2026-08-12 06:05:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5755
+2026-08-12 06:05:01 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:05:01 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082949877123.0
+2026-08-12 06:05:01 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:01 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5252
+2026-08-12 06:05:02 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5755
+2026-08-12 06:05:02 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:02 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:02 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:02 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:02 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5755
+2026-08-12 06:05:02 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083269877640.0
+2026-08-12 06:05:03 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:03 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5755
+2026-08-12 06:05:03 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:03 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:03 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:03 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5755
+2026-08-12 06:05:04 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:04 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:04 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:04 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:04 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5755
+2026-08-12 06:05:04 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:05 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083269877640.0
+2026-08-12 06:05:05 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083269878020.0
+2026-08-12 06:05:05 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:05 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5755
+2026-08-12 06:05:05 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.5755
+2026-08-12 06:05:06 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193576.3381
+2026-08-12 06:05:06 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:06 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4222
+2026-08-12 06:05:06 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083269878020.0
+2026-08-12 06:05:06 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4222
+2026-08-12 06:05:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4222
+2026-08-12 06:05:07 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:08 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791485761.0
+2026-08-12 06:05:08 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4222
+2026-08-12 06:05:08 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:08 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:08 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:08 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:09 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4222
+2026-08-12 06:05:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4222
+2026-08-12 06:05:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:10 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:10 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486056.0
+2026-08-12 06:05:11 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.4252
+2026-08-12 06:05:11 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791485761.0
+2026-08-12 06:05:11 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:11 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:11 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:12 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7198
+2026-08-12 06:05:13 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:13 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486056.0
+2026-08-12 06:05:13 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:13 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486056.0
+2026-08-12 06:05:13 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7198
+2026-08-12 06:05:14 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7198
+2026-08-12 06:05:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:15 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7152
+2026-08-12 06:05:15 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:15 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7198
+2026-08-12 06:05:16 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486268.0
+2026-08-12 06:05:16 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:16 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486268.0
+2026-08-12 06:05:16 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:16 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7198
+2026-08-12 06:05:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:17 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:18 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486492.0
+2026-08-12 06:05:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:18 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486492.0
+2026-08-12 06:05:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:18 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:19 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486492.0
+2026-08-12 06:05:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:19 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:19 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486492.0
+2026-08-12 06:05:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:20 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:20 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486492.0
+2026-08-12 06:05:20 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:21 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7416
+2026-08-12 06:05:22 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:22 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:22 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:22 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:22 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486942.0
+2026-08-12 06:05:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:23 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486942.0
+2026-08-12 06:05:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:23 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:24 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:24 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791486942.0
+2026-08-12 06:05:24 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:25 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:26 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:26 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:26 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7593
+2026-08-12 06:05:26 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488432.0
+2026-08-12 06:05:27 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488432.0
+2026-08-12 06:05:27 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:27 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:28 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:29 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488432.0
+2026-08-12 06:05:29 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:29 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:30 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:30 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:30 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:30 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:31 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.6965
+2026-08-12 06:05:31 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:31 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193578.7689
+2026-08-12 06:05:31 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:32 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:32 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:32 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:32 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:32 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.6965
+2026-08-12 06:05:33 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:33 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:33 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:33 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:33 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:34 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:34 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:34 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:34 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:34 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:35 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.6965
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:35 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791489106.0
+2026-08-12 06:05:36 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:36 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7674
+2026-08-12 06:05:36 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791488660.0
+2026-08-12 06:05:36 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791489106.0
+2026-08-12 06:05:36 - root - ERROR - Error in trading decision loop: 'list' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/workspace/src/main.py", line 236, in _trading_decision_loop
+    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 93, in analyze
+    regime = await self._detect_market_regime(matrix_snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/math_core/matrix_context_analyzer.py", line 119, in _detect_market_regime
+    volatility = matrix.get('atr', {}).get('current_atr', 0)
+                 ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-08-12 06:05:36 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791489106.0
+2026-08-12 06:05:36 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791489106.0
+2026-08-12 06:05:36 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791489106.0
+2026-08-12 06:05:37 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1082791489106.0
+2026-08-12 06:05:37 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1193579.7963
+2026-08-12 06:05:37 - root - INFO - Stopping components...
+2026-08-12 06:05:37 - src.executor - INFO - [Executor] Stopping - closing all positions with stop-loss...
+2026-08-12 06:05:37 - binance.ws.reconnecting_websocket - DEBUG - Closing Websocket wss://ws-api.testnet.binance.vision/ws-api/v3
+2026-08-12 06:05:37 - src.executor - INFO - [Executor] Stopped
+2026-08-12 06:05:37 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7f9c70ec30e0>
+2026-08-12 06:05:37 - asyncio - ERROR - Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x7f9c70e928d0>, 4221.310183393), (<aiohttp.client_proto.ResponseHandler object at 0x7f9c70d29fd0>, 4221.459507493), (<aiohttp.client_proto.ResponseHandler object at 0x7f9c70d2a3f0>, 4221.544987005)])']
+connector: <aiohttp.connector.TCPConnector object at 0x7f9c71d700e0>
+2026-08-12 06:05:37 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7f9c7212e570>
