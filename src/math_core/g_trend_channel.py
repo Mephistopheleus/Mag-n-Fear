@@ -122,7 +122,9 @@ class G_TrendChannel(BaseIndicator):
             'upper': upper_band,
             'lower': lower_band,
             'slope': m,
-            'std_err': std_err
+            'std_err': std_err,
+            'direction': 'UP' if m > 0.0001 else ('DOWN' if m < -0.0001 else 'NEUTRAL'),
+            'strength': min(1.0, abs(m) * 500)
         }
 
         return {

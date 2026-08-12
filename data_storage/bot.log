@@ -1639,3 +1639,782 @@ connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x7f9c70e
 connector: <aiohttp.connector.TCPConnector object at 0x7f9c71d700e0>
 2026-08-12 06:05:37 - asyncio - ERROR - Unclosed client session
 client_session: <aiohttp.client.ClientSession object at 0x7f9c7212e570>
+2026-08-12 07:14:50 - root - INFO - Initializing Trading Bot...
+2026-08-12 07:14:50 - root - INFO - DataRotator initialized with limits: logs=2MB, DB=5MB
+2026-08-12 07:14:50 - root - INFO - Config loaded.
+2026-08-12 07:14:50 - src.math_core.fibonacci_levels - INFO - FibonacciLevels initialized for BTCUSDT
+2026-08-12 07:14:50 - src.logic.scenario_writer - INFO - ScenarioWriter v3.0 инициализирован. Режим: КОНВЕЙЕР ИДЕЙ
+2026-08-12 07:14:50 - root - INFO - Trading Bot initialized. Symbols: ['DOGEUSDT', 'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']
+2026-08-12 07:14:50 - asyncio - DEBUG - Using selector: EpollSelector
+2026-08-12 07:14:50 - root - INFO - Starting Trading Bot loop...
+2026-08-12 07:14:50 - src.data.feed - INFO - Initializing Binance Futures client...
+2026-08-12 07:14:50 - src.data.feed - INFO - Binance client initialized (testnet=True)
+2026-08-12 07:14:50 - src.data.feed - INFO - Preloading market data...
+2026-08-12 07:14:50 - src.data.feed - INFO - Loaded data for DOGEUSDT: price=0.07167
+2026-08-12 07:14:50 - src.data.feed - INFO - Loaded data for BTCUSDT: price=63760.57
+2026-08-12 07:14:50 - src.data.feed - INFO - Binance Futures feed started
+2026-08-12 07:14:50 - src.data.feed - INFO - Starting WebSocket streams (aiohttp)...
+2026-08-12 07:14:50 - src.data.feed - INFO - WebSocket tasks created for 2 symbols.
+2026-08-12 07:14:51 - src.executor - INFO - [Executor] Syncing positions from exchange...
+2026-08-12 07:14:51 - src.executor - INFO - [Executor] Synced position DOGEUSDT: SHORT 2383.0 @ 0.07026065828321583, SL=0.07096326486604798
+2026-08-12 07:14:51 - src.data.feed - INFO - Connected to orderbook WS for BTCUSDT
+2026-08-12 07:14:51 - src.data.feed - INFO - Connected to orderbook WS for DOGEUSDT
+2026-08-12 07:14:51 - src.data.feed - INFO - [DataFeed] Initial price for DOGEUSDT: 0.07164
+2026-08-12 07:14:51 - root - INFO - Initialized DOGEUSDT with price 0.07164
+2026-08-12 07:14:51 - src.data.feed - INFO - Connected to trades WS for BTCUSDT
+2026-08-12 07:14:51 - src.data.feed - INFO - Connected to trades WS for DOGEUSDT
+2026-08-12 07:14:51 - src.data.feed - INFO - [DataFeed] Initial price for BTCUSDT: 63745.0
+2026-08-12 07:14:51 - root - INFO - Initialized BTCUSDT with price 63745.0
+2026-08-12 07:14:51 - src.data.feed - INFO - [DataFeed] Initial price for ETHUSDT: 1889.16
+2026-08-12 07:14:51 - root - INFO - Initialized ETHUSDT with price 1889.16
+2026-08-12 07:14:51 - src.data.feed - INFO - [DataFeed] Initial price for SOLUSDT: 76.07
+2026-08-12 07:14:51 - root - INFO - Initialized SOLUSDT with price 76.07
+2026-08-12 07:14:51 - src.data.feed - INFO - [DataFeed] Initial price for BNBUSDT: 612.36
+2026-08-12 07:14:51 - root - INFO - Initialized BNBUSDT with price 612.36
+2026-08-12 07:14:51 - src.analyzers.news_aggregator - DEBUG - [NewsAggregator] Cycle complete. Generated 0 cards, added to field.
+2026-08-12 07:14:51 - root - INFO - [CHECK] Real Balance: $3349.07 | Shadow PnL (closed trades): $0.00
+2026-08-12 07:14:51 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:51 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:14:51 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:14:51 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:14:51 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:14:51 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:14:51 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:51 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:51 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:52 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:52 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:14:52 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:14:52 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63760.5700
+2026-08-12 07:14:52 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:14:52 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:14:52 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:52 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:52 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:52 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:52 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:52 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.33
+2026-08-12 07:14:53 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.33
+2026-08-12 07:14:53 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.33
+2026-08-12 07:14:53 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3316
+2026-08-12 07:14:53 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:53 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:14:53 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:14:53 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:14:53 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:14:53 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:14:53 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:53 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:14:53 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:14:53 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:14:53 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:14:53 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:14:53 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3316
+2026-08-12 07:14:54 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:54 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:54 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:54 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:54 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:54 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:14:54 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:14:54 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:14:54 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:14:54 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:14:54 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:55 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:55 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:14:55 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:14:55 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:14:55 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:14:55 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:14:55 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729264.0
+2026-08-12 07:14:55 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.33
+2026-08-12 07:14:55 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3316
+2026-08-12 07:14:56 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3316
+2026-08-12 07:14:56 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:56 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:14:56 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:14:56 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:14:56 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:14:56 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:14:56 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:56 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:14:56 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:14:56 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:14:56 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:14:56 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:14:57 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344730374.0
+2026-08-12 07:14:57 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729859.0
+2026-08-12 07:14:57 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344730374.0
+2026-08-12 07:14:57 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729859.0
+2026-08-12 07:14:57 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:57 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:14:57 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:14:57 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:14:57 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:14:57 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:14:58 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:58 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:14:58 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:14:58 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:14:58 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:14:58 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:14:58 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3615
+2026-08-12 07:14:58 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729859.0
+2026-08-12 07:14:58 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3615
+2026-08-12 07:14:58 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3615
+2026-08-12 07:14:59 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:59 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:14:59 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:14:59 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:14:59 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:14:59 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:14:59 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:14:59 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:14:59 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:14:59 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:14:59 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:14:59 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:00 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729859.0
+2026-08-12 07:15:00 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344730374.0
+2026-08-12 07:15:00 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729859.0
+2026-08-12 07:15:00 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344729859.0
+2026-08-12 07:15:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3615
+2026-08-12 07:15:00 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3615
+2026-08-12 07:15:00 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:00 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:00 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:15:00 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:15:00 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:00 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:01 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.8849
+2026-08-12 07:15:01 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:01 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:01 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:15:01 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.4000
+2026-08-12 07:15:01 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:01 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:01 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.3615
+2026-08-12 07:15:01 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.8849
+2026-08-12 07:15:01 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.7115
+2026-08-12 07:15:02 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:02 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:02 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:15:02 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:15:02 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:02 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:02 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:02 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:02 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:02 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:15:02 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:02 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:02 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:02 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:02 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:03 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.8849
+2026-08-12 07:15:03 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.8849
+2026-08-12 07:15:03 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:03 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:03 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:15:03 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:15:03 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:03 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:04 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:04 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:04 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:04 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:15:04 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:04 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:04 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:04 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:04 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.7115
+2026-08-12 07:15:05 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.8849
+2026-08-12 07:15:05 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:05 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:05 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:05 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:15:05 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:15:05 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:05 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:05 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:05 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:05 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:15:05 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:05 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:05 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:05 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:05 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.7115
+2026-08-12 07:15:05 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:06 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:06 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:06 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085344731837.0
+2026-08-12 07:15:06 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.7115
+2026-08-12 07:15:06 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:06 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:06 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:15:06 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:15:06 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:06 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:07 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:07 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:07 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:15:07 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:07 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:07 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:07 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824742629.0
+2026-08-12 07:15:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824742629.0
+2026-08-12 07:15:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824742629.0
+2026-08-12 07:15:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824742629.0
+2026-08-12 07:15:08 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:08 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:08 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0004
+2026-08-12 07:15:08 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:08 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:08 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824742629.0
+2026-08-12 07:15:08 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:08 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:08 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:15:08 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:08 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:08 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824742629.0
+2026-08-12 07:15:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824746610.0
+2026-08-12 07:15:08 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:09 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:09 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:09 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:09 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0716
+2026-08-12 07:15:09 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:09 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:10 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:10 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:10 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0001
+2026-08-12 07:15:10 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:10 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:10 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:10 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:10 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824742629.0
+2026-08-12 07:15:10 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824746610.0
+2026-08-12 07:15:10 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824742629.0
+2026-08-12 07:15:10 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824746610.0
+2026-08-12 07:15:10 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824746610.0
+2026-08-12 07:15:10 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824746610.0
+2026-08-12 07:15:11 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:11 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:11 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:11 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:11 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:11 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:11 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180554.8233
+2026-08-12 07:15:11 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824746610.0
+2026-08-12 07:15:11 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:11 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:11 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:11 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:11 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:11 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:11 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.1283
+2026-08-12 07:15:12 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824747126.0
+2026-08-12 07:15:12 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824747126.0
+2026-08-12 07:15:12 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824747126.0
+2026-08-12 07:15:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.1283
+2026-08-12 07:15:13 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:13 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:13 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:13 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:13 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:13 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:13 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:13 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:13 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:13 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:13 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:13 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:13 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.1283
+2026-08-12 07:15:13 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824747126.0
+2026-08-12 07:15:13 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824747126.0
+2026-08-12 07:15:14 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:14 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:14 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:14 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:14 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:14 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:14 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824747126.0
+2026-08-12 07:15:14 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:14 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:14 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:14 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:14 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:14 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.1337
+2026-08-12 07:15:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.1283
+2026-08-12 07:15:15 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.1337
+2026-08-12 07:15:15 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.1283
+2026-08-12 07:15:15 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767703.0
+2026-08-12 07:15:16 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:16 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:16 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:16 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:16 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:16 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:16 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767703.0
+2026-08-12 07:15:16 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:16 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:16 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:16 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:16 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:16 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:16 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.2002
+2026-08-12 07:15:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.2002
+2026-08-12 07:15:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.2002
+2026-08-12 07:15:17 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:17 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:17 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:17 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:17 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:17 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:17 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:17 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:17 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:17 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:17 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:17 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:17 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:18 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767703.0
+2026-08-12 07:15:18 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.2002
+2026-08-12 07:15:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.2002
+2026-08-12 07:15:19 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:19 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.70, trend=BULLISH
+2026-08-12 07:15:19 - root - DEBUG - Market Model for DOGEUSDT: Trend=BEARISH, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:19 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:19 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:19 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:19 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:19 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:19 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:19 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:19 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:19 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.2002
+2026-08-12 07:15:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767703.0
+2026-08-12 07:15:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:20 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:20 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.80, trend=BULLISH
+2026-08-12 07:15:20 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:20 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:20 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:20 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:20 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:20 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:20 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:20 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:20 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:20 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.2002
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.68
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824767847.0
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.6853
+2026-08-12 07:15:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:22 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:22 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.80, trend=BULLISH
+2026-08-12 07:15:22 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:22 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:22 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:22 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:22 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.68
+2026-08-12 07:15:22 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:22 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:22 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:22 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:22 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:22 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.6853
+2026-08-12 07:15:23 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:23 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:23 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:23 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:23 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.80, trend=BULLISH
+2026-08-12 07:15:23 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:23 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:23 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:23 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.68
+2026-08-12 07:15:24 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:24 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:24 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:24 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:24 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:24 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:24 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.68
+2026-08-12 07:15:24 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:24 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.68
+2026-08-12 07:15:25 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:25 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=0.80, trend=BULLISH
+2026-08-12 07:15:25 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0003
+2026-08-12 07:15:25 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:15:25 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:15:25 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:15:25 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:25 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:15:25 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:15:25 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:15:25 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:15:25 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:15:25 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:15:25 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:25 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1084824768757.0
+2026-08-12 07:15:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180555.68
+2026-08-12 07:15:25 - root - INFO - Stopping components...
+2026-08-12 07:15:25 - src.executor - INFO - [Executor] Stopping - closing all positions with stop-loss...
+2026-08-12 07:15:26 - src.executor - ERROR - [Executor] Failed to set stop-loss for DOGEUSDT: APIError(code=-1111): Precision is over the maximum defined for this asset.
+2026-08-12 07:15:26 - binance.ws.reconnecting_websocket - DEBUG - Closing Websocket wss://ws-api.testnet.binance.vision/ws-api/v3
+2026-08-12 07:15:26 - src.executor - INFO - [Executor] Stopped
+2026-08-12 07:15:26 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7ff898692990>
+2026-08-12 07:15:26 - asyncio - ERROR - Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x7ff8923b91f0>, 8410.046743376), (<aiohttp.client_proto.ResponseHandler object at 0x7ff8923b9a30>, 8410.199170379), (<aiohttp.client_proto.ResponseHandler object at 0x7ff8923b9490>, 8410.287168061)])']
+connector: <aiohttp.connector.TCPConnector object at 0x7ff893d96150>
+2026-08-12 07:15:26 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7ff89febf9e0>
+2026-08-12 07:16:05 - root - INFO - Initializing Trading Bot...
+2026-08-12 07:16:05 - root - INFO - DataRotator initialized with limits: logs=2MB, DB=5MB
+2026-08-12 07:16:05 - root - INFO - Config loaded.
+2026-08-12 07:16:05 - src.math_core.fibonacci_levels - INFO - FibonacciLevels initialized for BTCUSDT
+2026-08-12 07:16:05 - src.logic.scenario_writer - INFO - ScenarioWriter v3.0 инициализирован. Режим: КОНВЕЙЕР ИДЕЙ
+2026-08-12 07:16:05 - root - INFO - Trading Bot initialized. Symbols: ['DOGEUSDT', 'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']
+2026-08-12 07:16:05 - asyncio - DEBUG - Using selector: EpollSelector
+2026-08-12 07:16:05 - root - INFO - Starting Trading Bot loop...
+2026-08-12 07:16:05 - src.data.feed - INFO - Initializing Binance Futures client...
+2026-08-12 07:16:05 - src.data.feed - INFO - Binance client initialized (testnet=True)
+2026-08-12 07:16:05 - src.data.feed - INFO - Preloading market data...
+2026-08-12 07:16:05 - src.data.feed - INFO - Loaded data for DOGEUSDT: price=0.07172
+2026-08-12 07:16:06 - src.data.feed - INFO - Loaded data for BTCUSDT: price=63756.8
+2026-08-12 07:16:06 - src.data.feed - INFO - Binance Futures feed started
+2026-08-12 07:16:06 - src.data.feed - INFO - Starting WebSocket streams (aiohttp)...
+2026-08-12 07:16:06 - src.data.feed - INFO - WebSocket tasks created for 2 symbols.
+2026-08-12 07:16:06 - src.executor - INFO - [Executor] Syncing positions from exchange...
+2026-08-12 07:16:06 - src.executor - INFO - [Executor] Synced position DOGEUSDT: SHORT 2383.0 @ 0.07026065828321583, SL=0.07096326486604798
+2026-08-12 07:16:06 - src.data.feed - INFO - Connected to orderbook WS for DOGEUSDT
+2026-08-12 07:16:06 - src.data.feed - INFO - Connected to orderbook WS for BTCUSDT
+2026-08-12 07:16:06 - src.data.feed - INFO - Connected to trades WS for DOGEUSDT
+2026-08-12 07:16:06 - src.data.feed - INFO - Connected to trades WS for BTCUSDT
+2026-08-12 07:16:06 - src.data.feed - INFO - [DataFeed] Initial price for DOGEUSDT: 0.0717
+2026-08-12 07:16:06 - root - INFO - Initialized DOGEUSDT with price 0.0717
+2026-08-12 07:16:06 - src.data.feed - INFO - [DataFeed] Initial price for BTCUSDT: 63745.0
+2026-08-12 07:16:06 - root - INFO - Initialized BTCUSDT with price 63745.0
+2026-08-12 07:16:06 - src.data.feed - INFO - [DataFeed] Initial price for ETHUSDT: 1889.43
+2026-08-12 07:16:06 - root - INFO - Initialized ETHUSDT with price 1889.43
+2026-08-12 07:16:06 - src.data.feed - INFO - [DataFeed] Initial price for SOLUSDT: 76.06
+2026-08-12 07:16:06 - root - INFO - Initialized SOLUSDT with price 76.06
+2026-08-12 07:16:06 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465836785.0
+2026-08-12 07:16:06 - src.data.feed - INFO - [DataFeed] Initial price for BNBUSDT: 612.21
+2026-08-12 07:16:06 - root - INFO - Initialized BNBUSDT with price 612.21
+2026-08-12 07:16:06 - src.analyzers.news_aggregator - DEBUG - [NewsAggregator] Cycle complete. Generated 0 cards, added to field.
+2026-08-12 07:16:06 - root - INFO - [CHECK] Real Balance: $3349.07 | Shadow PnL (closed trades): $0.00
+2026-08-12 07:16:06 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1085646872669.0
+2026-08-12 07:16:06 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:06 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:06 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:06 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:06 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:06 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3664
+2026-08-12 07:16:07 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:07 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:07 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:07 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63756.8000
+2026-08-12 07:16:07 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:07 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:07 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3664
+2026-08-12 07:16:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465836785.0
+2026-08-12 07:16:08 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:08 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:08 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:08 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:08 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:08 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:08 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465836785.0
+2026-08-12 07:16:08 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:08 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:08 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:08 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:08 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:08 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3664
+2026-08-12 07:16:09 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465836785.0
+2026-08-12 07:16:09 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3664
+2026-08-12 07:16:09 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:09 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:09 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:09 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:09 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:09 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:10 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:10 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:10 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:10 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.3000
+2026-08-12 07:16:10 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:10 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:11 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465836785.0
+2026-08-12 07:16:11 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:11 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:11 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:11 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:11 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:11 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:11 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:11 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:11 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:11 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.3000
+2026-08-12 07:16:11 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:11 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3739
+2026-08-12 07:16:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3786
+2026-08-12 07:16:12 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851194.0
+2026-08-12 07:16:12 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3739
+2026-08-12 07:16:12 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:12 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:12 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:12 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:12 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:12 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:13 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:13 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:13 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:13 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.3000
+2026-08-12 07:16:13 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:13 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:14 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:14 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:14 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:14 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:14 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:14 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3786
+2026-08-12 07:16:14 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3739
+2026-08-12 07:16:14 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:14 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:14 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:14 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.3000
+2026-08-12 07:16:14 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:14 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:14 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851120.0
+2026-08-12 07:16:15 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3786
+2026-08-12 07:16:15 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3739
+2026-08-12 07:16:15 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:15 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:15 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:15 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:15 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:15 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:16 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:16 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:16 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:16 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:16 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:16 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:16 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.3786
+2026-08-12 07:16:16 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851194.0
+2026-08-12 07:16:16 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851415.0
+2026-08-12 07:16:16 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:17 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:17 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:17 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:17 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:17 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:17 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:17 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:17 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:17 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:17 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:17 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:17 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:17 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:18 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851415.0
+2026-08-12 07:16:18 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851415.0
+2026-08-12 07:16:18 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:18 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:19 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:19 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:19 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:19 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:19 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:19 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:19 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:19 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:19 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.4000
+2026-08-12 07:16:19 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:19 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:19 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:20 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851415.0
+2026-08-12 07:16:20 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:20 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:20 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:20 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:20 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:20 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:20 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:20 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:20 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:20 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:20 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:20 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.4451
+2026-08-12 07:16:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9267
+2026-08-12 07:16:21 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851705.0
+2026-08-12 07:16:21 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9267
+2026-08-12 07:16:22 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:22 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:22 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:22 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:22 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:22 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:22 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:22 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:22 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:22 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:22 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:22 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:22 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9267
+2026-08-12 07:16:22 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851705.0
+2026-08-12 07:16:22 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851705.0
+2026-08-12 07:16:22 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851782.0
+2026-08-12 07:16:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9935
+2026-08-12 07:16:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9935
+2026-08-12 07:16:23 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:23 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:23 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:23 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:23 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:23 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:23 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9267
+2026-08-12 07:16:23 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:23 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:23 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:23 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:23 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:23 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:24 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9267
+2026-08-12 07:16:24 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851705.0
+2026-08-12 07:16:24 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465851782.0
+2026-08-12 07:16:25 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:25 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:25 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:25 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:25 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:25 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:25 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:25 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:25 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:25 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:25 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:25 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9267
+2026-08-12 07:16:25 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.7916
+2026-08-12 07:16:26 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180549.9935
+2026-08-12 07:16:26 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.7916
+2026-08-12 07:16:26 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:26 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:26 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:26 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:26 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:26 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:26 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:26 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:26 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:26 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:26 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:26 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:27 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:27 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:27 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:27 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:28 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:28 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:28 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:28 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:28 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:28 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.7916
+2026-08-12 07:16:28 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:28 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:28 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:28 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:28 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:28 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:28 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.7916
+2026-08-12 07:16:28 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:28 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:28 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.7916
+2026-08-12 07:16:28 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:29 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:29 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:29 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:29 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:29 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:29 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:29 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:29 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:29 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:29 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:29 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:29 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:29 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:29 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:29 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:29 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:29 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:30 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.7916
+2026-08-12 07:16:30 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.7916
+2026-08-12 07:16:31 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:31 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.05, trend=BULLISH
+2026-08-12 07:16:31 - root - DEBUG - Market Model for DOGEUSDT: Trend=SIDEWAYS, Strength=0.33, Vol=0.0004
+2026-08-12 07:16:31 - src.logic.scenario_writer - INFO - Генерация идей для DOGEUSDT. Цена: 0.0717
+2026-08-12 07:16:31 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для DOGEUSDT. Передача в RiskManager.
+2026-08-12 07:16:31 - root - DEBUG - No valid ideas for DOGEUSDT
+2026-08-12 07:16:31 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.7916
+2026-08-12 07:16:31 - src.logic.market_synthesizer - DEBUG - Correlation: DOGEUSDT/BTC=0.000, divergence=0.000
+2026-08-12 07:16:31 - src.logic.market_synthesizer - DEBUG - G-Channel on DOGEUSDT: position=1.00, trend=BULLISH
+2026-08-12 07:16:31 - root - DEBUG - Market Model for BTCUSDT: Trend=SIDEWAYS, Strength=1.00, Vol=0.0000
+2026-08-12 07:16:31 - src.logic.scenario_writer - INFO - Генерация идей для BTCUSDT. Цена: 63745.0000
+2026-08-12 07:16:31 - src.logic.scenario_writer - INFO - Сгенерировано 0 торговых идей для BTCUSDT. Передача в RiskManager.
+2026-08-12 07:16:31 - root - DEBUG - No valid ideas for BTCUSDT
+2026-08-12 07:16:31 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083465852317.0
+2026-08-12 07:16:31 - src.data.feed - DEBUG - 24h volume for BTCUSDT: 1180550.8255
+2026-08-12 07:16:32 - src.data.feed - DEBUG - 24h volume for DOGEUSDT: 1083607394489.0
+2026-08-12 07:16:32 - root - INFO - Stopping components...
+2026-08-12 07:16:32 - src.executor - INFO - [Executor] Stopping - closing all positions with stop-loss...
+2026-08-12 07:16:32 - src.executor - ERROR - [Executor] Failed to set stop-loss for DOGEUSDT: APIError(code=-1111): Precision is over the maximum defined for this asset.
+2026-08-12 07:16:32 - binance.ws.reconnecting_websocket - DEBUG - Closing Websocket wss://ws-api.testnet.binance.vision/ws-api/v3
+2026-08-12 07:16:32 - src.executor - INFO - [Executor] Stopped
+2026-08-12 07:16:32 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7fef01218cb0>
+2026-08-12 07:16:32 - asyncio - ERROR - Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x7fef01045e50>, 8450.453850802)])', 'deque([(<aiohttp.client_proto.ResponseHandler object at 0x7fef006c4ef0>, 8476.252936051), (<aiohttp.client_proto.ResponseHandler object at 0x7fef006ed5b0>, 8476.280294347), (<aiohttp.client_proto.ResponseHandler object at 0x7fef006c4a70>, 8476.560959805)])']
+connector: <aiohttp.connector.TCPConnector object at 0x7fef028e9cd0>
+2026-08-12 07:16:32 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7fef0189e9c0>
