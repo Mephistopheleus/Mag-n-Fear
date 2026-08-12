@@ -94,8 +94,8 @@ class TradingBot:
         # 8. Инициализация матричного контекстного анализатора (кросс-валидация)
         self.matrix_context_analyzer = MatrixContextAnalyzer(self.config)
         
-        # 9. Инициализация сценариста
-        self.scenario_writer = ScenarioWriter(self.config, self.prob_field)
+        # 9. Инициализация сценариста (теперь только config)
+        self.scenario_writer = ScenarioWriter(self.config)
         
         # 10. Инициализация тюнера
         self.tuner = AutoTuner(self.config, self.prob_field)
@@ -343,15 +343,16 @@ class TradingBot:
                     logger.debug(f"Market Model for {symbol}: Trend={market_model['trend']}, Strength={strength:.2f}, Vol={market_model_obj.volatility:.4f}")
                     
                     # 2. Генерация торговых идей через ScenarioWriter
-                    # Передаем market_context в формате, ожидаемом ScenarioWriter
+                    # Передаем symbol, current_price и market_context в формате, ожидаемом ScenarioWriter
                     market_context = {
                         'market_model': market_model,
                         'clusters': clusters,
                         'analysis_points': analysis_points,
-                        'regime_summary': self.matrix_context_analyzer.get_regime_summary()
+                        'regime_summary': self.matrix_context_analyzer.get_regime_summary(),
+                        'matrix_snapshot': {}  # Пустой словарь для совместимости (данные берутся из market_model)
                     }
                     
-                    ideas = self.scenario_writer.generate_all_ideas(current_price, market_context)
+                    ideas = self.scenario_writer.generate_all_ideas(symbol, current_price, market_context)
                     
                     if ideas:
                         # ВАЖНО: Проверяем ВСЕ идеи, не только лучшие!
