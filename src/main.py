@@ -29,6 +29,7 @@ from src.math_core.time_continuum import TimeContinuum
 from src.math_core.classic_tf import ClassicTF
 from src.math_core.market_regime import MarketRegimeDetector
 from src.math_core.order_book_sr import OrderBookAnalyzer
+from src.math_core.matrix_context_analyzer import MatrixContextAnalyzer
 
 # Импорт логики и ядра
 from src.core.field import ProbabilityField
@@ -36,7 +37,6 @@ from src.logic.scenario_writer import ScenarioWriter
 from src.risk.manager import RiskManager
 from src.tuner.auto_tuner import AutoTuner
 from src.executor import Executor
-from src.logic.matrix_analyzer import MatrixAnalyzer
 from src.logic.market_synthesizer import MarketSynthesizer, MarketTrend
 from src.executor.shadow_dealer import ShadowDealer
 from src.correlation_engine import CorrelationEngine
@@ -91,11 +91,11 @@ class TradingBot:
         # 7. Инициализация риск-менеджера
         self.risk_manager = RiskManager(self.config, self.prob_field)
         
-        # 8. Инициализация матричного анализатора (кросс-валидация)
-        self.matrix_analyzer = MatrixAnalyzer()
+        # 8. Инициализация матричного контекстного анализатора (кросс-валидация)
+        self.matrix_context_analyzer = MatrixContextAnalyzer(self.config)
         
         # 9. Инициализация сценариста
-        self.scenario_writer = ScenarioWriter(self.config, self.prob_field, self.risk_manager, self.matrix_analyzer)
+        self.scenario_writer = ScenarioWriter(self.config, self.prob_field)
         
         # 10. Инициализация тюнера
         self.tuner = AutoTuner(self.config, self.prob_field)
@@ -231,7 +231,21 @@ class TradingBot:
                     
                     # Собираем данные для синтезатора
                     matrix_snapshot = self.prob_field.get_matrix_snapshot(symbol)
-                    clusters = self.matrix_analyzer.find_clusters(matrix_snapshot, current_price)
+                    
+                    # Запускаем MatrixContextAnalyzer для получения инсайтов
+                    insights = await self.matrix_context_analyzer.analyze(matrix_snapshot)
+                    
+                    # Преобразуем инсайты в кластеры для совместимости
+                    clusters = []
+                    for insight in insights:
+                        clusters.append({
+                            'target_price': insight.target_price if insight.target_price else current_price,
+                            'probability': insight.probability,
+                            'target_time_sec': insight.target_time_sec if insight.target_time_sec else 300,
+                            'pattern_type': insight.insight_type,
+                            'confidence': insight.probability,
+                            'reason': insight.reason
+                        })
                     
                     # Извлекаем analysis_points из кластеров матрицы
                     analysis_points = []
@@ -328,35 +342,43 @@ class TradingBot:
                     
                     logger.debug(f"Market Model for {symbol}: Trend={market_model['trend']}, Strength={strength:.2f}, Vol={market_model_obj.volatility:.4f}")
                     
-                    # 2. Генерация сценариев на основе модели
-                    scenarios = self.scenario_writer.generate_scenarios(market_model, current_price)
+                    # 2. Генерация торговых идей через ScenarioWriter
+                    # Передаем market_context в формате, ожидаемом ScenarioWriter
+                    market_context = {
+                        'market_model': market_model,
+                        'clusters': clusters,
+                        'analysis_points': analysis_points,
+                        'regime_summary': self.matrix_context_analyzer.get_regime_summary()
+                    }
                     
-                    if scenarios:
-                        # ВАЖНО: Проверяем ВСЕ сценарии, не только лучший!
-                        # Каждый сценарий проходит валидацию и попадает в тень или на исполнение
-                        for scenario in scenarios:
+                    ideas = self.scenario_writer.generate_all_ideas(current_price, market_context)
+                    
+                    if ideas:
+                        # ВАЖНО: Проверяем ВСЕ идеи, не только лучшие!
+                        # Каждая идея проходит валидацию и попадает в тень или на исполнение
+                        for idea in ideas:
                             # 3. Валидация риск-менеджером (async метод)
-                            # is_shadow=True - чтобы в режиме обучения все сценарии шли в тень для статистики
-                            is_valid, reason = await self.risk_manager.validate_scenario(symbol, scenario.to_dict(), is_shadow=False)  # БОЕВОЙ РЕЖИМ
+                            # is_shadow=True - чтобы в режиме обучения все идеи шли в тень для статистики
+                            is_valid, reason = await self.risk_manager.validate_scenario(symbol, idea.to_dict(), is_shadow=False)  # БОЕВОЙ РЕЖИМ
                             
                             if is_valid:
                                 # 4. Отправка в Executor (реальная сделка или тень)
-                                logger.info(f"Scenario ACCEPTED for {symbol}: {scenario.strategy_type} {scenario.direction} - {reason}")
-                                await self.executor.execute_scenario(scenario)
-                                await self.notifier.notify_trade(scenario.to_dict(), "OPEN")
+                                logger.info(f"Idea ACCEPTED for {symbol}: {idea.scenario_type.value} {'LONG' if idea.direction == 1 else 'SHORT'} - {reason}")
+                                await self.executor.execute_scenario(idea)
+                                await self.notifier.notify_trade(idea.to_dict(), "OPEN")
                                 
-                                # ВАЖНО: Даже принятые сценарии идут в ShadowDealer для обучения!
+                                # ВАЖНО: Даже принятые идеи идут в ShadowDealer для обучения!
                                 # Это нужно для сбора полной статистики по всем исходам
-                                shadow_trade = await self.shadow_dealer.execute_scenario(scenario.to_dict())
-                                await self.risk_manager.add_to_shadow_learning(symbol, scenario.to_dict(), "accepted_real_trade", shadow_trade)
+                                shadow_trade = await self.shadow_dealer.execute_scenario(idea.to_dict())
+                                await self.risk_manager.add_to_shadow_learning(symbol, idea.to_dict(), "accepted_real_trade", shadow_trade)
                             else:
-                                # Даже отклоненные сценарии идут в ShadowDealer для обучения!
-                                logger.debug(f"Scenario REJECTED for {symbol}: {scenario.strategy_type} {scenario.direction} - {reason}")
+                                # Даже отклоненные идеи идут в ShadowDealer для обучения!
+                                logger.debug(f"Idea REJECTED for {symbol}: {idea.scenario_type.value} {'LONG' if idea.direction == 1 else 'SHORT'} - {reason}")
                                 # Отправляем в ShadowDealer для сбора статистики
-                                shadow_trade = await self.shadow_dealer.execute_scenario(scenario.to_dict())
-                                await self.risk_manager.add_to_shadow_learning(symbol, scenario.to_dict(), reason, shadow_trade)
+                                shadow_trade = await self.shadow_dealer.execute_scenario(idea.to_dict())
+                                await self.risk_manager.add_to_shadow_learning(symbol, idea.to_dict(), reason, shadow_trade)
                     else:
-                        logger.debug(f"No valid scenarios for {symbol}")
+                        logger.debug(f"No valid ideas for {symbol}")
                     
                     # 5. Обновление трейлинг-стопов для активных позиций
                     # Обновляем цены в ShadowDealer для проверки TP/SL
