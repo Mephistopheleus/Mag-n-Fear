@@ -60,7 +60,9 @@ TUNABLE_PARAMS:
   risk:
     trading_balance_usd: 50.0          # Стартовый лимит (консервативно)
     risk_per_trade_pct: 0.5            # Риск на сделку % от баланса
-    max_position_size_pct: 0.66        # Макс размер позиции % от лимита
+    max_position_size_pct: 0.66        # Макс размер позиции % от лимита (2/3)
+    high_confidence_threshold: 0.90    # Порог уверенности для повышения лимита (90%)
+    high_confidence_max_pct: 0.75      # Макс размер при высокой уверенности (3/4)
     max_daily_loss_pct: 2.0            # Макс дневной убыток %
     max_correlation_exposure: 0.8      # Макс корреляционная экспозиция
     min_reward_ratio: 1.5              # Мин R:R для входа
@@ -79,10 +81,11 @@ TUNABLE_PARAMS:
     confidence_leverage_multiplier: 0.2
     
   # ---------------------------------------------------------------------------
-  # Трейлинг-стоп (Трехуровневый адаптивный)
+  # Трейлинг-стоп (Трехуровневый адаптивный с учётом матрицы)
   # ---------------------------------------------------------------------------
   trailing_stop:
     enabled: true
+    use_matrix_levels: true        # Использовать уровни из матрицы вероятностей
     # База: ATR множитель
     atr_multiplier_base: 2.0
     # Уровень 1: Активация (безубыток)
@@ -332,9 +335,23 @@ TUNABLE_PARAMS:
 # -----------------------------------------------------------------------------
 system:
   bot_name: "HybridMathScalper"
-  version: "3.0.0"
+  version: "3.0.1"  # Обновлена версия после интеграции модулей V3
   mode: "live"  # live, test, shadow
   exchange: "binance_futures"
+  
+  # Настройки разогрева (Warmup)
+  warmup:
+    enabled: true
+    history_days: 1            # Загрузка истории за 1 день
+    base_tf: "5m"              # Базовый таймфрейм для загрузки
+    load_orderbook: true       # Загружать ли срез стакана при разогреве
+    orderbook_levels: 20       # Глубина стакана при разогреве
+  
+  # Настройки потока данных (Data Feed)
+  data_feed:
+    websocket_depth: 20        # Количество уровней для WebSocket (depth20)
+    rest_sync_interval_min: 5  # Интервал синхронизации через REST (минуты)
+    force_sl_at_entry: true    # ГАРАНТИЯ: Выставлять SL сразу при открытии
   
   logging:
     level: "INFO"
