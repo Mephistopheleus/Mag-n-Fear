@@ -22,6 +22,7 @@ from src.utils.data_rotator import DataRotator, setup_rotating_logger
 
 # Импорт модулей данных
 from src.data.feed import DataFeed
+from src.data.historical_loader import HistoricalLoader
 from src.analyzers.news_aggregator import NewsAggregator
 
 # Импорт математического ядра
@@ -75,6 +76,8 @@ class TradingBot:
         
         # 4. Инициализация модулей данных
         self.feed = DataFeed(self.config, self.prob_field)
+        # Исторический загрузчик (для разогрева) будет создан после старта feed
+        self.historical_loader = None
         # Передаем конфиг секции news в NewsAggregator
         news_config = self.config.news if hasattr(self.config, 'news') else {}
         self.news = NewsAggregator(news_config)
@@ -133,13 +136,30 @@ class TradingBot:
         # Инициализация DataFeed (клиент Binance)
         await self.feed.start()
         
+        # === ШАГ 1: РАЗОГРЕВ СИСТЕМЫ ===
+        # Создаем загрузчик исторических данных после инициализации клиента
+        self.historical_loader = HistoricalLoader(
+            client=self.feed.client,
+            field=self.prob_field,
+            config=self.config
+        )
+        
+        # Загружаем историю за 1 день по 5-минутным свечам для всех символов
+        logger.info("🔥 Starting WARMUP phase: loading 1 day of 5m history + orderbook...")
+        await self.historical_loader.warmup_all_symbols(
+            symbols=self.symbols,
+            days=1,
+            interval='5m'
+        )
+        logger.info("✅ WARMUP complete. ProbabilityField initialized with historical data.")
+        
         # Инициализация клиента Binance в Executor
         await self.executor.start()
         await self.news.start()
         
-        # Инициализация поля данных для каждого символа
+        # Инициализация поля данных для каждого символа (теперь уже с историей)
         for symbol in self.symbols:
-            # Получаем начальную цену из фида
+            # Получаем последнюю цену из загруженной истории
             initial_price = await self.feed.get_initial_price(symbol)
             if initial_price:
                 await self.prob_field.initialize_symbol(symbol, initial_price)
