@@ -384,27 +384,22 @@ class TradingBot:
                     matrix_snapshot = {
                         'graph_patterns': [],  # Заполняем из clusters с паттернами
                         'liquidity_map': {
-                            'poc_price': current_price,  # Пока текущая цена, можно улучшить
+                            'poc_price': None,  # Будет заполнено из analysis_points или order_book
                             'zones': []
                         },
                         'g_trend': {
-                            'direction': trend_map.get(dominant_trend, 'NEUTRAL'),
+                            'direction': 'UP' if dominant_trend == MarketTrend.BULLISH else ('DOWN' if dominant_trend == MarketTrend.BEARISH else 'NEUTRAL'),
                             'strength': strength,
                             'lower_bound': min(levels['support']) if levels['support'] else current_price * 0.99,
                             'upper_bound': max(levels['resistance']) if levels['resistance'] else current_price * 1.01
                         },
                         'mean_reversion': {
-                            'rsi': 50,  # Пока дефолт, можно добавить расчет
-                            'bb_upper': current_price * 1.02,
-                            'bb_lower': current_price * 0.98,
+                            'rsi': market_model_obj.rsi if hasattr(market_model_obj, 'rsi') else 50,
+                            'bb_upper': current_price * (1 + market_model_obj.volatility) if hasattr(market_model_obj, 'volatility') else current_price * 1.02,
+                            'bb_lower': current_price * (1 - market_model_obj.volatility) if hasattr(market_model_obj, 'volatility') else current_price * 0.98,
                             'bb_middle': current_price
                         },
-                        'correlations': {
-                            'BTCUSDT': {
-                                'coefficient': symbol_corr.get('btc_integrated_correlation', 0.8),
-                                'divergence_pct': 0.0  # Можно рассчитать позже
-                            }
-                        }
+                        'correlations': symbol_corr if symbol_corr else {}
                     }
                     
                     # Заполняем graph_patterns из clusters
