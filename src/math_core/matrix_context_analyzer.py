@@ -15,14 +15,15 @@ import uuid
 # Импорты анализаторов для сбора данных
 try:
     from .liquidity_density_analyzer import LiquidityDensityAnalyzer
-    from .atr_analyzer import ATRAnalyzer
-    from .trend_line_detector import TrendLineDetector
+    from .atr_indicator import ATRIndicator
+    from .g_trend_channel import G_TrendChannel
     from .fibonacci_levels import FibonacciLevels
-    from .graph_pattern_recognizer import GraphPatternRecognizer
-    from .market_slice_analyzer import MarketSliceAnalyzer
+    from .fractal_patterns import FractalPatternAnalyzer
+    from .market_regime import MarketRegimeDetector
     ANALYZERS_AVAILABLE = True
-except ImportError:
+except ImportError as e:
     ANALYZERS_AVAILABLE = False
+    print(f"WARNING: MatrixContextAnalyzer - ошибка импорта анализаторов: {e}")
 
 @dataclass
 class MarketRegime:
@@ -65,11 +66,11 @@ class MatrixContextAnalyzer:
         # Инициализация под-анализаторов (если доступны)
         if ANALYZERS_AVAILABLE:
             self.liquidity_analyzer = LiquidityDensityAnalyzer(config)
-            self.atr_analyzer = ATRAnalyzer(config)
-            self.trend_analyzer = TrendLineDetector(config)
+            self.atr_analyzer = ATRIndicator(config)
+            self.trend_analyzer = G_TrendChannel(config)
             self.fib_analyzer = FibonacciLevels(config)
-            self.pattern_analyzer = GraphPatternRecognizer(config)
-            self.slice_analyzer = MarketSliceAnalyzer(config)
+            self.pattern_analyzer = FractalPatternAnalyzer(config)
+            self.slice_analyzer = MarketRegimeDetector(config)
         else:
             self.liquidity_analyzer = None
             self.atr_analyzer = None
