@@ -157,6 +157,10 @@ class SystemConfig(BaseModel):
     version: str = "3.0.0"
     mode: str = "shadow"
     exchange: str = "binance_futures"
+    
+    # Настройки data_feed - добавлено поле для корректного чтения конфига
+    data_feed: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
     storage: StorageConfig = Field(default_factory=StorageConfig)
     data: Dict[str, Any] = Field(default_factory=dict)
