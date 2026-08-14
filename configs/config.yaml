@@ -61,6 +61,7 @@ TUNABLE_PARAMS:
   risk:
     trading_balance_usd: 50.0          # Стартовый лимит (консервативно)
     risk_per_trade_pct: 0.5            # Риск на сделку % от баланса
+    stop_loss_pct: 1.0                 # Стоп-лосс % от цены входа (настраивается тюнером)
     max_position_size_pct: 0.66        # Макс размер позиции % от лимита (2/3)
     high_confidence_threshold: 0.90    # Порог уверенности для повышения лимита (90%)
     high_confidence_max_pct: 0.75      # Макс размер при высокой уверенности (3/4)
