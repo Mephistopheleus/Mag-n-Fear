@@ -42,6 +42,7 @@ class RiskConfig(BaseModel):
     max_position_size_pct: float = 0.66  # Максимальный размер позиции (% от баланса), 2/3 = 0.66
     risk_per_trade_pct: float = 0.5      # Риск на сделку (%)
     min_reward_ratio: float = 1.5        # Минимальное соотношение Профит/Риск
+    stop_loss_pct: float = 0.01          # Размер стоп-лосса по умолчанию (1% = 0.01)
 
     # Режим обучения (Learning Mode)
     learning_mode: bool = True

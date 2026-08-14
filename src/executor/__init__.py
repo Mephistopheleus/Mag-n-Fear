@@ -122,8 +122,16 @@ class Executor:
         try:
             positions = await self._client.futures_position_information()
             
-            # Получаем настройки risk - обрабатываем и dict и Pydantic модель
-            risk_cfg = self.config.get('risk', {})
+            # Получаем настройки risk из TUNABLE_PARAMS.risk (для поддержки автотюнинга)
+            # Fallback на старый формат config.risk для совместимости
+            tunable_params = self.config.get('TUNABLE_PARAMS', {})
+            if hasattr(tunable_params, 'risk'):
+                risk_cfg = tunable_params.risk
+            elif isinstance(tunable_params, dict) and 'risk' in tunable_params:
+                risk_cfg = tunable_params['risk']
+            else:
+                risk_cfg = self.config.get('risk', {})
+            
             if hasattr(risk_cfg, 'dict'):
                 risk_dict = risk_cfg.dict()
             elif hasattr(risk_cfg, '__dict__'):
@@ -186,7 +194,15 @@ class Executor:
                         entry_price = pos.get('entry_price', 0)
                         side = pos.get('side', 'LONG')
                         if entry_price > 0:
-                            risk_cfg = self.config.get('risk', {})
+                            # Читаем stop_loss_pct из TUNABLE_PARAMS.risk (с поддержкой автотюнинга)
+                            tunable_params = self.config.get('TUNABLE_PARAMS', {})
+                            if hasattr(tunable_params, 'risk'):
+                                risk_cfg = tunable_params.risk
+                            elif isinstance(tunable_params, dict) and 'risk' in tunable_params:
+                                risk_cfg = tunable_params['risk']
+                            else:
+                                risk_cfg = self.config.get('risk', {})
+                            
                             if hasattr(risk_cfg, 'dict'):
                                 risk_dict = risk_cfg.dict()
                             else:
@@ -211,11 +227,12 @@ class Executor:
                             has_stop_loss = False
                             for order in open_orders:
                                 order_type = order.get('type', '')
-                                # STOP_MARKET или STOP_LOSS с reduceOnly=True - это стоп-лосс
+                                # STOP_MARKET или STOP_LOSS с reduceOnly=True ИЛИ closePosition=True - это стоп-лосс
                                 # TAKE_PROFIT_MARKET - это тейк-профит, не считаем его защитой
                                 if order_type in ['STOP_MARKET', 'STOP_LOSS']:
                                     # reduceOnly=True означает что ордер закрывает часть позиции (это SL)
-                                    if order.get('reduceOnly', False):
+                                    # closePosition=True также означает закрытие позиции (старый формат SL)
+                                    if order.get('reduceOnly', False) or order.get('closePosition', False):
                                         has_stop_loss = True
                                         break
                             
@@ -630,13 +647,14 @@ class Executor:
                 print(f"[Executor] Error cancelling old stop: {e}")
         
         # Размещение нового Stop Market ордера
+        # Унифицированная логика: quantity + reduceOnly=True (вместо closePosition)
         order = await self._client.futures_create_order(
             symbol=symbol,
             side=stop_side,
             type='STOP_MARKET',
             quantity=quantity,
             stopPrice=new_stop_price,
-            closePosition=True  # Закрывает всю позицию
+            reduceOnly=True
         )
         
         print(f"[Executor] UPDATE_STOP {symbol}: new_stop={new_stop_price}, order_id={order['orderId']}")
