@@ -1,7 +1,8 @@
 """
 ScenarioLab Module
 Performs "What-If" analysis on rejected scenarios to find optimal parameters.
-Simulates variations of entry/exit conditions and reports results to AutoTuner.
+Uses Gradient Descent to find ideal settings for a specific trade snapshot.
+Reports ideal snapshots to AutoTuner.
 """
 import numpy as np
 import copy
@@ -11,86 +12,135 @@ class ScenarioLab:
     def __init__(self, config: dict):
         self.config = config
         self.max_iterations = config.get('lab_max_iterations', 50)
-        self.variation_step = config.get('lab_variation_step', 0.1) # 10% variation
-        
+        self.learning_rate = config.get('lab_learning_rate', 0.05)
+        self.target_metrics = config.get('tuner', {}).get('target_metrics', {
+            'target_pnl_pct': 1.0,
+            'target_wr': 1.0,
+            'target_dd': 0.0
+        })
+
     def analyze_scenario(self, scenario: Dict, market_context: Dict) -> List[Dict]:
         """
-        Take a rejected scenario and simulate variations.
-        Returns a list of "lab snapshots" with modified parameters.
+        Take a rejected scenario and simulate variations using Gradient Descent.
+        Returns a list of "lab snapshots" with optimized parameters.
         """
         lab_results = []
         
-        base_params = scenario.get('parameters', {})
-        entry_price = scenario.get('entry_price', 0)
-        direction = scenario.get('direction', 'LONG')
+        # Run optimization to find ideal parameters for this specific snapshot
+        ideal_params = self.optimize_for_snapshot(scenario, market_context)
         
-        # Define parameters to vary
-        params_to_vary = ['stop_loss_pct', 'take_profit_pct', 'leverage', 'confidence_threshold']
-        
-        for param in params_to_vary:
-            if param not in base_params:
-                continue
-                
-            base_val = base_params[param]
+        if ideal_params:
+            snapshot = self.generate_ideal_snapshot(scenario, ideal_params, market_context)
+            lab_results.append(snapshot)
             
-            # Generate variations: -10%, +10%
-            variations = [
-                base_val * (1 - self.variation_step),
-                base_val * (1 + self.variation_step)
-            ]
-            
-            for var_val in variations:
-                # Create modified scenario
-                modified_scenario = copy.deepcopy(scenario)
-                modified_scenario['parameters'][param] = var_val
-                modified_scenario['source'] = 'LAB'
-                modified_scenario['variation_of'] = param
-                
-                # Simulate outcome (simplified logic, real logic uses Executor simulation)
-                simulated_pnl = self._quick_simulate(modified_scenario, market_context)
-                
-                snapshot = {
-                    'scenario_id': f"lab_{scenario.get('id')}_{param}_{var_val}",
-                    'original_pnl': scenario.get('simulated_pnl', 0),
-                    'modified_pnl': simulated_pnl,
-                    'improvement': simulated_pnl - scenario.get('simulated_pnl', 0),
-                    'changed_param': param,
-                    'new_value': var_val,
-                    'old_value': base_val,
-                    'market_context': market_context.get('volatility', 0),
-                    'recommendation': 'INCREASE' if simulated_pnl > scenario.get('simulated_pnl', 0) else 'DECREASE'
-                }
-                
-                lab_results.append(snapshot)
-                
         return lab_results
 
-    def _quick_simulate(self, scenario: Dict, context: Dict) -> float:
+    def _calculate_loss(self, params: dict, snapshot: dict, context: dict) -> float:
         """
-        Fast approximation of PnL based on parameter changes.
-        Uses heuristics to estimate outcome without full simulation.
+        Loss function: Distance from Ideal (100% PnL, 100% WR, 0% DD).
+        Lower is better.
         """
-        # Heuristic simulation logic: 
-        # Wider SL -> lower chance of hit but larger loss
-        # Wider TP -> lower chance of hit but larger gain
+        estimated_pnl = self._estimate_pnl(params, snapshot, context)
+        estimated_wr = self._estimate_wr(params, snapshot, context)
+        estimated_dd = self._estimate_dd(params, snapshot, context)
         
-        base_pnl = scenario.get('simulated_pnl', 0)
-        volatility = context.get('volatility', 0.01)
+        target_pnl = self.target_metrics.get('target_pnl_pct', 1.0)
+        target_wr = self.target_metrics.get('target_wr', 1.0)
+        target_dd = self.target_metrics.get('target_dd', 0.0)
         
-        sl_pct = scenario['parameters'].get('stop_loss_pct', 0.02)
-        tp_pct = scenario['parameters'].get('take_profit_pct', 0.04)
+        loss = (
+            ((estimated_pnl - target_pnl) ** 2) +
+            ((estimated_wr - target_wr) ** 2) +
+            ((estimated_dd - target_dd) ** 2)
+        )
+        return loss
+
+    def _estimate_pnl(self, params: dict, snapshot: dict, context: dict) -> float:
+        tp = params.get('take_profit_pct', 0.04)
+        sl = params.get('stop_loss_pct', 0.02)
+        conf = snapshot.get('confidence', 0.5)
+        rr = tp / sl if sl > 0 else 0
+        return conf * rr * 0.5
+
+    def _estimate_wr(self, params: dict, snapshot: dict, context: dict) -> float:
+        sl = params.get('stop_loss_pct', 0.02)
+        vol = context.get('volatility', 0.01)
+        return min(1.0, sl / (vol * 2))
+
+    def _estimate_dd(self, params: dict, snapshot: dict, context: dict) -> float:
+        lev = params.get('leverage', 10)
+        sl = params.get('stop_loss_pct', 0.02)
+        return min(1.0, (lev * sl) / 0.5)
+
+    def _compute_gradient(self, params: dict, snapshot: dict, context: dict) -> dict:
+        """
+        Numerically compute gradient for each parameter.
+        """
+        gradient = {}
+        epsilon = 1e-5
         
-        # Heuristic: if volatility is high, wider stops perform better
-        vol_factor = volatility / 0.02  # Normalize around 2% vol
+        current_loss = self._calculate_loss(params, snapshot, context)
         
-        if sl_pct > 0.02 * vol_factor:
-            # Wider stop avoided premature exit
-            adjustment = base_pnl * 0.1 
-        else:
-            # Tighter stop got hit by noise
-            adjustment = -abs(base_pnl) * 0.2
+        for key in ['take_profit_pct', 'stop_loss_pct', 'leverage', 'confidence_threshold']:
+            if key not in params:
+                continue
+                
+            params_plus = params.copy()
+            params_plus[key] += epsilon
             
-        return base_pnl + adjustment
+            loss_plus = self._calculate_loss(params_plus, snapshot, context)
+            
+            gradient[key] = (loss_plus - current_loss) / epsilon
+            
+        return gradient
+
+    def optimize_for_snapshot(self, snapshot: dict, context: dict) -> Optional[dict]:
+        """
+        Run Gradient Descent to find parameters that minimize loss.
+        """
+        current_params = snapshot.get('parameters', {}).copy()
+        
+        defaults = {'take_profit_pct': 0.04, 'stop_loss_pct': 0.02, 'leverage': 10, 'confidence_threshold': 0.5}
+        for k, v in defaults.items():
+            if k not in current_params:
+                current_params[k] = v
+
+        for i in range(self.max_iterations):
+            grad = self._compute_gradient(current_params, snapshot, context)
+            
+            updated = False
+            for key, value in grad.items():
+                if key in current_params:
+                    new_val = current_params[key] - (self.learning_rate * value)
+                    if key == 'leverage':
+                        new_val = max(1, min(125, new_val))
+                    elif key in ['take_profit_pct', 'stop_loss_pct']:
+                        new_val = max(0.001, min(0.2, new_val))
+                    elif key == 'confidence_threshold':
+                        new_val = max(0.1, min(0.99, new_val))
+                        
+                    if abs(new_val - current_params[key]) > 1e-6:
+                        current_params[key] = new_val
+                        updated = True
+            
+            if not updated:
+                break
+                
+        return current_params
+
+    def generate_ideal_snapshot(self, original_scenario: dict, ideal_params: dict, context: dict) -> dict:
+        """
+        Create a snapshot with ideal parameters found by optimization.
+        """
+        return {
+            'type': 'LAB_IDEAL',
+            'source_scenario_id': original_scenario.get('id'),
+            'original_params': original_scenario.get('parameters', {}),
+            'ideal_params': ideal_params,
+            'market_context': context,
+            'target_metrics': self.target_metrics,
+            'timestamp': original_scenario.get('timestamp', 0)
+        }
 
     def generate_optimization_report(self, snapshots: List[Dict]) -> Dict:
         """
@@ -98,25 +148,19 @@ class ScenarioLab:
         """
         if not snapshots:
             return {'status': 'NO_DATA'}
-            
-        best_improvement = max(snapshots, key=lambda x: x['improvement'])
-        worst_decline = min(snapshots, key=lambda x: x['improvement'])
         
         report = {
-            'total_simulations': len(snapshots),
-            'best_adjustment': {
-                'param': best_improvement['changed_param'],
-                'direction': best_improvement['recommendation'],
-                'value': best_improvement['new_value'],
-                'expected_gain': best_improvement['improvement']
-            },
-            'worst_adjustment': {
-                'param': worst_decline['changed_param'],
-                'direction': worst_decline['recommendation'],
-                'value': worst_decline['new_value'],
-                'expected_loss': worst_decline['improvement']
-            },
-            'confidence': 0.75 # Base confidence in lab data
+            'status': 'SUCCESS',
+            'total_snapshots': len(snapshots),
+            'recommendations': []
         }
         
+        for snap in snapshots:
+            if snap.get('type') == 'LAB_IDEAL':
+                report['recommendations'].append({
+                    'scenario_id': snap.get('source_scenario_id'),
+                    'ideal_params': snap.get('ideal_params'),
+                    'message': 'Optimized parameters found via Gradient Descent'
+                })
+                
         return report

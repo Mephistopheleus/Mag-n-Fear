@@ -174,120 +174,61 @@ class RiskManager:
         dynamic = base * vol_factor * liq_factor
         return max(self.min_leverage, min(dynamic, self.max_leverage_default))
 
-    async def validate_scenario(self, symbol: str, scenario: Dict[str, Any], is_shadow: bool = False) -> tuple[bool, str]:
+    async def validate_scenario(self, symbol: str, scenario: Dict[str, Any], current_usage: float, is_shadow: bool = False) -> Dict[str, Any]:
         """
-        Валидация сценария от ScenarioWriter.
-        Возвращает (True/False, reason).
-        
-        ВАЖНО: ВСЕ сценарии проходят проверку - и для реальных сделок, и для тени.
-        Система адаптируется под рынок, а не требует "правильный" рынок.
+        Валидация сценария на соответствие риск-лимитам баланса.
         
         Логика:
-        1. В режиме обучения (learning_mode=True) - ВСЕ сценарии идут в тень для сбора статистики
-        2. Реальные сделки проверяются строго
-        3. На нейтральном рынке - снижаем требования к профиту, торгуем отскоки
-        4. Динамический min_profit_threshold в зависимости от волатильности
-        """
-        card = await self.field.get_card(symbol)
+        1. Базовый лимит занятости депозита: 66%.
+        2. Исключение: Если уверенность (confidence) > 90%, лимит повышается до 75%.
+        3. Если занятость >= лимит -> Отклонить для Реала, отправить в Тень.
         
-        # === РЕЖИМ ОБУЧЕНИЯ: ВСЕ СЦЕНАРИИ ИДУТ В ТЕНЬ ===
-        # В learning_mode пропускаем ВСЕ сценарии для тени, чтобы собрать статистику
-        # Проверки работают ТОЛЬКО для реальных сделок (is_shadow=False)
-        if self.learning_mode and is_shadow:
-            # Для тени в режиме обучения - всегда пропускаем
-            logger.debug(f"[RiskManager] {symbol}: Shadow scenario accepted for learning (collecting statistics)")
-            return True, "Learning mode: shadow scenario accepted"
-        
-        if not card or not card.risk_metrics:
-            # Для реальных сделок нужны данные
-            if self.learning_mode:
-                logger.info(f"[RiskManager] {symbol}: Scenario accepted for learning (no data yet)")
-                return True, "Learning mode: collecting data"
-            logger.warning(f"[RiskManager] {symbol}: No data or risk metrics available")
-            return False, "No data or risk metrics available"
+        Args:
+            symbol: Символ пары.
+            scenario: Словарь с данными сценария (entry_price, confidence и т.д.).
+            current_usage: Текущая занятость баланса в долях (0.0 - 1.0).
+            is_shadow: Флаг, является ли сделка теневой (для логирования).
             
-        metrics = card.risk_metrics
+        Returns:
+            Dict с ключами: 'approved' (bool), 'is_shadow' (bool), 'reason' (str).
+        """
+        confidence = scenario.get('confidence', 0.0)
         
-        # Расчет ожидаемого профита из R/R и входа
-        entry_price = scenario.get('entry_price', 0)
-        target_price = scenario.get('target_price', 0)
-        direction = scenario.get('direction', 'LONG')
-        
-        if entry_price > 0 and target_price > 0:
-            if direction == 'LONG':
-                expected_profit_pct = ((target_price - entry_price) / entry_price) * 100
-            else:
-                expected_profit_pct = ((entry_price - target_price) / entry_price) * 100
+        # Чтение лимитов из конфига (с дефолтами)
+        if isinstance(self.config, dict):
+            risk_cfg = self.config.get('risk', {})
         else:
-            expected_profit_pct = 0.0
-        
-        scenario['expected_profit_pct'] = expected_profit_pct
-        
-        # === ДИНАМИЧЕСКИЙ ПОРОГ ПРИБЫЛИ ===
-        # Адаптируем min_profit_threshold под текущую волатильность
-        # Высокая волатильность = можно требовать больше прибыли
-        # Низкая волатильность (флэт) = снижаем требования, чтобы торговать
-        base_threshold = self.min_profit_threshold
-        volatility_factor = max(0.5, 1.0 - (metrics.volatility_index * 10))  # 0.5-1.0
-        dynamic_min_profit = base_threshold * volatility_factor
-        
-        # Если рынок нейтральный (волатильность низкая) - применяем настраиваемую скидку
-        if metrics.volatility_index < 0.01:  # Очень низкая волатильность = флэт
-            # Берем скидку из конфига (настраивается автотюнером), а не хардкод
-            flat_discount = self.config.get('risk', {}).get('flat_market_discount', 0.7)
-            dynamic_min_profit *= flat_discount
-            logger.debug(f"[RiskManager] {symbol}: Flat market detected, reduced profit threshold by factor {flat_discount} to {dynamic_min_profit:.3f}%")
-        
-        # Проверка минимальной прибыли
-        if expected_profit_pct < dynamic_min_profit:
-            # В режиме обучения всё равно пропускаем для сбора статистики
-            if self.learning_mode:
-                logger.debug(f"[RiskManager] {symbol}: Shadow scenario low profit {expected_profit_pct:.2f}% < {dynamic_min_profit:.2f}% (allowed for learning)")
-                pass  # Пропускаем для обучения
-            else:
-                logger.debug(f"[RiskManager] {symbol}: REJECTED - Profit {expected_profit_pct:.2f}% < dynamic threshold {dynamic_min_profit:.2f}%")
-                return False, f"Profit {expected_profit_pct:.2f}% < threshold {dynamic_min_profit:.2f}%"
-        
-        # Проверка плеча
-        req_leverage = scenario.get('leverage', 1.0)
-        if req_leverage > metrics.max_leverage:
-            # В режиме обучения пропускаем для сбора статистики
-            if self.learning_mode:
-                logger.debug(f"[RiskManager] {symbol}: Shadow leverage {req_leverage} exceeds limit {metrics.max_leverage:.2f} (allowed for learning)")
-                pass
-            else:
-                logger.debug(f"[RiskManager] {symbol}: REJECTED - Leverage {req_leverage} exceeds limit {metrics.max_leverage:.2f}")
-                return False, f"Leverage {req_leverage} exceeds limit {metrics.max_leverage:.2f}"
-        
-        # Проверка экспозиции
-        qty = scenario.get('quantity', 0)
-        price = scenario.get('price', card.price)
-        notional = qty * price
-        
-        # metrics.exposure_limit уже рассчитан как trading_balance_usd * max_position_size_pct * (1 - liq_risk)
-        # Сравниваем напрямую с лимитом в долларах
-        if notional > metrics.exposure_limit:
-            logger.debug(f"[RiskManager] {symbol}: REJECTED - Exposure {notional:.2f} exceeds limit {metrics.exposure_limit:.2f}")
-            return False, f"Exposure {notional:.2f} exceeds limit {metrics.exposure_limit:.2f}"
-        
-        # Проверка аварийных флагов (всегда строго, кроме режима обучения для тени)
-        if metrics.is_emergency:
-            if self.learning_mode:
-                logger.debug(f"[RiskManager] {symbol}: Emergency mode but allowed for learning: {metrics.reason}")
-                pass
-            else:
-                logger.warning(f"[RiskManager] {symbol}: REJECTED - Emergency mode: {metrics.reason}")
-                return False, f"Emergency mode: {metrics.reason}"
-            
-        logger.info(f"[RiskManager] {symbol}: ACCEPTED - Profit {expected_profit_pct:.2f}%, RR={scenario.get('risk_reward_ratio', 0):.2f}, Vol={metrics.volatility_index:.4f}")
-        return True, "OK"
+            risk_cfg = getattr(self.config, 'risk', {})
+            if hasattr(risk_cfg, 'model_dump'):
+                risk_cfg = risk_cfg.model_dump()
+            elif hasattr(risk_cfg, 'dict'):
+                risk_cfg = risk_cfg.dict()
 
-    async def _shadow_check(self, symbol: str, card: DataCard, metrics: RiskMetrics):
-        """
-        Теневой расчет: сравнение текущего состояния с идеальным сценарием.
-        1. Считает текущий PnL теневой позиции и MAE.
-        2. Обновляет уровень стоп-лосса по логике адаптивного трейлинга.
-        3. Фиксирует расхождения для обучения AutoTuner.
+        base_limit = risk_cfg.get('max_balance_usage_pct', 0.66)
+        high_limit = risk_cfg.get('high_confidence_limit_pct', 0.75)
+        conf_threshold = risk_cfg.get('confidence_threshold_high', 0.90)
+        
+        # Определение актуального лимита
+        if confidence > conf_threshold:
+            limit = high_limit
+            limit_type = "HIGH_CONF"
+        else:
+            limit = base_limit
+            limit_type = "BASE"
+            
+        # Логика маршрутизации
+        if current_usage >= limit:
+            # Превышен лимит -> Отправляем в ТЕНЬ
+            reason = f'Balance usage {current_usage:.2f} >= limit {limit:.2f} ({limit_type}, Conf: {confidence:.2f})'
+            logger.warning(f"[RiskManager] {symbol}: Scenario rejected for REAL. Reason: {reason}. Sending to SHADOW.")
+            return {
+                'approved': False,
+                'is_shadow': True,
+                'reason': reason
+            }
+            
+        logger.debug(f"[RiskManager] {symbol}: Scenario approved for REAL. Usage {current_usage:.2f} < limit {limit:.2f} ({limit_type}).")
+        return {'approved': True, 'is_shadow': False}
         """
         if symbol not in self._shadow_scenarios:
             return

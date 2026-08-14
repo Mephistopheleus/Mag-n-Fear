@@ -51,6 +51,25 @@ class Executor:
         self.testnet = binance_dict.get('testnet', True)
         self.max_queue_size = exec_cfg.get('max_queue_size', 10)
         self.rate_limit_ms = exec_cfg.get('rate_limit_ms', 100)  # Мин. интервал между ордерами
+
+        # !!! КРИТИЧНО: Чтение force_sl_at_entry из конфига (safety) !!!
+        safety_cfg = self.config.get('safety', {})
+        if hasattr(safety_cfg, 'dict'):
+            safety_dict = safety_cfg.dict()
+        else:
+            safety_dict = safety_cfg
+        self.force_sl_at_entry = safety_dict.get('force_sl_at_entry', False)
+
+        # Интервал проверки SL (из data_feed.rest_sync_interval_min)
+        data_feed_cfg = self.config.get('data_feed', {})
+        if hasattr(data_feed_cfg, 'dict'):
+            data_feed_dict = data_feed_cfg.dict()
+        else:
+            data_feed_dict = data_feed_cfg
+        sync_min = data_feed_dict.get('rest_sync_interval_min', 5)
+        self.sl_check_interval = sync_min * 60
+
+        self._sl_monitor_task: Optional[asyncio.Task] = None
         
         # Состояние
         self._client: Optional[AsyncClient] = None

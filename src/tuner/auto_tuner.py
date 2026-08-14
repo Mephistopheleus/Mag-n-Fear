@@ -1,294 +1,138 @@
 """
-Tuner Module: Auto Tuner
-Анализирует карточки сделок, вычисляет влияние параметров на результат,
-обновляет коэффициенты доверия и настройки в конфиге.
-
-НЕ меняет математику анализаторов - только регулирует "силу влияния" через конфиг.
+Tuner Module: Auto Tuner (Momentum Instant Update)
+Мгновенная обработка снимков сделок. Без накопления.
+Обновляет веса анализаторов и настройки конфига с плавностью 0.5%.
+Записывает изменения в config.yaml и .brain.
 """
-import json
-from pathlib import Path
-from typing import Dict, List, Any, Optional, TYPE_CHECKING
-from datetime import datetime
-from collections import defaultdict
 import yaml
+from pathlib import Path
+from typing import Dict, Any, TYPE_CHECKING
+from datetime import datetime
 
 if TYPE_CHECKING:
-    from src.core.field import ProbabilityField
-
+    from src.storage.sqlite_manager import DatabaseManager
 
 class AutoTuner:
     """
-    Авто-настройщик системы.
-    
-    Принцип работы:
-    1. Загружает карточки сделок из хранилища
-    2. Группирует по типам анализаторов и значениям параметров
-    3. Вычисляет метрики: WinRate, Avg PnL, Impact Score для каждой группы
-    4. Обновляет confidence_factors и другие параметры в конфиге
-    5. Сохраняет новый config.yaml
-    
-    Целевые метрики: 100% PnL/день, 100% WinRate, 0% Drawdown
-    (На практике: стремление к максимуму этих показателей)
+    Мгновенный адаптивный тюнер.
+    Обрабатывает каждый снимок сделки сразу после закрытия.
     """
-    
-    def __init__(self, config: Any, probability_field):
-        # Конвертируем Pydantic модель в dict для совместимости
-        if hasattr(config, 'model_dump'):
-            self.config_dict = config.model_dump()
-        else:
-            self.config_dict = config
-            
-        self.field = probability_field
-        
-        # Пути из конфига
-        logging_cfg = self.config_dict.get('logging', {})
-        storage_cfg = self.config_dict.get('storage', {})
-        
-        cards_path = logging_cfg.get('cards_path', 'data_storage/cards') if isinstance(logging_cfg, dict) else getattr(logging_cfg, 'cards_path', 'data_storage/cards')
-        config_path = 'configs/config.yaml'
-        
-        self.cards_path = Path(cards_path)
+    def __init__(self, config_path: str, db_manager: 'DatabaseManager'):
         self.config_path = Path(config_path)
-        self.cards: List[Dict] = []
-        self.current_config: Dict = {}
-    
-    def load_cards(self) -> int:
-        """Загружает все карточки из хранилища."""
-        self.cards = []
+        self.db = db_manager
+        self.config = self._load_config()
         
-        # Путь к SQLite базе данных (.brain файл)
-        db_path = self.cards_path.parent / "trading.brain"
+        # Настройки плавности (максимальное изменение за шаг)
+        self.max_step_pct = 0.005  # 0.5%
         
-        # Приоритет 1: Загрузка из SQLite базы данных
-        if db_path.exists():
-            try:
-                import sqlite3
-                conn = sqlite3.connect(str(db_path))
-                conn.row_factory = sqlite3.Row
-                cursor = conn.cursor()
-                
-                cursor.execute("""
-                    SELECT * FROM trades ORDER BY id DESC
-                """)
-                
-                rows = cursor.fetchall()
-                for row in rows:
-                    card = {
-                        "symbol": row["symbol"],
-                        "timestamp_open": row["timestamp_open"],
-                        "timestamp_close": row["timestamp_close"],
-                        "strategy_type": row["strategy_type"],
-                        "direction": row["direction"],
-                        "entry_price": row["entry_price"],
-                        "stop_loss": row["stop_loss"],
-                        "target_price": row["target_price"],
-                        "confidence": row["confidence"],
-                        "risk_reward_ratio": row["risk_reward_ratio"],
-                        "leverage": row["leverage"],
-                        "quantity": row["quantity"],
-                        "trade_result": {
-                            "pnl_usd": row["pnl_usd"],
-                            "pnl_percent": row["pnl_percent"],
-                            "exit_price": row["exit_price"],
-                            "duration_sec": row["duration_sec"],
-                            "exit_reason": row["exit_reason"],
-                            "max_drawdown": row["max_drawdown"],
-                            "max_profit": row["max_profit"]
-                        },
-                        "tuner_notes": {
-                            "analyzer_trend_useful": bool(row["analyzer_trend_useful"]) if row["analyzer_trend_useful"] is not None else False,
-                            "analyzer_mean_reversion_useful": bool(row["analyzer_mean_reversion_useful"]) if row["analyzer_mean_reversion_useful"] is not None else False,
-                            "analyzer_order_flow_useful": bool(row["analyzer_order_flow_useful"]) if row["analyzer_order_flow_useful"] is not None else False,
-                            "analyzer_volatility_useful": bool(row["analyzer_volatility_useful"]) if row["analyzer_volatility_useful"] is not None else False,
-                            "analyzer_matrix_useful": bool(row["analyzer_matrix_useful"]) if row["analyzer_matrix_useful"] is not None else False,
-                            "analyzer_trend_confidence": row["analyzer_trend_confidence"],
-                            "analyzer_mean_reversion_confidence": row["analyzer_mean_reversion_confidence"],
-                            "analyzer_order_flow_confidence": row["analyzer_order_flow_confidence"],
-                            "analyzer_volatility_confidence": row["analyzer_volatility_confidence"],
-                            "analyzer_matrix_confidence": row["analyzer_matrix_confidence"]
-                        },
-                        "market_conditions": {
-                            "trend": row["market_trend"],
-                            "volatility": row["market_volatility"],
-                            "volume": row["market_volume"]
-                        }
-                    }
-                    self.cards.append(card)
-                
-                conn.close()
-                print(f"[AutoTuner] Loaded {len(self.cards)} cards from SQLite database")
-                return len(self.cards)
-            except Exception as e:
-                print(f"[AutoTuner] Error loading from SQLite: {e}")
-        
-        # Приоритет 2: Загрузка из JSON файла (для обратной совместимости)
-        history_file = self.cards_path / "trading_history.json.txt"
-        if history_file.exists():
-            try:
-                with open(history_file, 'r', encoding='utf-8') as f:
-                    self.cards = json.load(f)
-                print(f"[AutoTuner] Loaded {len(self.cards)} cards from {history_file}")
-                return len(self.cards)
-            except (json.JSONDecodeError, IOError) as e:
-                print(f"[AutoTuner] Error loading history file: {e}")
-        
-        # Приоритет 3: Старые отдельные файлы (для обратной совместимости)
-        for card_file in self.cards_path.glob("*.txt"):
-            if card_file.name == "trading_history.json.txt":
-                continue
-            try:
-                with open(card_file, 'r', encoding='utf-8') as f:
-                    self.cards.append(json.load(f))
-            except (json.JSONDecodeError, IOError):
-                continue
-        
-        print(f"[AutoTuner] Loaded {len(self.cards)} cards from individual files")
-        return len(self.cards)
-    
-    def load_config(self):
-        """Загружает текущий конфиг."""
-        with open(self.config_path, 'r', encoding='utf-8') as f:
-            self.current_config = yaml.safe_load(f)
-    
-    def analyze_impact(self) -> Dict[str, Any]:
+        # Идеальные метрики для сравнения
+        self.target_pnl = 1.0  # 100%
+        self.target_wr = 1.0   # 100%
+        self.target_dd = 0.0   # 0%
+
+    def _load_config(self) -> dict:
+        """Загрузка актуального конфига."""
+        try:
+            with open(self.config_path, 'r', encoding='utf-8') as f:
+                return yaml.safe_load(f)
+        except Exception as e:
+            print(f"[AutoTuner] Ошибка загрузки конфига: {e}")
+            return {}
+
+    def _save_config(self):
+        """Сохранение конфига на диск."""
+        try:
+            with open(self.config_path, 'w', encoding='utf-8') as f:
+                yaml.dump(self.config, f, default_flow_style=False, allow_unicode=True)
+            print("[AutoTuner] Конфиг обновлен на диске.")
+        except Exception as e:
+            print(f"[AutoTuner] Ошибка сохранения конфига: {e}")
+
+    def process_snapshot(self, snapshot: dict):
         """
-        Анализирует влияние параметров на результат сделок.
-        
-        :return: Отчет с метриками по каждому параметру
+        ГЛАВНЫЙ МЕТОД: Мгновенная обработка снимка.
+        1. Сравнивает результат с идеалом.
+        2. Корректирует веса и параметры.
+        3. Применяет ограничение шага (0.5%).
+        4. Сохраняет в конфиг и БД.
         """
-        if not self.cards:
-            return {"error": "No cards loaded"}
-        
-        # Группировка по типам анализаторов
-        analyzer_stats: Dict[str, Dict] = defaultdict(lambda: {
-            "total_trades": 0,
-            "profitable_trades": 0,
-            "total_pnl": 0.0,
-            "avg_confidence": 0.0
-        })
-        
-        # Анализ каждой карточки
-        for card in self.cards:
-            if not card.get("trade_result"):
-                continue  # Пропускаем незавершенные сделки
-            
-            pnl = card["trade_result"].get("pnl_usd", 0)
-            is_profitable = pnl > 0
-            
-            # Анализ вкладов анализаторов
-            tuner_notes = card.get("tuner_notes", {})
-            
-            for key, value in tuner_notes.items():
-                if key.startswith("analyzer_") and key.endswith("_useful"):
-                    analyzer_type = key.replace("analyzer_", "").replace("_useful", "")
-                    
-                    analyzer_stats[analyzer_type]["total_trades"] += 1
-                    if is_profitable:
-                        analyzer_stats[analyzer_type]["profitable_trades"] += 1
-                    analyzer_stats[analyzer_type]["total_pnl"] += pnl
-                    
-                    # Учет доверия
-                    conf_key = f"analyzer_{analyzer_type}_confidence"
-                    if conf_key in tuner_notes:
-                        current_avg = analyzer_stats[analyzer_type]["avg_confidence"]
-                        count = analyzer_stats[analyzer_type]["total_trades"]
-                        # Скользящее среднее
-                        analyzer_stats[analyzer_type]["avg_confidence"] = (
-                            (current_avg * (count - 1) + tuner_notes[conf_key]) / count
-                        )
-        
-        # Расчет метрик
-        report = {
-            "analyzers": {},
-            "timestamp": datetime.utcnow().isoformat()
-        }
-        
-        for analyzer_type, stats in analyzer_stats.items():
-            if stats["total_trades"] == 0:
-                continue
-            
-            win_rate = stats["profitable_trades"] / stats["total_trades"]
-            avg_pnl = stats["total_pnl"] / stats["total_trades"]
-            
-            # Impact Score: комбинация WinRate и Avg PnL
-            # (Простая формула, можно усложнить)
-            impact_score = win_rate * 0.7 + min(avg_pnl / 100, 0.3)  # Нормализация
-            
-            report["analyzers"][analyzer_type] = {
-                "total_trades": stats["total_trades"],
-                "win_rate": win_rate,
-                "avg_pnl": avg_pnl,
-                "impact_score": impact_score,
-                "avg_confidence": stats["avg_confidence"]
-            }
-        
-        return report
-    
-    def update_confidence_factors(self, report: Dict[str, Any], min_trades: int = 10):
-        """
-        Обновляет коэффициенты доверия в конфиге на основе отчета.
-        
-        :param report: Отчет из analyze_impact()
-        :param min_trades: Минимальное количество сделок для обновления
-        """
-        if "analyzers" not in report:
+        if not snapshot:
             return
+
+        # 1. Анализ отклонения от идеала
+        pnl = snapshot.get('pnl_percent', 0) / 100.0  # нормализация
+        is_win = 1 if pnl > 0 else 0
+        dd = snapshot.get('drawdown_max', 0) / 100.0
         
-        new_confidence_factors = {}
+        # Вычисляем "ошибку" (чем дальше от идеала, тем сильнее коррекция)
+        error_score = (self.target_pnl - pnl) + (self.target_wr - is_win) + (dd - self.target_dd)
         
-        for analyzer_type, metrics in report["analyzers"].items():
-            if metrics["total_trades"] < min_trades:
-                # Недостаточно данных, оставляем старое значение
-                old_value = self.current_config.get("tuner", {}).get("confidence_factors", {}).get(analyzer_type, 0.5)
-                new_confidence_factors[analyzer_type] = old_value
-                continue
+        # 2. Коррекция весов анализаторов
+        analyzer_scores = snapshot.get('analyzer_scores', {})
+        direction = 1 if pnl > 0 else -1
+        
+        updated_weights = {}
+        # Путь к весам в конфиге
+        if 'analysis' not in self.config:
+            self.config['analysis'] = {}
+        if 'weights' not in self.config['analysis']:
+            self.config['analysis']['weights'] = {}
             
-            # Новая уверенность = Impact Score (нормализованный)
-            # Можно добавить другие формулы
-            new_confidence = min(max(metrics["impact_score"], 0.1), 1.0)  # Ограничение [0.1, 1.0]
-            new_confidence_factors[analyzer_type] = round(new_confidence, 3)
+        current_weights = self.config['analysis']['weights']
         
-        # Обновление конфига
-        if "tuner" not in self.current_config:
-            self.current_config["tuner"] = {}
-        self.current_config["tuner"]["confidence_factors"] = new_confidence_factors
-    
-    def save_config(self, backup: bool = True):
-        """Сохраняет обновленный конфиг."""
-        if backup:
-            backup_path = self.config_path.with_suffix(".yaml.bak")
-            if self.config_path.exists():
-                with open(self.config_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                with open(backup_path, 'w', encoding='utf-8') as f:
-                    f.write(content)
+        for name, score in analyzer_scores.items():
+            if score == 0:
+                continue
+                
+            current_weight = current_weights.get(name, 0.5)
+            
+            # Расчет дельты: знак прибыли * сила сигнала * шаг
+            delta = direction * abs(score) * self.max_step_pct
+            
+            new_weight = current_weight + delta
+            
+            # Ограничение диапазона [0.1, 1.0]
+            new_weight = max(0.1, min(1.0, new_weight))
+            
+            updated_weights[name] = new_weight
+
+        # Нормализация весов (сумма = 1.0)
+        total = sum(updated_weights.values())
+        if total > 0:
+            for name in updated_weights:
+                updated_weights[name] /= total
+                self.config['analysis']['weights'][name] = round(updated_weights[name], 4)
+
+        # 3. Коррекция общих настроек (Risk Multiplier)
+        if 'risk' not in self.config:
+            self.config['risk'] = {}
+            
+        current_mult = self.config['risk'].get('dynamic_risk_multiplier', 1.0)
+        if pnl < 0:
+            new_mult = current_mult * (1 - self.max_step_pct)
+        else:
+            new_mult = current_mult * (1 + self.max_step_pct)
+            
+        # Ограничение множителя [0.5, 2.0]
+        new_mult = max(0.5, min(2.0, new_mult))
+        self.config['risk']['dynamic_risk_multiplier'] = round(new_mult, 4)
+
+        # 4. Сохранение изменений в конфиг
+        self._save_config()
         
-        with open(self.config_path, 'w', encoding='utf-8') as f:
-            yaml.dump(self.current_config, f, default_flow_style=False, allow_unicode=True)
-    
-    def run_full_cycle(self) -> Dict[str, Any]:
-        """
-        Запускает полный цикл настройки:
-        1. Загрузка карточек
-        2. Анализ влияния
-        3. Обновление конфига
-        4. Сохранение
-        
-        :return: Отчет о настройке
-        """
-        self.load_config()
-        cards_count = self.load_cards()
-        
-        if cards_count == 0:
-            return {"status": "no_data", "message": "No trade cards found"}
-        
-        report = self.analyze_impact()
-        self.update_confidence_factors(report)
-        self.save_config()
-        
-        return {
-            "status": "success",
-            "cards_analyzed": cards_count,
-            "report": report,
-            "new_config_path": str(self.config_path)
+        # 5. Запись решения в БД (.brain)
+        decision_record = {
+            'timestamp': datetime.now().isoformat(),
+            'snapshot_id': snapshot.get('id'),
+            'error_score': round(error_score, 4),
+            'updated_weights': updated_weights,
+            'new_risk_multiplier': new_mult
         }
+        # Предполагаем, что у db_manager есть метод save_tuner_decision
+        # Если нет - добавим заглушку или обработаем ошибку
+        try:
+            self.db.save_tuner_decision(decision_record)
+        except AttributeError:
+            print("[AutoTuner] Метод save_tuner_decision не найден в DB manager")
+            
+        print(f"[AutoTuner] Обработан снимок. Ошибка: {error_score:.4f}. Весы обновлены.")

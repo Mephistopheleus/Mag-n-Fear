@@ -26,9 +26,15 @@ class ScenarioWriter:
     """
     def __init__(self, config: Dict[str, Any]):
         self.config = config
-        # Символ больше не хранится здесь - передается в generate_all_ideas
         
-        # Параметры для разных типов сценариев (настраиваемые через TUNABLE_PARAMS)
+        # Чтение параметров издержек из конфига (для точного расчета PnL)
+        costs = config.get('trading_costs', config)
+        self.fee_rate = float(costs.get('commission_rate', 0.0004))
+        self.spread_rate = float(costs.get('spread_rate', 0.0001))
+        self.slippage_rate = float(costs.get('slippage_rate', 0.0005))
+        self.total_cost_rate = (self.fee_rate * 2) + self.spread_rate + self.slippage_rate
+
+        # Параметры для разных типов сценариев
         self.scenario_params = {
             ScenarioType.SCALPING_LONG: {'min_rr': 1.5, 'time_horizon': (60, 300), 'target_move_pct': (0.005, 0.015)},
             ScenarioType.SCALPING_SHORT: {'min_rr': 1.5, 'time_horizon': (60, 300), 'target_move_pct': (0.005, 0.015)},
@@ -42,46 +48,46 @@ class ScenarioWriter:
             ScenarioType.MEAN_REVERSION: {'min_rr': 2.0, 'time_horizon': (300, 1200), 'target_move_pct': (0.01, 0.025)},
             ScenarioType.ARBITRAGE_CORRELATION: {'min_rr': 1.8, 'time_horizon': (120, 600), 'target_move_pct': (0.005, 0.012)},
         }
-        
-        logger.info("ScenarioWriter v3.0 инициализирован. Режим: КОНВЕЙЕР ИДЕЙ")
+
+        logger.info(f"ScenarioWriter v3.0 инициализирован. Издержки: {self.total_cost_rate:.4%}. Режим: КОНВЕЙЕР ИДЕЙ")
 
     def generate_all_ideas(self, symbol: str, current_price: float, market_context: Dict[str, Any]) -> List[TradeIdea]:
         """
         Генерирует ВСЕ возможные торговые идеи на основе данных из market_context.
         Не фильтрует идеи - это задача RiskManager.
-        
+
         :param symbol: Символ для генерации идей (BTCUSDT, DOGEUSDT и т.д.)
         :param current_price: Текущая цена
         :param market_context: Данные от MatrixContextAnalyzer и других источников
         """
         ideas = []
         timestamp = datetime.now().timestamp()
-        
+
         logger.info(f"Генерация идей для {symbol}. Цена: {current_price:.4f}")
-        
+
         # Получаем данные из market_context (результат работы MatrixContextAnalyzer)
         field_data = market_context.get('matrix_snapshot', {})
-        
+
         # 1. Генерируем идеи на основе паттернов
         pattern_ideas = self._generate_pattern_ideas(field_data, current_price, timestamp, symbol)
         ideas.extend(pattern_ideas)
-        
+
         # 2. Генерируем идеи на основе ликвидности
         liquidity_ideas = self._generate_liquidity_ideas(field_data, current_price, timestamp, symbol)
         ideas.extend(liquidity_ideas)
-        
+
         # 3. Генерируем идеи на основе тренда
         trend_ideas = self._generate_trend_ideas(field_data, current_price, timestamp, symbol)
         ideas.extend(trend_ideas)
-        
+
         # 4. Генерируем идеи на основе возврата к среднему
         mean_rev_ideas = self._generate_mean_reversion_ideas(field_data, current_price, timestamp, symbol)
         ideas.extend(mean_rev_ideas)
-        
+
         # 5. Генерируем идеи на основе корреляций
         arb_ideas = self._generate_arbitrage_ideas(field_data, current_price, timestamp, symbol)
         ideas.extend(arb_ideas)
-        
+
         logger.info(f"Сгенерировано {len(ideas)} торговых идей для {symbol}. Передача в RiskManager.")
         return ideas
 
@@ -89,18 +95,18 @@ class ScenarioWriter:
         """Генерирует идеи на основе графических паттернов."""
         ideas = []
         patterns = field_data.get('graph_patterns', [])
-        
+
         for pattern in patterns:
             pattern_type = pattern.get('type', '')
             confidence = pattern.get('confidence', 0.5)
             breakout_direction = pattern.get('breakout_direction', 0)
             target_price = pattern.get('target_price', price)
             neckline = pattern.get('neckline', price)
-            
+
             if breakout_direction > 0:
                 scenario_type = ScenarioType.BREAKOUT_LONG if confidence > 0.7 else ScenarioType.PULLBACK_LONG
-                idea = self._create_idea(symbol, scenario_type, 1, price, neckline * 0.995, target_price, 
-                                        target_price, 600, confidence, f"Паттерн {pattern_type}: пробой вверх", 
+                idea = self._create_idea(symbol, scenario_type, 1, price, neckline * 0.995, target_price,
+                                        target_price, 600, confidence, f"Паттерн {pattern_type}: пробой вверх",
                                         [f"pattern_{pattern_type}", "breakout"], ts)
                 if idea: ideas.append(idea)
             elif breakout_direction < 0:
@@ -117,10 +123,10 @@ class ScenarioWriter:
         liq_data = field_data.get('liquidity_map', {})
         poc_price = liq_data.get('poc_price')
         zones = liq_data.get('zones', [])
-        
+
         if not poc_price:
             return ideas
-        
+
         dist_to_poc = abs(price - poc_price) / price
         if dist_to_poc > 0.002:
             direction = 1 if price < poc_price else -1
@@ -130,7 +136,7 @@ class ScenarioWriter:
                                     poc_price, 900, 0.65, f"Движение к POC ({poc_price:.4f})",
                                     ["liquidity_run", "poc_magnet"], ts)
             if idea: ideas.append(idea)
-        
+
         for zone in zones:
             if zone.get('type') == 'void' and zone.get('strength', 0) > 0.5:
                 void_low, void_high = zone.get('low', price), zone.get('high', price)
@@ -154,7 +160,7 @@ class ScenarioWriter:
         trend_strength = trend_data.get('strength', 0.5)
         channel_lower = trend_data.get('lower_bound', price * 0.99)
         channel_upper = trend_data.get('upper_bound', price * 1.01)
-        
+
         if trend_direction == 'UP' and trend_strength > 0.6:
             scenario_type = ScenarioType.PULLBACK_LONG if price > channel_lower * 1.005 else ScenarioType.SCALPING_LONG
             idea = self._create_idea(symbol, scenario_type, 1, price, channel_lower * 0.995, channel_upper,
@@ -177,7 +183,7 @@ class ScenarioWriter:
         bb_upper = mr_data.get('bb_upper', price * 1.02)
         bb_lower = mr_data.get('bb_lower', price * 0.98)
         bb_middle = mr_data.get('bb_middle', price)
-        
+
         if rsi < 30:
             idea = self._create_idea(symbol, ScenarioType.MEAN_REVERSION, 1, price, bb_lower * 0.99, bb_middle,
                                     bb_middle, 600, 0.7, f"Перепроданность (RSI={rsi:.1f})",
@@ -197,7 +203,7 @@ class ScenarioWriter:
         btc_corr = corr_data.get('BTCUSDT', {})
         coeff = btc_corr.get('coefficient', 0.8)
         divergence = btc_corr.get('divergence_pct', 0.0)
-        
+
         if abs(divergence) > 0.01 and coeff > 0.7:
             direction = 1 if divergence > 0 else -1
             tp_mult = 1.015 if direction > 0 else 0.985
@@ -212,23 +218,37 @@ class ScenarioWriter:
     def _create_idea(self, symbol: str, scenario_type: ScenarioType, direction: int, entry: float,
                      stop: float, tp: float, target_price: float, target_time_sec: int,
                      confidence: float, reason: str, logic_tags: List[str], timestamp: float) -> Optional[TradeIdea]:
-        """Создает объект TradeIdea с расчетом рекомендуемого плеча."""
+        """
+        Создает объект TradeIdea с расчетом чистой прибыли (Net PnL).
+        Формула для фьючерсов: (Цена_Тейка - Цена_Входа) * Плечо - (Комиссии + Спред + Проскальзывание)
+        Фильтр: создается идея только если Net_PnL > 0.
+        """
         params = self.scenario_params.get(scenario_type, {'min_rr': 1.5})
-        min_rr = params['min_rr']
         
-        risk = (entry - stop) if direction == 1 else (stop - entry)
-        reward = (tp - entry) if direction == 1 else (entry - tp)
+        risk = abs(entry - stop)
+        reward = abs(tp - entry)
         
-        if risk <= 0 or reward <= 0:
+        if risk <= 0:
             return None
-        
+
         rr = reward / risk
-        if rr < min_rr:
+        
+        # Расчет ожидаемого PnL в % с учетом издержек
+        # Для лонга: (TP - Entry) / Entry
+        # Для шорта: (Entry - TP) / Entry
+        raw_pnl_pct = (tp - entry) / entry if direction == 1 else (entry - tp) / entry
+        
+        # Вычитаем суммарные издержки (комиссия вход+выход, спред, проскальзывание)
+        net_pnl_pct = raw_pnl_pct - self.total_cost_rate
+        
+        # ГЛАВНЫЙ ФИЛЬТР: создаем идею только если чистая прибыль положительна
+        if net_pnl_pct <= 0:
+            logger.debug(f"Сценарий отклонен: отрицательный Net PnL ({net_pnl_pct:.4%}) для {symbol}")
             return None
-        
-        dist_to_sl_pct = abs(risk / entry * 100)
+
+        dist_to_sl_pct = risk / entry
         recommended_leverage = min(10.0, 2.0 / dist_to_sl_pct) if dist_to_sl_pct > 0 else 1.0
-        
+
         return TradeIdea(
             symbol=symbol,
             scenario_type=scenario_type,
@@ -243,5 +263,6 @@ class ScenarioWriter:
             logic_tags=logic_tags,
             reason=reason,
             recommended_leverage=recommended_leverage,
-            matrix_snapshot={}
+            matrix_snapshot={},
+            net_pnl_expectation=net_pnl_pct  # Добавляем ожидание чистой прибыли
         )
