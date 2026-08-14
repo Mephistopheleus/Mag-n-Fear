@@ -120,6 +120,7 @@ class AutoTuner:
         # Параметры риска для обновления
         risk_param_map = {
             'risk_per_trade_pct': (0.1, 2.0),      # (min, max)
+            'stop_loss_pct': (0.5, 3.0),           # Стоп-лосс % от цены входа
             'max_position_size_pct': (0.33, 0.75),
             'high_confidence_threshold': (0.70, 0.95),
             'high_confidence_max_pct': (0.60, 0.80),
@@ -260,18 +261,8 @@ class AutoTuner:
                 new_cf = max(0.05, min(0.5, new_cf))
                 current_analyzer['confidence_factor'] = round(new_cf, 4)
             
-            # Обновление weight (если есть)
-            if 'weight' in analyzer_cfg:
-                current_w = current_analyzer.get('weight', analyzer_cfg.get('weight', 1.0))
-                
-                if pnl > 0:
-                    delta = current_w * self.max_step_pct
-                else:
-                    delta = -current_w * self.max_step_pct
-                
-                new_w = current_w + delta
-                new_w = max(0.1, min(2.0, new_w))
-                current_analyzer['weight'] = round(new_w, 4)
+            # ВЕСА УЖЕ ОБНОВЛЕНЫ И НОРМАЛИЗОВАНЫ ВЫШЕ (строки 73-110)
+            # Не перезаписываем их здесь, чтобы не нарушить нормализацию
         
         tunable_params['analyzers'] = analyzers_tunable
         

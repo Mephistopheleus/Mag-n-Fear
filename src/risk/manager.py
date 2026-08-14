@@ -230,9 +230,9 @@ class RiskManager:
                 elif hasattr(risk_cfg, 'dict'):
                     risk_cfg = risk_cfg.dict()
 
-        base_limit = risk_cfg.get('max_balance_usage_pct', 0.66)
-        high_limit = risk_cfg.get('high_confidence_limit_pct', 0.75)
-        conf_threshold = risk_cfg.get('confidence_threshold_high', 0.90)
+        base_limit = risk_cfg.get('max_position_size_pct', 0.66)
+        high_limit = risk_cfg.get('high_confidence_max_pct', 0.75)
+        conf_threshold = risk_cfg.get('high_confidence_threshold', 0.90)
         
         # Определение актуального лимита
         if confidence > conf_threshold:
@@ -520,7 +520,7 @@ class RiskManager:
     async def add_to_shadow_learning(self, symbol: str, scenario: Dict[str, Any], reject_reason: str, shadow_trade=None):
         """
         Добавление отклоненного сценария в систему обучения.
-        Сценарий сохраняется для анализа AutoTuner'ом, даже если не прошел фильтры.
+        Сценарий сохраняется для анализа AutoTuner, даже если не прошел фильтры.
         ВАЖНО: В режиме обучения все сценарии идут в тень для сбора полной статистики.
         
         Args:

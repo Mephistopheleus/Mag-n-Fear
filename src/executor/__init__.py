@@ -211,11 +211,11 @@ class Executor:
                             has_stop_loss = False
                             for order in open_orders:
                                 order_type = order.get('type', '')
-                                # STOP_MARKET или STOP_LOSS с closePosition = это стоп-лосс
+                                # STOP_MARKET или STOP_LOSS с reduceOnly=True - это стоп-лосс
                                 # TAKE_PROFIT_MARKET - это тейк-профит, не считаем его защитой
                                 if order_type in ['STOP_MARKET', 'STOP_LOSS']:
-                                    # closePosition=True означает что ордер закрывает всю позицию (это SL)
-                                    if order.get('closePosition', False):
+                                    # reduceOnly=True означает что ордер закрывает часть позиции (это SL)
+                                    if order.get('reduceOnly', False):
                                         has_stop_loss = True
                                         break
                             
@@ -267,8 +267,11 @@ class Executor:
                         
                         # Передаём исходную сторону позиции (LONG/SHORT), 
                         # _place_stop_loss_order сам инвертирует её в SELL/BUY
-                        await self._place_stop_loss_order(symbol, stop_loss_price, quantity, side)
-                        logger.info(f"[Executor] STOP-LOSS order placed for {symbol}")
+                        result = await self._place_stop_loss_order(symbol, stop_loss_price, quantity, side)
+                        if result:
+                            logger.info(f"[Executor] STOP-LOSS order placed for {symbol}")
+                        else:
+                            logger.error(f"[Executor] FAILED to place STOP-LOSS for {symbol} - position unprotected!")
                             
                 except Exception as e:
                     logger.error(f"[Executor] Failed to set stop-loss for {symbol}: {e}")
@@ -537,7 +540,7 @@ class Executor:
                 type='STOP_MARKET',
                 quantity=quantity,
                 stopPrice=stop_price,
-                closePosition=True
+                reduceOnly=True
             )
             
             # Сохраняем ID стопа в позицию
