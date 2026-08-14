@@ -1,7 +1,8 @@
 """
 Data Module: SQLite Manager for Trade Snapshots and Logs.
 Хранение снимков сделок, карточек анализов и логов автотюнера в SQLite.
-Автоматическая ротация данных при превышении лимита (5MB для снимков, 2MB для логов).
+Автоматическая ротация данных при превышении лимита (13MB для снимков, 2MB для логов, 5MB для истории тюнера).
+Файл БД: .brain (для исключения конфликтов с Git)
 """
 import sqlite3
 import json
@@ -23,12 +24,12 @@ class SQLiteManager:
     3. TunerLog - логи изменений настроек автотюнером
     
     Автоматическая ротация по объёму (в байтах):
-    - Снимки сделок: макс. 10MB (старые записи удаляются)
-    - Логи тюнера: макс. 1.5MB
+    - Снимки сделок: макс. 13MB (старые записи удаляются)
+    - Логи тюнера: макс. 2MB
     - История изменений тюнера: макс. 5MB
     """
     
-    def __init__(self, db_path: str, max_snapshots_size_mb: float = 10.0, max_logs_size_mb: float = 1.5, max_tuner_history_size_mb: float = 5.0):
+    def __init__(self, db_path: str, max_snapshots_size_mb: float = 13.0, max_logs_size_mb: float = 2.0, max_tuner_history_size_mb: float = 5.0):
         self.db_path = Path(db_path)
         self.max_snapshots_size_bytes = int(max_snapshots_size_mb * 1024 * 1024)
         self.max_logs_size_bytes = int(max_logs_size_mb * 1024 * 1024)

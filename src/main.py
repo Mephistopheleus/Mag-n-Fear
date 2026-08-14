@@ -46,7 +46,7 @@ from src.scenario_lab import ScenarioLab
 
 # Пути к данным
 LOG_FILE = "data_storage/bot.log"
-DB_PATH = "data_storage/trading_history.db"
+DB_PATH = "data_storage/trading.brain"
 
 # Настраиваем логгер с ротацией
 os.makedirs("data_storage", exist_ok=True)
@@ -591,7 +591,7 @@ class TradingBot:
                 
                 # Подсчет количества карточек в SQLite базе данных
                 card_count = 0
-                db_path = cards_path.parent / "trading_history.db"
+                db_path = cards_path.parent / "trading.brain"
                 if db_path.exists():
                     try:
                         import sqlite3
@@ -692,7 +692,7 @@ class TradingBot:
                 
                 # Подсчет количества карточек в SQLite базе данных
                 card_count = 0
-                db_path = cards_path.parent / "trading_history.db"
+                db_path = cards_path.parent / "trading.brain"
                 if db_path.exists():
                     try:
                         import sqlite3

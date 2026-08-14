@@ -16,7 +16,7 @@ def generate_summary(cards_dir: str = "data_storage/cards", output_file: str = "
         output_file: Имя выходного файла
     """
     cards_path = Path(cards_dir)
-    db_path = cards_path.parent / "trading_history.db"
+    db_path = cards_path.parent / "trading.brain"
     output_path = cards_path.parent / output_file
     
     if not db_path.exists():
