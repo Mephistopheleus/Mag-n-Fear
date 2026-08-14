@@ -120,7 +120,7 @@ class AutoTuner:
         # Параметры риска для обновления
         risk_param_map = {
             'risk_per_trade_pct': (0.1, 2.0),      # (min, max)
-            'stop_loss_pct': (0.5, 3.0),           # Стоп-лосс % от цены входа
+            'stop_loss_pct': (0.005, 0.05),        # Стоп-лосс как доля (0.5% - 5%)
             'max_position_size_pct': (0.33, 0.75),
             'high_confidence_threshold': (0.70, 0.95),
             'high_confidence_max_pct': (0.60, 0.80),
@@ -143,6 +143,9 @@ class AutoTuner:
                     elif param_name in ['min_reward_ratio', 'min_profit_threshold']:
                         # Уменьшаем требования при прибыли
                         delta = -current_val * self.max_step_pct
+                    elif param_name == 'stop_loss_pct':
+                        # При прибыли сужаем стоп (фиксируем прибыль быстрее)
+                        delta = -current_val * self.max_step_pct
                     else:
                         delta = 0
                 else:
@@ -151,6 +154,9 @@ class AutoTuner:
                         delta = -current_val * self.max_step_pct
                     elif param_name in ['min_reward_ratio', 'min_profit_threshold']:
                         # Повышаем требования при убытке
+                        delta = current_val * self.max_step_pct
+                    elif param_name == 'stop_loss_pct':
+                        # При убытке расширяем стоп (защита от волатильности)
                         delta = current_val * self.max_step_pct
                     else:
                         delta = 0
