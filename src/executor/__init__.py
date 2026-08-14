@@ -265,19 +265,10 @@ class Executor:
                         side = pos['side']
                         quantity = pos['quantity']
                         
-                        # Для LONG позиция закрывается продажей, для SHORT - покупкой
-                        stop_side = 'SELL' if side == 'LONG' else 'BUY'
-                        
-                        # Выставляем Stop Market ордер
-                        stop_order = await self._client.futures_create_order(
-                            symbol=symbol,
-                            side=stop_side,
-                            type='STOP_MARKET',
-                            quantity=quantity,
-                            stopPrice=stop_loss_price,
-                            reduceOnly=True
-                        )
-                        logger.info(f"[Executor] STOP-LOSS order placed for {symbol}: {stop_side} {quantity} @ {stop_loss_price}, order_id={stop_order['orderId']}")
+                        # Передаём исходную сторону позиции (LONG/SHORT), 
+                        # _place_stop_loss_order сам инвертирует её в SELL/BUY
+                        await self._place_stop_loss_order(symbol, stop_loss_price, quantity, side)
+                        logger.info(f"[Executor] STOP-LOSS order placed for {symbol}")
                             
                 except Exception as e:
                     logger.error(f"[Executor] Failed to set stop-loss for {symbol}: {e}")
