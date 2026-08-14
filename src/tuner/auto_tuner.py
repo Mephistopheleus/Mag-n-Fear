@@ -238,13 +238,14 @@ class AutoTuner:
         
         # --- Analyzer параметры (веса и confidence_factor) ---
         analyzers_tunable = tunable_params.get('analyzers', {})
-        analyzers_current = analyzers_tunable.copy()  # Работаем внутри TUNABLE_PARAMS['analyzers']
+        # Работаем напрямую с analyzers_tunable, без копии
+        # Изменяем значения внутри словаря TUNABLE_PARAMS['analyzers']
         
-        for analyzer_name, analyzer_cfg in analyzers_tunable.items():
-            if analyzer_name not in analyzers_current:
-                analyzers_current[analyzer_name] = {}
+        for analyzer_name, analyzer_cfg in list(analyzers_tunable.items()):
+            if analyzer_name not in analyzers_tunable:
+                analyzers_tunable[analyzer_name] = {}
             
-            current_analyzer = analyzers_current[analyzer_name]
+            current_analyzer = analyzers_tunable[analyzer_name]
             
             # Обновление confidence_factor
             if 'confidence_factor' in analyzer_cfg:
@@ -272,7 +273,7 @@ class AutoTuner:
                 new_w = max(0.1, min(2.0, new_w))
                 current_analyzer['weight'] = round(new_w, 4)
         
-        tunable_params['analyzers'] = analyzers_current
+        tunable_params['analyzers'] = analyzers_tunable
         
         # Сохраняем обновлённый TUNABLE_PARAMS обратно в конфиг
         self.config['TUNABLE_PARAMS'] = tunable_params
