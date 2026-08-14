@@ -36,15 +36,29 @@ class RiskManager:
             
         self.field = probability_field
         
-        # Настройки из конфига (с дефолтами для старта)
+        # Чтение настроек риска ИЗ TUNABLE_PARAMS (где AutoTuner хранит обновления)
+        # Fallback на старый формат если TUNABLE_PARAMS отсутствует
         if isinstance(self.config, dict):
-            risk_cfg = self.config.get('risk', {})
+            tunable_params = self.config.get('TUNABLE_PARAMS', {})
+            risk_cfg = tunable_params.get('risk', {})
+            # Если в TUNABLE_PARAMS нет risk, пробуем старый путь
+            if not risk_cfg:
+                risk_cfg = self.config.get('risk', {})
         else:
-            risk_cfg = getattr(self.config, 'risk', {})
-            if hasattr(risk_cfg, 'dict'):
-                risk_cfg = risk_cfg.dict()
-            elif hasattr(risk_cfg, 'model_dump'):
-                risk_cfg = risk_cfg.model_dump()
+            # Pydantic модель
+            tunable_params = getattr(self.config, 'TUNABLE_PARAMS', None)
+            if tunable_params:
+                risk_cfg = getattr(tunable_params, 'risk', {})
+                if hasattr(risk_cfg, 'model_dump'):
+                    risk_cfg = risk_cfg.model_dump()
+                elif hasattr(risk_cfg, 'dict'):
+                    risk_cfg = risk_cfg.dict()
+            else:
+                risk_cfg = getattr(self.config, 'risk', {})
+                if hasattr(risk_cfg, 'model_dump'):
+                    risk_cfg = risk_cfg.model_dump()
+                elif hasattr(risk_cfg, 'dict'):
+                    risk_cfg = risk_cfg.dict()
         
         self.min_leverage = risk_cfg.get('min_leverage', 1.0)
         self.max_leverage_default = risk_cfg.get('max_leverage', 5.0)
@@ -195,14 +209,26 @@ class RiskManager:
         confidence = scenario.get('confidence', 0.0)
         
         # Чтение лимитов из конфига (с дефолтами)
+        # Приоритет: TUNABLE_PARAMS['risk'] (где AutoTuner хранит обновления) -> старый формат risk
         if isinstance(self.config, dict):
-            risk_cfg = self.config.get('risk', {})
+            tunable_params = self.config.get('TUNABLE_PARAMS', {})
+            risk_cfg = tunable_params.get('risk', {})
+            if not risk_cfg:
+                risk_cfg = self.config.get('risk', {})
         else:
-            risk_cfg = getattr(self.config, 'risk', {})
-            if hasattr(risk_cfg, 'model_dump'):
-                risk_cfg = risk_cfg.model_dump()
-            elif hasattr(risk_cfg, 'dict'):
-                risk_cfg = risk_cfg.dict()
+            tunable_params = getattr(self.config, 'TUNABLE_PARAMS', None)
+            if tunable_params:
+                risk_cfg = getattr(tunable_params, 'risk', {})
+                if hasattr(risk_cfg, 'model_dump'):
+                    risk_cfg = risk_cfg.model_dump()
+                elif hasattr(risk_cfg, 'dict'):
+                    risk_cfg = risk_cfg.dict()
+            else:
+                risk_cfg = getattr(self.config, 'risk', {})
+                if hasattr(risk_cfg, 'model_dump'):
+                    risk_cfg = risk_cfg.model_dump()
+                elif hasattr(risk_cfg, 'dict'):
+                    risk_cfg = risk_cfg.dict()
 
         base_limit = risk_cfg.get('max_balance_usage_pct', 0.66)
         high_limit = risk_cfg.get('high_confidence_limit_pct', 0.75)

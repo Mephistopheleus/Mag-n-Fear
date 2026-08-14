@@ -71,22 +71,23 @@ class AutoTuner:
         direction = 1 if pnl > 0 else -1
         
         # 2. Коррекция весов анализаторов
+        # ВЕСА ЧИТАЕМ И ЗАПИСЫВАЕМ ВНУТРЬ TUNABLE_PARAMS['analyzers']
         analyzer_scores = snapshot.get('analyzer_scores', {})
         
+        tunable_params = self.config.get('TUNABLE_PARAMS', {})
+        analyzers_tunable = tunable_params.get('analyzers', {})
+        
         updated_weights = {}
-        # Путь к весам в конфиге
-        if 'analysis' not in self.config:
-            self.config['analysis'] = {}
-        if 'weights' not in self.config['analysis']:
-            self.config['analysis']['weights'] = {}
-            
-        current_weights = self.config['analysis']['weights']
         
         for name, score in analyzer_scores.items():
             if score == 0:
                 continue
-                
-            current_weight = current_weights.get(name, 0.5)
+            
+            # Получаем текущий weight из TUNABLE_PARAMS['analyzers'][name]
+            if name not in analyzers_tunable:
+                analyzers_tunable[name] = {'weight': 0.5, 'confidence_factor': 0.1}
+            
+            current_weight = analyzers_tunable[name].get('weight', 0.5)
             
             # Расчет дельты: знак прибыли * сила сигнала * шаг
             delta = direction * abs(score) * self.max_step_pct
@@ -96,14 +97,17 @@ class AutoTuner:
             # Ограничение диапазона [0.1, 1.0]
             new_weight = max(0.1, min(1.0, new_weight))
             
-            updated_weights[name] = new_weight
+            analyzers_tunable[name]['weight'] = round(new_weight, 4)
+            updated_weights[name] = analyzers_tunable[name]['weight']
 
-        # Нормализация весов (сумма = 1.0)
-        total = sum(updated_weights.values())
+        # Нормализация весов (сумма = 1.0) - теперь внутри TUNABLE_PARAMS
+        total = sum(a.get('weight', 0) for a in analyzers_tunable.values())
         if total > 0:
-            for name in updated_weights:
-                updated_weights[name] /= total
-                self.config['analysis']['weights'][name] = round(updated_weights[name], 4)
+            for name in analyzers_tunable:
+                if 'weight' in analyzers_tunable[name]:
+                    analyzers_tunable[name]['weight'] = round(analyzers_tunable[name]['weight'] / total, 4)
+        
+        tunable_params['analyzers'] = analyzers_tunable
 
         # 3. Коррекция ВСЕХ настраиваемых параметров из TUNABLE_PARAMS
         # Читаем и записываем изменения ВНУТРЬ секции TUNABLE_PARAMS
