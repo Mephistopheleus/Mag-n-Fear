@@ -95,6 +95,8 @@ class Executor:
             self._client = None
             self._running = True
             asyncio.create_task(self._process_queue())
+            # Запуск фонового мониторинга SL даже в режиме симуляции
+            self._sl_monitor_task = asyncio.create_task(self._verify_positions_loop())
             print(f"[Executor] Started (testnet={self.testnet}, simulation_mode=True)")
             return
         
@@ -110,6 +112,8 @@ class Executor:
         
         # Запуск обработчика очереди
         asyncio.create_task(self._process_queue())
+        # Запуск фонового процесса проверки SL на бирже (раз в 5 мин)
+        self._sl_monitor_task = asyncio.create_task(self._verify_positions_loop())
         print(f"[Executor] Started (testnet={self.testnet})")
     
     async def _sync_positions_from_exchange(self):
@@ -157,13 +161,98 @@ class Executor:
                 
         except Exception as e:
             logger.error(f"[Executor] Error syncing positions: {e}", exc_info=True)
+    
+    async def _verify_positions_loop(self):
+        """
+        Фоновый процесс проверки всех открытых позиций на наличие SL.
+        Запускается раз в 5 минут (sl_check_interval).
+        """
+        logger.info(f"[Executor] SL monitor started (interval={self.sl_check_interval}s)")
+        
+        while self._running:
+            try:
+                await asyncio.sleep(self.sl_check_interval)
+                
+                if not self._active_positions:
+                    continue
+                
+                logger.info(f"[Executor] Verifying SL for {len(self._active_positions)} active positions...")
+                
+                for symbol, pos in list(self._active_positions.items()):
+                    stop_loss_price = pos.get('stop_loss')
+                    if not stop_loss_price:
+                        logger.warning(f"[Executor] Position {symbol} has no SL! Attempting to restore...")
+                        # Попытка восстановить SL из внутренних данных
+                        entry_price = pos.get('entry_price', 0)
+                        side = pos.get('side', 'LONG')
+                        if entry_price > 0:
+                            risk_cfg = self.config.get('risk', {})
+                            if hasattr(risk_cfg, 'dict'):
+                                risk_dict = risk_cfg.dict()
+                            else:
+                                risk_dict = risk_cfg
+                            stop_loss_pct = risk_dict.get('stop_loss_pct', 0.01)
+                            
+                            if side == 'LONG':
+                                stop_loss_price = entry_price * (1 - stop_loss_pct)
+                            else:
+                                stop_loss_price = entry_price * (1 + stop_loss_pct)
+                            
+                            pos['stop_loss'] = stop_loss_price
+                            logger.info(f"[Executor] Restored SL for {symbol}: {stop_loss_price}")
+                    
+                    # Проверка наличия SL ордера на бирже (только если есть клиент)
+                    if self._client:
+                        try:
+                            # Получаем все открытые ордера для символа
+                            open_orders = await self._client.futures_get_open_orders(symbol=symbol)
+                            
+                            # Проверяем, есть ли среди них стоп-лосс
+                            has_stop_loss = False
+                            for order in open_orders:
+                                if order.get('type') in ['STOP_MARKET', 'STOP_LOSS', 'TAKE_PROFIT_MARKET']:
+                                    if order.get('reduceOnly', False):
+                                        has_stop_loss = True
+                                        break
+                            
+                            if not has_stop_loss and stop_loss_price:
+                                logger.warning(f"[Executor] No SL order found on exchange for {symbol}. Re-creating...")
+                                quantity = pos.get('quantity', 0)
+                                side = pos.get('side', 'LONG')
+                                stop_side = 'SELL' if side == 'LONG' else 'BUY'
+                                
+                                await self._place_stop_loss_order(symbol, stop_loss_price, quantity, stop_side)
+                                logger.info(f"[Executor] SL order re-created for {symbol}")
+                                
+                        except Exception as e:
+                            logger.error(f"[Executor] Error checking orders for {symbol}: {e}")
+                
+                logger.info("[Executor] SL verification complete")
+                
+            except asyncio.CancelledError:
+                logger.info("[Executor] SL monitor stopped")
+                break
+            except Exception as e:
+                logger.error(f"[Executor] Error in SL monitor loop: {e}", exc_info=True)
+                await asyncio.sleep(10)  # Защита от бесконечного цикла ошибок
+        
+        logger.info("[Executor] SL monitor loop exited")
         
     async def stop(self):
         """Остановка и закрытие клиента с выставлением стоп-лоссов по активным позициям."""
         logger.info("[Executor] Stopping - closing all positions with stop-loss...")
         
+        # Остановка фонового мониторинга SL
+        self._running = False
+        if self._sl_monitor_task:
+            self._sl_monitor_task.cancel()
+            try:
+                await self._sl_monitor_task
+            except asyncio.CancelledError:
+                pass
+        
         # Если есть активные позиции - выставляем для них стоп-лосс ордера
-        if self._active_positions:
+        if self._active_positions and self._client:
             for symbol, pos in self._active_positions.items():
                 try:
                     stop_loss_price = pos.get('stop_loss')
@@ -188,7 +277,6 @@ class Executor:
                 except Exception as e:
                     logger.error(f"[Executor] Failed to set stop-loss for {symbol}: {e}")
         
-        self._running = False
         if self._client:
             await self._client.close_connection()
         logger.info("[Executor] Stopped")
