@@ -314,7 +314,6 @@ TUNABLE_PARAMS:
   tuner:
     enabled: true
     learning_mode: false  # false = LIVE, true = только симуляция
-    min_trades_for_update: 50
     impact_threshold: 0.05
     target_metrics:
       pnl_day_target: 1.0    # 100% PnL в день (идеал для градиента)
