@@ -11,6 +11,7 @@
 api_keys:
   binance_testnet_api_key: mYVqkHL4mSwEiHrHC6PaurPUHOV7auYwXXpkSmMX7hSSY8KT7teRmbQV6BY9YD3i
   binance_testnet_api_secret: ym3B6HkI6ervEsc4We0jr47O51tueW8CRTqpU6TxbpwzKsxAtLWtGKtbeUQ86aBf
+  binance_testnet_enabled: true  # Единая настройка сети для REST и WebSocket
   
   # Новостные API
   finnhub_api_key: d9q5s1pr01qo4q2sbe7gd9q5s1pr01qo4q2sbe80

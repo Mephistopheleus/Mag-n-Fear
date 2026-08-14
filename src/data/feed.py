@@ -75,7 +75,13 @@ class BinanceFuturesFeed:
         self._ws_tasks: List[asyncio.Task] = []
         
         # Параметры синхронизации стакана (читаем из конфига с дефолтными значениями)
-        data_feed_cfg = self.config.get("data_feed", {}) if isinstance(self.config, dict) else getattr(self.config, 'data_feed', {})
+        # Конфиг может быть dict или Pydantic моделью, данные находятся в system.data_feed
+        if isinstance(self.config, dict):
+            system_cfg = self.config.get("system", {})
+            data_feed_cfg = system_cfg.get("data_feed", {}) if isinstance(system_cfg, dict) else {}
+        else:
+            system_cfg = getattr(self.config, 'system', None)
+            data_feed_cfg = getattr(system_cfg, 'data_feed', {}) if system_cfg else {}
         
         # Интервал синхронизации в секундах (по умолчанию 300 сек = 5 мин)
         rest_sync_min = data_feed_cfg.get("rest_sync_interval_min", 5) if isinstance(data_feed_cfg, dict) else getattr(data_feed_cfg, 'rest_sync_interval_min', 5)
@@ -85,6 +91,16 @@ class BinanceFuturesFeed:
         divergence_pct = data_feed_cfg.get("orderbook_divergence_threshold_pct", 1.0) if isinstance(data_feed_cfg, dict) else getattr(data_feed_cfg, 'orderbook_divergence_threshold_pct', 1.0)
         self._divergence_threshold: float = divergence_pct / 100.0
         
+        # Режим тестовой сети (по умолчанию True для безопасности)
+        if isinstance(self.config, dict):
+            api_keys_cfg = self.config.get("api_keys", {})
+            testnet_default = api_keys_cfg.get("binance_testnet_enabled", True) if isinstance(api_keys_cfg, dict) else True
+        else:
+            api_keys_cfg = getattr(self.config, 'api_keys', None)
+            testnet_default = getattr(api_keys_cfg, 'binance_testnet_enabled', True) if api_keys_cfg else True
+        
+        self.testnet_mode: bool = testnet_default
+        
         # Время последней синхронизации
         self._last_sync_time: float = 0.0
     
@@ -92,8 +108,8 @@ class BinanceFuturesFeed:
         """Инициализация клиента и подключение."""
         logger.info("Initializing Binance Futures client...")
         
-        # Определяем testnet режим - всегда True для тестнета
-        testnet = True
+        # Используем testnet режим из конфигурации (единая настройка для REST и WS)
+        testnet = self.testnet_mode
         
         self.client = await AsyncClient.create(
             api_key=self.api_key,
