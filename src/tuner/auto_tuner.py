@@ -56,8 +56,8 @@ class AutoTuner:
         """Загружает все карточки из хранилища."""
         self.cards = []
         
-        # Путь к SQLite базе данных
-        db_path = self.cards_path.parent / "trading_history.db"
+        # Путь к SQLite базе данных (.brain файл)
+        db_path = self.cards_path.parent / "trading.brain"
         
         # Приоритет 1: Загрузка из SQLite базы данных
         if db_path.exists():

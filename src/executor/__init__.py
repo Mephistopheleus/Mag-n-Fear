@@ -675,8 +675,8 @@ class Executor:
         # Создаем директорию если не существует
         os.makedirs(cards_path, exist_ok=True)
         
-        # Путь к SQLite базе данных
-        db_path = os.path.join(os.path.dirname(cards_path), "trading_history.db")
+        # Путь к SQLite базе данных (.brain файл)
+        db_path = os.path.join(os.path.dirname(cards_path), "trading.brain")
         
         # Создаем карточку со всеми данными
         tuner_notes = scenario.get("tuner_notes", {})
