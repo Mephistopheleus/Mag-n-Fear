@@ -362,11 +362,11 @@ system:
     
   storage:
     type: "sqlite"
-    db_path: "data_storage/history.db"
+    db_path: "data_storage/trading.brain"
     matrix_cache_path: "data_storage/matrix_cache.parquet"
-    max_snapshots_db_mb: 10
-    max_tuner_logs_mb: 1.5
-    max_history_mb: 5
+    max_snapshots_db_mb: 13.0
+    max_tuner_logs_mb: 2.0
+    max_history_mb: 5.0
     
   data:
     primary_symbol: "DOGEUSDT"

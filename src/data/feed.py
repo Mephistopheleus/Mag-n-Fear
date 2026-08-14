@@ -73,6 +73,11 @@ class BinanceFuturesFeed:
         
         self._running = False
         self._ws_tasks: List[asyncio.Task] = []
+        
+        # Параметры синхронизации стакана
+        self._last_sync_time: float = 0.0
+        self._sync_interval_sec: int = 300  # 5 минут
+        self._divergence_threshold: float = 0.01  # 1% порог расхождения
     
     async def start(self):
         """Инициализация клиента и подключение."""
@@ -192,8 +197,82 @@ class BinanceFuturesFeed:
             # Сделки
             task_tr = asyncio.create_task(self._run_trades_ws(symbol))
             self._ws_tasks.append(task_tr)
+        
+        # Запускаем задачу синхронизации стакана через REST
+        task_sync = asyncio.create_task(self._run_sync_loop())
+        self._ws_tasks.append(task_sync)
+        
+        logger.info(f"WebSocket tasks created for {len(self.symbols)} symbols + sync loop.")
+
+    async def _run_sync_loop(self):
+        """Фоновый цикл синхронизации стакана через REST API раз в 5 минут."""
+        logger.info(f"Starting orderbook sync loop (interval={self._sync_interval_sec}s, threshold={self._divergence_threshold*100}%)")
+        
+        while self._running:
+            await asyncio.sleep(60)  # Проверяем каждую минуту
             
-        logger.info(f"WebSocket tasks created for {len(self.symbols)} symbols.")
+            current_time = datetime.utcnow().timestamp()
+            if current_time - self._last_sync_time >= self._sync_interval_sec:
+                for symbol in self.symbols:
+                    await self._sync_orderbook_rest(symbol)
+                self._last_sync_time = current_time
+
+    async def _sync_orderbook_rest(self, symbol: str):
+        """Синхронизация локального стакана с REST API Binance."""
+        if not self.client:
+            logger.warning(f"Client not initialized, skipping sync for {symbol}")
+            return
+        
+        try:
+            # Получаем актуальный стакан через REST
+            rest_orderbook = await self.client.get_order_book(symbol=symbol, limit=20)
+            rest_bids = [[float(b[0]), float(b[1])] for b in rest_orderbook['bids']]
+            rest_asks = [[float(a[0]), float(a[1])] for a in rest_orderbook['asks']]
+            
+            # Получаем локальный стакан из WS
+            local_ob = self.order_books.get(symbol)
+            if not local_ob or not local_ob['bids'] or not local_ob['asks']:
+                logger.info(f"[SYNC] No local data for {symbol}, replacing with REST data")
+                self.order_books[symbol] = {
+                    'bids': rest_bids,
+                    'asks': rest_asks,
+                    'timestamp': datetime.utcnow()
+                }
+                return
+            
+            # Сравниваем цены лучших уровней
+            local_bid_price = local_ob['bids'][0][0]
+            local_ask_price = local_ob['asks'][0][0]
+            rest_bid_price = rest_bids[0][0]
+            rest_ask_price = rest_asks[0][0]
+            
+            # Расчет расхождения в %
+            bid_diff = abs(local_bid_price - rest_bid_price) / local_bid_price
+            ask_diff = abs(local_ask_price - rest_ask_price) / local_ask_price
+            max_diff = max(bid_diff, ask_diff)
+            
+            logger.debug(f"[SYNC] {symbol}: local_bid={local_bid_price}, rest_bid={rest_bid_price}, diff={bid_diff*100:.4f}%")
+            
+            # Если расхождение > порога (1%), заменяем локальный стакан на REST
+            if max_diff > self._divergence_threshold:
+                logger.warning(f"[SYNC] {symbol}: divergence {max_diff*100:.4f}% > threshold {self._divergence_threshold*100}%. Replacing with REST data.")
+                self.order_books[symbol] = {
+                    'bids': rest_bids,
+                    'asks': rest_asks,
+                    'timestamp': datetime.utcnow()
+                }
+                
+                # Уведомляем подписчиков об обновлении
+                for callback in self._orderbook_callbacks:
+                    try:
+                        callback(symbol, self.order_books[symbol])
+                    except Exception as e:
+                        logger.error(f"Error in orderbook callback after sync: {e}")
+            else:
+                logger.debug(f"[SYNC] {symbol}: OK (diff={max_diff*100:.4f}%)")
+                
+        except Exception as e:
+            logger.error(f"[SYNC] Error syncing {symbol} via REST: {e}")
 
     async def _run_orderbook_ws(self, symbol: str):
         """WS задача для стакана."""
