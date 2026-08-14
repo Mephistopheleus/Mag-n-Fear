@@ -1,43 +1,57 @@
 ```
-# Binary/compiled files
-*.brain
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+.env.*
 
 # Dependencies
+.venv/
+venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Environment
-.venv/
-venv/
-env/
-ENV/
-
-# Build outputs
+# Build artifacts
 build/
 dist/
 *.egg-info/
 
-# Logs
-*.log
-
-# Editor/IDE
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
 
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
 # Testing
+.coverage
+htmlcov/
+.coverage.*
+.cache
 .pytest_cache/
 .mypy_cache/
+
+# Distribution / packaging
+*.tar.gz
+*.whl
+*.zip
+
+# Local configuration
+config/local_settings.py
+*.local
+
+# Compiled Python
+*.so
+*.dylib
+*.dll
+
+# Original rules preserved
+*.log
 ```

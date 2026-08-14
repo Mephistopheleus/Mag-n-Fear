@@ -74,10 +74,19 @@ class BinanceFuturesFeed:
         self._running = False
         self._ws_tasks: List[asyncio.Task] = []
         
-        # Параметры синхронизации стакана
+        # Параметры синхронизации стакана (читаем из конфига с дефолтными значениями)
+        data_feed_cfg = self.config.get("data_feed", {}) if isinstance(self.config, dict) else getattr(self.config, 'data_feed', {})
+        
+        # Интервал синхронизации в секундах (по умолчанию 300 сек = 5 мин)
+        rest_sync_min = data_feed_cfg.get("rest_sync_interval_min", 5) if isinstance(data_feed_cfg, dict) else getattr(data_feed_cfg, 'rest_sync_interval_min', 5)
+        self._sync_interval_sec: int = rest_sync_min * 60
+        
+        # Порог расхождения в % (по умолчанию 1.0%)
+        divergence_pct = data_feed_cfg.get("orderbook_divergence_threshold_pct", 1.0) if isinstance(data_feed_cfg, dict) else getattr(data_feed_cfg, 'orderbook_divergence_threshold_pct', 1.0)
+        self._divergence_threshold: float = divergence_pct / 100.0
+        
+        # Время последней синхронизации
         self._last_sync_time: float = 0.0
-        self._sync_interval_sec: int = 300  # 5 минут
-        self._divergence_threshold: float = 0.01  # 1% порог расхождения
     
     async def start(self):
         """Инициализация клиента и подключение."""
@@ -276,7 +285,7 @@ class BinanceFuturesFeed:
 
     async def _run_orderbook_ws(self, symbol: str):
         """WS задача для стакана."""
-        url = f"wss://fstream.binancefuture.com/ws/{symbol.lower()}@depth20@100ms"
+        url = f"wss://fstream.binance.com/ws/{symbol.lower()}@depth20@100ms"
         while self._running:
             try:
                 async with self.ws_session.ws_connect(url) as ws:
@@ -293,7 +302,7 @@ class BinanceFuturesFeed:
 
     async def _run_trades_ws(self, symbol: str):
         """WS задача для сделок."""
-        url = f"wss://fstream.binancefuture.com/ws/{symbol.lower()}@aggTrade"
+        url = f"wss://fstream.binance.com/ws/{symbol.lower()}@aggTrade"
         while self._running:
             try:
                 async with self.ws_session.ws_connect(url) as ws:

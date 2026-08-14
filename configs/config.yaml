@@ -351,6 +351,7 @@ system:
   data_feed:
     websocket_depth: 20        # Количество уровней для WebSocket (depth20)
     rest_sync_interval_min: 5  # Интервал синхронизации через REST (минуты)
+    orderbook_divergence_threshold_pct: 1.0  # Порог расхождения стакана (%) для принудительной синхронизации
     force_sl_at_entry: true    # ГАРАНТИЯ: Выставлять SL сразу при открытии
   
   logging:
