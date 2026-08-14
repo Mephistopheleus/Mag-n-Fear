@@ -98,6 +98,7 @@ class StorageConfig(BaseModel):
 class ApiKeysConfig(BaseModel):
     binance_testnet_api_key: str = ""
     binance_testnet_api_secret: str = ""
+    binance_testnet_enabled: bool = False
 
 
 class NewsConfig(BaseModel):
