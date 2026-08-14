@@ -14,25 +14,15 @@ env/
 .env.*
 
 # Build artifacts
-dist/
 build/
+dist/
 *.egg-info/
 
 # Logs
 *.log
 
-# Editors
-.vscode/
-.idea/
+# Temporary files
+*.tmp
 *.swp
-*.swo
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Testing
-.pytest_cache/
-.mypy_cache/
+*~
 ```

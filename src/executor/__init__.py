@@ -207,10 +207,13 @@ class Executor:
                             # Получаем все открытые ордера для символа
                             open_orders = await self._client.futures_get_open_orders(symbol=symbol)
                             
-                            # Проверяем, есть ли среди них стоп-лосс
+                            # Проверяем, есть ли среди них стоп-лосс (не путать с Take Profit!)
                             has_stop_loss = False
                             for order in open_orders:
-                                if order.get('type') in ['STOP_MARKET', 'STOP_LOSS', 'TAKE_PROFIT_MARKET']:
+                                order_type = order.get('type', '')
+                                # STOP_MARKET или STOP_LOSS с reduceOnly = это стоп-лосс
+                                # TAKE_PROFIT_MARKET - это тейк-профит, не считаем его защитой
+                                if order_type in ['STOP_MARKET', 'STOP_LOSS']:
                                     if order.get('reduceOnly', False):
                                         has_stop_loss = True
                                         break
@@ -219,9 +222,10 @@ class Executor:
                                 logger.warning(f"[Executor] No SL order found on exchange for {symbol}. Re-creating...")
                                 quantity = pos.get('quantity', 0)
                                 side = pos.get('side', 'LONG')
-                                stop_side = 'SELL' if side == 'LONG' else 'BUY'
                                 
-                                await self._place_stop_loss_order(symbol, stop_loss_price, quantity, stop_side)
+                                # Передаём исходную сторону позиции (LONG/SHORT), 
+                                # _place_stop_loss_order сам инвертирует её в SELL/BUY
+                                await self._place_stop_loss_order(symbol, stop_loss_price, quantity, side)
                                 logger.info(f"[Executor] SL order re-created for {symbol}")
                                 
                         except Exception as e:

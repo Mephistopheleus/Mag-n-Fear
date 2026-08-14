@@ -106,15 +106,12 @@ class AutoTuner:
                 self.config['analysis']['weights'][name] = round(updated_weights[name], 4)
 
         # 3. Коррекция ВСЕХ настраиваемых параметров из TUNABLE_PARAMS
-        # Используем секцию TUNABLE_PARAMS из конфига как шаблон
+        # Читаем и записываем изменения ВНУТРЬ секции TUNABLE_PARAMS
         tunable_params = self.config.get('TUNABLE_PARAMS', {})
         
         # --- Risk параметры ---
-        if 'risk' in tunable_params and 'risk' not in self.config:
-            self.config['risk'] = {}
-        
         risk_tunable = tunable_params.get('risk', {})
-        risk_current = self.config.get('risk', {})
+        risk_current = risk_tunable.copy()  # Работаем внутри TUNABLE_PARAMS['risk']
         
         # Параметры риска для обновления
         risk_param_map = {
@@ -157,14 +154,11 @@ class AutoTuner:
                 new_val = max(min_val, min(max_val, new_val))
                 risk_current[param_name] = round(new_val, 6)
         
-        self.config['risk'] = risk_current
+        tunable_params['risk'] = risk_current
         
         # --- Leverage параметры ---
-        if 'leverage' in tunable_params and 'leverage' not in self.config:
-            self.config['leverage'] = {}
-        
         leverage_tunable = tunable_params.get('leverage', {})
-        leverage_current = self.config.get('leverage', {})
+        leverage_current = leverage_tunable.copy()  # Работаем внутри TUNABLE_PARAMS['leverage']
         
         leverage_param_map = {
             'base_leverage': (1, 3),
@@ -194,14 +188,11 @@ class AutoTuner:
                 new_val = max(min_val, min(max_val, new_val))
                 leverage_current[param_name] = round(new_val, 4)
         
-        self.config['leverage'] = leverage_current
+        tunable_params['leverage'] = leverage_current
         
         # --- Trailing Stop параметры ---
-        if 'trailing_stop' in tunable_params and 'trailing_stop' not in self.config:
-            self.config['trailing_stop'] = {}
-        
         trailing_tunable = tunable_params.get('trailing_stop', {})
-        trailing_current = self.config.get('trailing_stop', {})
+        trailing_current = trailing_tunable.copy()  # Работаем внутри TUNABLE_PARAMS['trailing_stop']
         
         trailing_param_map = {
             'atr_multiplier_base': (1.0, 3.0),
@@ -239,61 +230,67 @@ class AutoTuner:
                 new_val = max(min_val, min(max_val, new_val))
                 trailing_current[param_name] = round(new_val, 4)
         
-        self.config['trailing_stop'] = trailing_current
+        tunable_params['trailing_stop'] = trailing_current
         
         # --- Analyzer параметры (веса и confidence_factor) ---
-        if 'analyzers' in tunable_params:
-            analyzers_tunable = tunable_params.get('analyzers', {})
-            analyzers_current = self.config.get('analyzers', {})
+        analyzers_tunable = tunable_params.get('analyzers', {})
+        analyzers_current = analyzers_tunable.copy()  # Работаем внутри TUNABLE_PARAMS['analyzers']
+        
+        for analyzer_name, analyzer_cfg in analyzers_tunable.items():
+            if analyzer_name not in analyzers_current:
+                analyzers_current[analyzer_name] = {}
             
-            for analyzer_name, analyzer_cfg in analyzers_tunable.items():
-                if analyzer_name not in analyzers_current:
-                    analyzers_current[analyzer_name] = {}
-                
-                current_analyzer = analyzers_current[analyzer_name]
-                
-                # Обновление confidence_factor
-                if 'confidence_factor' in analyzer_cfg:
-                    current_cf = current_analyzer.get('confidence_factor', analyzer_cfg['confidence_factor'])
-                    
-                    if pnl > 0:
-                        delta = current_cf * self.max_step_pct
-                    else:
-                        delta = -current_cf * self.max_step_pct
-                    
-                    new_cf = current_cf + delta
-                    new_cf = max(0.05, min(0.5, new_cf))
-                    current_analyzer['confidence_factor'] = round(new_cf, 4)
-                
-                # Обновление weight (если есть)
-                if 'weight' in analyzer_cfg:
-                    current_w = current_analyzer.get('weight', analyzer_cfg.get('weight', 1.0))
-                    
-                    if pnl > 0:
-                        delta = current_w * self.max_step_pct
-                    else:
-                        delta = -current_w * self.max_step_pct
-                    
-                    new_w = current_w + delta
-                    new_w = max(0.1, min(2.0, new_w))
-                    current_analyzer['weight'] = round(new_w, 4)
+            current_analyzer = analyzers_current[analyzer_name]
             
-            self.config['analyzers'] = analyzers_current
+            # Обновление confidence_factor
+            if 'confidence_factor' in analyzer_cfg:
+                current_cf = current_analyzer.get('confidence_factor', analyzer_cfg['confidence_factor'])
+                
+                if pnl > 0:
+                    delta = current_cf * self.max_step_pct
+                else:
+                    delta = -current_cf * self.max_step_pct
+                
+                new_cf = current_cf + delta
+                new_cf = max(0.05, min(0.5, new_cf))
+                current_analyzer['confidence_factor'] = round(new_cf, 4)
+            
+            # Обновление weight (если есть)
+            if 'weight' in analyzer_cfg:
+                current_w = current_analyzer.get('weight', analyzer_cfg.get('weight', 1.0))
+                
+                if pnl > 0:
+                    delta = current_w * self.max_step_pct
+                else:
+                    delta = -current_w * self.max_step_pct
+                
+                new_w = current_w + delta
+                new_w = max(0.1, min(2.0, new_w))
+                current_analyzer['weight'] = round(new_w, 4)
+        
+        tunable_params['analyzers'] = analyzers_current
+        
+        # Сохраняем обновлённый TUNABLE_PARAMS обратно в конфиг
+        self.config['TUNABLE_PARAMS'] = tunable_params
 
         # 4. Сохранение изменений в конфиг
         self._save_config()
         
         # 5. Запись решения в БД (.brain)
+        # Вычисляем актуальный множитель риска из обновлённых параметров
+        dynamic_risk_multiplier = tunable_params['risk'].get('risk_per_trade_pct', 0.5) / 0.5  # Относительно базового 0.5%
+        
         decision_record = {
             'timestamp': datetime.now().isoformat(),
             'snapshot_id': snapshot.get('id'),
             'error_score': round(error_score, 4),
             'updated_weights': updated_weights,
-            'new_risk_multiplier': self.config['risk'].get('dynamic_risk_multiplier', 1.0),
+            'new_risk_multiplier': round(dynamic_risk_multiplier, 4),
             'updated_params': {
-                'risk': {k: v for k, v in self.config['risk'].items() if k != 'dynamic_risk_multiplier'},
-                'leverage': self.config.get('leverage', {}),
-                'trailing_stop': self.config.get('trailing_stop', {}),
+                'risk': {k: v for k, v in tunable_params['risk'].items() if k != 'dynamic_risk_multiplier'},
+                'leverage': tunable_params.get('leverage', {}),
+                'trailing_stop': tunable_params.get('trailing_stop', {}),
+                'analyzers': tunable_params.get('analyzers', {}),
             }
         }
         # Предполагаем, что у db_manager есть метод save_tuner_decision
