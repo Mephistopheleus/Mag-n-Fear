@@ -211,10 +211,11 @@ class Executor:
                             has_stop_loss = False
                             for order in open_orders:
                                 order_type = order.get('type', '')
-                                # STOP_MARKET или STOP_LOSS с reduceOnly = это стоп-лосс
+                                # STOP_MARKET или STOP_LOSS с closePosition = это стоп-лосс
                                 # TAKE_PROFIT_MARKET - это тейк-профит, не считаем его защитой
                                 if order_type in ['STOP_MARKET', 'STOP_LOSS']:
-                                    if order.get('reduceOnly', False):
+                                    # closePosition=True означает что ордер закрывает всю позицию (это SL)
+                                    if order.get('closePosition', False):
                                         has_stop_loss = True
                                         break
                             
